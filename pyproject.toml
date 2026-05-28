@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools", "setuptools-scm"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ugp"
+description = "Uncertainty-Guided Policies: Test-Time Alignment with Reward Model Uncertainty"
+version = "0.1.0"
+requires-python = ">=3.10"
+dependencies = [
+    "torch>=2.0",
+    "transformers>=4.40",
+    "datasets>=2.18",
+    "accelerate>=0.28",
+    "numpy",
+    "typer>=0.9",
+    "tqdm",
+]
+
+[project.optional-dependencies]
+train = [
+    "peft>=0.10",
+    "bitsandbytes>=0.43",
+    "wandb",
+]
+
+[tool.black]
+line-length = 120
+target-version = ['py310']

@@ -1,0 +1,81 @@
+
+
+# --- Generation Model ---
+generation:
+  model_name: "Qwen/Qwen2.5-7B-Instruct"
+  max_new_tokens: 512
+  temperature: 0.7
+  top_p: 0.9
+  torch_dtype: "bfloat16"
+  load_in_4bit: false
+
+# --- RM Mode ---
+# "trivial" = pre-trained scalar RMs (no training needed)
+# "robust"  = uncertainty-aware RMs with learned (mu, sigma)
+rm_mode: "trivial"
+
+# --- Trivial RM Ensemble (rm_mode: trivial) ---
+reward_models:
+  model_names:
+    - "OpenAssistant/reward-model-deberta-v3-base"
+    - "OpenAssistant/reward-model-deberta-v3-large-v2"
+  batch_size: 8
+
+# --- Robust URM Ensemble (rm_mode: robust) ---
+# Train first: python -m src.reward_modeling.uncertainty_rm --n-ensemble 3 --output-dir models/urm_ensemble
+urm:
+  ensemble_dir: "models/urm_ensemble"
+  base_model: "microsoft/deberta-v3-base"
+  n_attributes: 5       # HelpSteer2: helpfulness, correctness, coherence, complexity, verbosity
+
+# --- BoN Settings ---
+bon:
+  n: 8                  # Number of parallel candidates
+  lam: 0.05            # lambda for risk-adjusted: mu - lambda*sigma^2
+
+# --- Sequential RF-SeqBoN Settings ---
+sequential:
+  n: 8                  # Number of sequential samples
+  gamma_vanilla: 0.0    # Reward threshold for vanilla RF-SeqBoN
+  gamma_sharpe: 1.0     # Sharpe-ratio threshold for variance-aware RF-SeqBoN
+
+# --- Controller Settings ---
+# controller_type: "threshold" | "thompson" | "lcb" | "cvar"
+controller:
+  type: "threshold"
+  uncertainty_top_k: 3
+  u_low: 0.05          # Below this → BoN (RM is confident)
+  u_high: 0.2          # Above this → Early stop (RM is unreliable)
+
+# --- Dataset ---
+# Supported: "gsm8k", "math500", "alpaca_eval"
+dataset:
+  name: "gsm8k"
+  split: "test"
+  max_examples: 50      # Set to null for full dataset
+
+# --- Output ---
+output:
+  path: "runs/results.jsonl"
+
+# --- Trivial RM Training () for custom scalar RMs) ---
+rm_training:
+  base_model: "microsoft/deberta-v3-base"
+  n_ensemble: 3
+  num_epochs: 2
+  batch_size: 8
+  learning_rate: 1.0e-5
+  max_pairs: 2000
+  output_dir: "models/ensemble_rm"
+
+# --- URM Training (for robust mode) ---
+urm_training:
+  base_model: "microsoft/deberta-v3-base"
+  n_ensemble: 3
+  n_attributes: 5
+  num_epochs: 3
+  batch_size: 16
+  learning_rate: 2.0e-5
+  max_length: 512
+  use_gating: true
+  output_dir: "models/urm_ensemble"
