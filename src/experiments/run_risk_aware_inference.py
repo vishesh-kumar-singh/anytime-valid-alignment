@@ -50,6 +50,8 @@ import numpy as np
 import typer
 from tqdm import tqdm
 
+from src.experiments.experiment_logger import ExperimentLogger
+
 from src.generation.generator import GenerationConfig, Generator
 from src.policies.controller import (
     BudgetConfig, decide_path, summarize_uncertainty,
@@ -906,12 +908,16 @@ def _evaluate_examples(
     scorer: RMScorer,
     examples: List[dict],
     desc: str = "Evaluating",
+    exp_logger: Optional[ExperimentLogger] = None,
 ) -> List[dict]:
     """Evaluate configured methods on a preloaded example set."""
     has_correctness = cfg.dataset in ("gsm8k", "math500")
     rows: List[dict] = []
     system_msg = _dataset_system_message(cfg.dataset)
     rng = np.random.default_rng(cfg.seed)
+
+    if exp_logger:
+        exp_logger.log_inference_start(len(examples), cfg.bon_n)
 
     for i, example in enumerate(tqdm(examples, desc=desc)):
         prompt = example["question"]
@@ -982,6 +988,7 @@ def _evaluate_examples(
                     generator, scorer, cfg,
                 ))
 
+        example_results = []
         for m in methods:
             is_correct = check_correctness(m.selected_answer, gold_answer, cfg.dataset) if has_correctness else None
             row = {
@@ -1014,6 +1021,13 @@ def _evaluate_examples(
                 "reward_model_names": cfg.reward_model_names,
             }
             rows.append(row)
+            example_results.append(row)
+
+        if exp_logger:
+            exp_logger.log_example_done(i, example_results)
+
+    if exp_logger:
+        exp_logger.log_inference_end(len(rows))
 
     return rows
 
@@ -1028,59 +1042,82 @@ def run_inference(cfg: ExperimentConfig) -> List[dict]:
     # Allow dataset names like "GSM8k" while preserving existing defaults.
     cfg.dataset = cfg.dataset.lower()
 
-    print(f"Loading generation model: {cfg.model_name}")
-    generator = Generator(
-        GenerationConfig(
-            model_name=cfg.model_name,
-            max_new_tokens=cfg.max_new_tokens,
-            temperature=cfg.temperature,
-            top_p=cfg.top_p,
-            torch_dtype=cfg.torch_dtype,
-            device=cfg.gen_device,
-            load_in_4bit=cfg.load_in_4bit,
+    # Initialize experiment logger
+    exp_name = f"{cfg.rm_mode}_{cfg.dataset}_n{cfg.bon_n}"
+    exp_logger = ExperimentLogger(log_dir="logs", experiment_name=exp_name)
+    exp_logger.log_environment()
+    exp_logger.log_config(cfg)
+
+    try:
+        t0 = time.time()
+        exp_logger.log_phase_start("model_loading", cfg.model_name)
+        print(f"Loading generation model: {cfg.model_name}")
+        generator = Generator(
+            GenerationConfig(
+                model_name=cfg.model_name,
+                max_new_tokens=cfg.max_new_tokens,
+                temperature=cfg.temperature,
+                top_p=cfg.top_p,
+                torch_dtype=cfg.torch_dtype,
+                device=cfg.gen_device,
+                load_in_4bit=cfg.load_in_4bit,
+            )
         )
-    )
+        exp_logger.log_phase_end("model_loading", time.time() - t0)
 
-    # Build RM scorer (trivial or robust)
-    scorer = build_scorer(cfg)
+        t0 = time.time()
+        exp_logger.log_phase_start("rm_loading", f"mode={cfg.rm_mode}")
+        scorer = build_scorer(cfg)
+        exp_logger.log_phase_end("rm_loading", time.time() - t0)
 
-    # Load dataset
-    print(f"Loading dataset: {cfg.dataset} ({cfg.dataset_split}) ...")
-    examples = load_dataset_examples(cfg.dataset, cfg.dataset_split, cfg.max_examples)
-    print(f"Running on {len(examples)} examples with N={cfg.bon_n} candidates")
-    print(f"RM mode: {cfg.rm_mode} | Controller: {cfg.controller_type} | Dataset: {cfg.dataset}\n")
+        # Load dataset
+        t0 = time.time()
+        exp_logger.log_phase_start("dataset_loading", cfg.dataset)
+        print(f"Loading dataset: {cfg.dataset} ({cfg.dataset_split}) ...")
+        examples = load_dataset_examples(cfg.dataset, cfg.dataset_split, cfg.max_examples)
+        exp_logger.log_phase_end("dataset_loading", time.time() - t0)
+        print(f"Running on {len(examples)} examples with N={cfg.bon_n} candidates")
+        print(f"RM mode: {cfg.rm_mode} | Controller: {cfg.controller_type} | Dataset: {cfg.dataset}\n")
 
-    has_correctness = cfg.dataset in ("gsm8k", "math500")
-    rows = _evaluate_examples(cfg, generator, scorer, examples, desc="Evaluating")
+        has_correctness = cfg.dataset in ("gsm8k", "math500")
+        rows = _evaluate_examples(cfg, generator, scorer, examples, desc="Evaluating", exp_logger=exp_logger)
 
-    # Save results
-    if cfg.output_path and cfg.save_jsonl:
-        out_path = Path(cfg.output_path)
-        out_path.parent.mkdir(parents=True, exist_ok=True)
-        with out_path.open("w", encoding="utf-8") as f:
-            for row in rows:
-                f.write(json.dumps(row, ensure_ascii=False) + "\n")
-        print(f"\nResults saved to {cfg.output_path}")
+        # Save results
+        if cfg.output_path and cfg.save_jsonl:
+            out_path = Path(cfg.output_path)
+            out_path.parent.mkdir(parents=True, exist_ok=True)
+            with out_path.open("w", encoding="utf-8") as f:
+                for row in rows:
+                    f.write(json.dumps(row, ensure_ascii=False) + "\n")
+            print(f"\nResults saved to {cfg.output_path}")
+            exp_logger.log_output_saved(cfg.output_path)
 
-    summary = _print_summary(rows, has_correctness)
+        summary = _print_summary(rows, has_correctness)
+        exp_logger.log_summary(summary)
 
-    # Persist summary metrics next to the configured output stem.
-    if cfg.output_path:
-        out_path = Path(cfg.output_path)
-        stem = out_path.stem
-        summary_json_path = out_path.parent / f"{stem}_summary.json"
-        summary_txt_path = out_path.parent / f"{stem}_summary.txt"
+        # Persist summary metrics next to the configured output stem.
+        if cfg.output_path:
+            out_path = Path(cfg.output_path)
+            stem = out_path.stem
+            summary_json_path = out_path.parent / f"{stem}_summary.json"
+            summary_txt_path = out_path.parent / f"{stem}_summary.txt"
 
-        with summary_json_path.open("w", encoding="utf-8") as f:
-            json.dump(summary, f, indent=2)
+            with summary_json_path.open("w", encoding="utf-8") as f:
+                json.dump(summary, f, indent=2)
 
-        with summary_txt_path.open("w", encoding="utf-8") as f:
-            f.write(_summary_to_text(summary, has_correctness))
+            with summary_txt_path.open("w", encoding="utf-8") as f:
+                f.write(_summary_to_text(summary, has_correctness))
 
-        print(f"Summary saved to {summary_json_path}")
-        print(f"Summary saved to {summary_txt_path}")
+            print(f"Summary saved to {summary_json_path}")
+            print(f"Summary saved to {summary_txt_path}")
+            exp_logger.log_output_saved(str(summary_json_path))
+            exp_logger.log_output_saved(str(summary_txt_path))
 
-    return rows
+        return rows
+
+    except Exception as e:
+        exp_logger.log_error(e, context="run_inference")
+        raise
 
 
 def _summary_to_text(summary: Dict[str, object], has_correctness: bool = True) -> str:
@@ -1276,6 +1313,7 @@ def main(
     gen_device: int = typer.Option(0, help="GPU index for generation model."),
     load_in_4bit: bool = typer.Option(False, help="4-bit quantization."),
     reward_load_in_4bit: bool = typer.Option(False, help="4-bit quantization for reward models."),
+    reward_batch_size: int = typer.Option(8, help="Batch size used when scoring candidates with reward models."),
     print_variances: bool = typer.Option(False, help="Print per-example candidate variances."),
     seed: int = typer.Option(42, help="Random seed for SoftBoN stochastic selection."),
     u_low: float = typer.Option(0.05, help="Controller low uncertainty threshold."),
@@ -1301,6 +1339,7 @@ def main(
         model_name=model_name,
         reward_model_names=parsed_reward_models,
         reward_load_in_4bit=reward_load_in_4bit,
+        reward_batch_size=reward_batch_size,
         rm_mode=rm_mode,
         urm_ensemble_dir=urm_ensemble_dir,
         urm_base_model=urm_base_model,
@@ -1590,117 +1629,187 @@ def ideas_suite(
         seed=seed,
     )
 
-    print(f"Loading generation model: {cfg.model_name}")
-    generator = Generator(
-        GenerationConfig(
-            model_name=cfg.model_name,
-            max_new_tokens=cfg.max_new_tokens,
-            temperature=cfg.temperature,
-            top_p=cfg.top_p,
-            torch_dtype=cfg.torch_dtype,
-            device=cfg.gen_device,
-            load_in_4bit=cfg.load_in_4bit,
-        )
-    )
-    scorer = build_scorer(cfg)
-    print(f"Loading dataset: {cfg.dataset}")
-    examples = load_dataset_examples(cfg.dataset, cfg.dataset_split, cfg.max_examples)
-    print(f"Ideas Suite: {len(examples)} examples | N={cfg.bon_n}")
-    print(f"Methods: vanilla_bon, bon_sharpe, mob_vanilla, mob_sharpe, wbon_inv_var, wbon_sharpe"
-          + (", adaptive_seqbon" if include_seq else ""))
+    # Initialize experiment logger
+    exp_logger = ExperimentLogger(log_dir="logs", experiment_name=f"ideas_suite_{dataset}")
+    exp_logger.log_environment()
+    exp_logger.log_config(cfg)
 
-    has_correctness = cfg.dataset in ("gsm8k", "math500")
-    system_msg = _dataset_system_message(cfg.dataset)
-    rng = np.random.default_rng(cfg.seed)
-    rows: List[dict] = []
-
-    for i, example in enumerate(tqdm(examples, desc="Ideas Suite")):
-        prompt = example["question"]
-        gold_answer = example.get("answer", "")
-
-        t_gen = time.perf_counter()
-        candidates = generator.generate(prompt, n=cfg.bon_n, system_msg=system_msg)
-        gen_time = time.perf_counter() - t_gen
-
-        t_rm = time.perf_counter()
-        raw_means, raw_variances = scorer.score(prompt, candidates)
-        member_scores = getattr(scorer, "last_member_scores", None)
-        means, variances = raw_means, raw_variances
-
-        # Apply normalization
-        if cfg.variance_norm_mode.lower() != "none" and member_scores is not None:
-            normalized_ms = _normalize_member_scores(
-                member_scores, cfg.variance_norm_mode, cfg.variance_norm_eps, cfg.variance_bound_tanh,
+    try:
+        t0 = time.time()
+        exp_logger.log_phase_start("model_loading", cfg.model_name)
+        print(f"Loading generation model: {cfg.model_name}")
+        generator = Generator(
+            GenerationConfig(
+                model_name=cfg.model_name,
+                max_new_tokens=cfg.max_new_tokens,
+                temperature=cfg.temperature,
+                top_p=cfg.top_p,
+                torch_dtype=cfg.torch_dtype,
+                device=cfg.gen_device,
+                load_in_4bit=cfg.load_in_4bit,
             )
-            norm_arr = np.asarray(normalized_ms, dtype=float)
-            means = np.mean(norm_arr, axis=0).tolist()
-            variances = np.var(norm_arr, axis=0, ddof=0).tolist()
-        rm_time = time.perf_counter() - t_rm
+        )
+        exp_logger.log_phase_end("model_loading", time.time() - t0)
 
-        # Run all methods
-        methods: List[MethodResult] = []
-        methods.append(run_vanilla_bon(candidates, means, variances))
-        methods.append(run_bon_sharpe(candidates, means, variances, eps=cfg.sharpe_eps))
-        methods.append(run_mob_bon(candidates, means, variances, n_bootstrap=mob_n_bootstrap,
-                                   subsample_frac=mob_subsample_frac, use_variance_weighting=False, rng=rng))
-        methods.append(run_mob_bon(candidates, means, variances, n_bootstrap=mob_n_bootstrap,
-                                   subsample_frac=mob_subsample_frac, use_variance_weighting=True,
-                                   eps=cfg.sharpe_eps, rng=rng))
+        t0 = time.time()
+        exp_logger.log_phase_start("rm_loading", f"mode={cfg.rm_mode}")
+        scorer = build_scorer(cfg)
+        exp_logger.log_phase_end("rm_loading", time.time() - t0)
 
-        # WBoN needs raw member_scores (before normalization)
-        if member_scores is not None:
-            methods.append(run_wbon(candidates, member_scores, eps=cfg.sharpe_eps))
-            methods.append(run_wbon_sharpe(candidates, member_scores, eps=cfg.sharpe_eps))
+        t0 = time.time()
+        exp_logger.log_phase_start("dataset_loading", cfg.dataset)
+        print(f"Loading dataset: {cfg.dataset}")
+        examples = load_dataset_examples(cfg.dataset, cfg.dataset_split, cfg.max_examples)
+        exp_logger.log_phase_end("dataset_loading", time.time() - t0)
 
-        # Adaptive SeqBoN (optional — slow)
-        if include_seq:
-            methods.append(run_adaptive_seqbon(
-                prompt, generator, scorer, cfg,
-                n_burnin=adaptive_burnin, gamma_percentile=adaptive_percentile,
-            ))
+        print(f"Ideas Suite: {len(examples)} examples | N={cfg.bon_n}")
+        print(f"Methods: vanilla_bon, bon_sharpe, mob_vanilla, mob_sharpe, wbon_inv_var, wbon_sharpe"
+              + (", adaptive_seqbon" if include_seq else ""))
 
-        for m in methods:
-            is_correct = check_correctness(m.selected_answer, gold_answer, cfg.dataset) if has_correctness else None
-            row = {
-                "example_index": i,
-                "prompt": prompt,
-                "ground_truth": gold_answer,
-                "method": m.method,
-                "selected_answer": m.selected_answer,
-                "is_correct": is_correct,
-                "reward_mean": m.reward_mean,
-                "reward_variance": m.reward_variance,
-                "score": m.score,
-                "n_candidates": m.n_candidates,
-                "n_rm_calls": m.n_rm_calls,
-                "latency_sec": m.latency_sec + gen_time + rm_time,
-                "rm_mode": cfg.rm_mode,
-                "dataset": cfg.dataset,
-            }
-            rows.append(row)
+        has_correctness = cfg.dataset in ("gsm8k", "math500")
+        system_msg = _dataset_system_message(cfg.dataset)
+        rng = np.random.default_rng(cfg.seed)
+        rows: List[dict] = []
 
-    # Save results
-    if cfg.output_path and cfg.save_jsonl:
-        out_path = Path(cfg.output_path)
-        out_path.parent.mkdir(parents=True, exist_ok=True)
-        with out_path.open("w", encoding="utf-8") as f:
-            for row in rows:
-                f.write(json.dumps(row, ensure_ascii=False) + "\n")
-        print(f"\nResults saved to {cfg.output_path}")
+        # Setup output file and resume logic
+        completed_indices = set()
+        out_path = Path(cfg.output_path) if cfg.output_path and cfg.save_jsonl else None
+        
+        if out_path:
+            out_path.parent.mkdir(parents=True, exist_ok=True)
+            if out_path.exists():
+                with out_path.open("r", encoding="utf-8") as f:
+                    for line in f:
+                        row = json.loads(line)
+                        completed_indices.add(row["example_index"])
+                        rows.append(row)
+                print(f"Resuming: {len(completed_indices) // len(methods) if rows else 0} examples already completed.")
 
-    summary = _print_summary(rows, has_correctness)
+        total_to_do = len(examples) - (len(completed_indices) // 7)  # approx
+        exp_logger.log_inference_start(total_to_do, cfg.bon_n)
 
-    if cfg.output_path:
-        out_path = Path(cfg.output_path)
-        stem = out_path.stem
-        summary_json_path = out_path.parent / f"{stem}_summary.json"
-        summary_txt_path = out_path.parent / f"{stem}_summary.txt"
-        with summary_json_path.open("w", encoding="utf-8") as f:
-            json.dump(summary, f, indent=2)
-        with summary_txt_path.open("w", encoding="utf-8") as f:
-            f.write(_summary_to_text(summary, has_correctness))
-        print(f"Summary saved to {summary_json_path}")
-        print(f"Summary saved to {summary_txt_path}")
+        f_out = out_path.open("a", encoding="utf-8") if out_path else None
+        
+        try:
+            for i, example in enumerate(tqdm(examples, desc="Ideas Suite")):
+                if i in completed_indices:
+                    continue
+
+                prompt = example["question"]
+                gold_answer = example.get("answer", "")
+
+            t_gen = time.perf_counter()
+            candidates = generator.generate(prompt, n=cfg.bon_n, system_msg=system_msg)
+            gen_time = time.perf_counter() - t_gen
+
+            t_rm = time.perf_counter()
+            raw_means, raw_variances = scorer.score(prompt, candidates)
+            member_scores = getattr(scorer, "last_member_scores", None)
+            means, variances = raw_means, raw_variances
+
+            # Apply normalization
+            if cfg.variance_norm_mode.lower() != "none" and member_scores is not None:
+                normalized_ms = _normalize_member_scores(
+                    member_scores, cfg.variance_norm_mode, cfg.variance_norm_eps, cfg.variance_bound_tanh,
+                )
+                norm_arr = np.asarray(normalized_ms, dtype=float)
+                means = np.mean(norm_arr, axis=0).tolist()
+                variances = np.var(norm_arr, axis=0, ddof=0).tolist()
+            rm_time = time.perf_counter() - t_rm
+
+            # Run all methods
+            methods: List[MethodResult] = []
+            
+            # Individual RM Baselines
+            if member_scores is not None and cfg.reward_model_names:
+                for j, rm_name in enumerate(cfg.reward_model_names):
+                    m = run_vanilla_bon(candidates, member_scores[j], variances)
+                    short_name = rm_name.split('/')[-1]
+                    m.method = f"vanilla_bon ({short_name})"
+                    methods.append(m)
+
+            m_ens = run_vanilla_bon(candidates, means, variances)
+            m_ens.method = "vanilla_bon (ensemble)"
+            methods.append(m_ens)
+            methods.append(run_bon_sharpe(candidates, means, variances, eps=cfg.sharpe_eps))
+            methods.append(run_mob_bon(candidates, means, variances, n_bootstrap=mob_n_bootstrap,
+                                       subsample_frac=mob_subsample_frac, use_variance_weighting=False, rng=rng))
+            methods.append(run_mob_bon(candidates, means, variances, n_bootstrap=mob_n_bootstrap,
+                                       subsample_frac=mob_subsample_frac, use_variance_weighting=True,
+                                       eps=cfg.sharpe_eps, rng=rng))
+
+            # WBoN needs raw member_scores (before normalization)
+            if member_scores is not None:
+                methods.append(run_wbon(candidates, member_scores, eps=cfg.sharpe_eps))
+                methods.append(run_wbon_sharpe(candidates, member_scores, eps=cfg.sharpe_eps))
+
+            # Adaptive SeqBoN (optional — slow)
+            if include_seq:
+                methods.append(run_adaptive_seqbon(
+                    prompt, generator, scorer, cfg,
+                    n_burnin=adaptive_burnin, gamma_percentile=adaptive_percentile,
+                ))
+
+            example_results = []
+            for m in methods:
+                is_correct = check_correctness(m.selected_answer, gold_answer, cfg.dataset) if has_correctness else None
+                row = {
+                    "example_index": i,
+                    "prompt": prompt,
+                    "ground_truth": gold_answer,
+                    "method": m.method,
+                    "selected_answer": m.selected_answer,
+                    "is_correct": is_correct,
+                    "reward_mean": m.reward_mean,
+                    "reward_variance": m.reward_variance,
+                    "score": m.score,
+                    "n_candidates": m.n_candidates,
+                    "n_rm_calls": m.n_rm_calls,
+                    "latency_sec": m.latency_sec + gen_time + rm_time,
+                    "rm_mode": cfg.rm_mode,
+                    "dataset": cfg.dataset,
+                }
+                rows.append(row)
+                example_results.append(row)
+                
+                if f_out:
+                    f_out.write(json.dumps(row, ensure_ascii=False) + "\n")
+
+            if f_out:
+                f_out.flush()
+
+            exp_logger.log_example_done(i, example_results)
+
+        finally:
+            if f_out:
+                f_out.close()
+
+        exp_logger.log_inference_end(len(rows))
+
+        if cfg.output_path and cfg.save_jsonl:
+            print(f"\nResults saved to {cfg.output_path}")
+            exp_logger.log_output_saved(cfg.output_path)
+
+        summary = _print_summary(rows, has_correctness)
+        exp_logger.log_summary(summary)
+
+        if cfg.output_path:
+            out_path = Path(cfg.output_path)
+            stem = out_path.stem
+            summary_json_path = out_path.parent / f"{stem}_summary.json"
+            summary_txt_path = out_path.parent / f"{stem}_summary.txt"
+            with summary_json_path.open("w", encoding="utf-8") as f:
+                json.dump(summary, f, indent=2)
+            with summary_txt_path.open("w", encoding="utf-8") as f:
+                f.write(_summary_to_text(summary, has_correctness))
+            print(f"Summary saved to {summary_json_path}")
+            print(f"Summary saved to {summary_txt_path}")
+            exp_logger.log_output_saved(str(summary_json_path))
+            exp_logger.log_output_saved(str(summary_txt_path))
+
+    except Exception as e:
+        exp_logger.log_error(e, context="ideas_suite")
+        raise
 
 
 if __name__ == "__main__":

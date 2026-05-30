@@ -1,0 +1,55 @@
+{"timestamp": "2026-05-29T14:03:37.988801", "event": "environment", "data": {"python": "3.12.11", "torch": "2.11.0+cu130", "cuda_available": true, "gpu": "NVIDIA L4", "gpu_memory": "23.7 GB", "hostname": "cs-01ksstcnmsscy88yky8f9ervmj", "timestamp": "2026-05-29T14:03:37.988580"}}
+{"timestamp": "2026-05-29T14:03:37.989499", "event": "phase_start", "data": {"phase": "rm_loading", "details": "OpenAssistant/reward-model-deberta-v3-large-v2"}}
+{"timestamp": "2026-05-29T14:03:42.619382", "event": "phase_end", "data": {"phase": "rm_loading", "duration_sec": 4.629781484603882}}
+{"timestamp": "2026-05-29T14:03:42.620181", "event": "inference_start", "data": {"total_examples": 500, "bon_n": 24}}
+{"timestamp": "2026-05-29T14:03:53.399350", "event": "checkpoint", "data": {"completed": 10, "total": 500, "elapsed_sec": 10.778662919998169, "eta": "8m 48s", "running_accuracy": {"scoring": 0.0}}}
+{"timestamp": "2026-05-29T14:04:03.917734", "event": "checkpoint", "data": {"completed": 20, "total": 500, "elapsed_sec": 21.297003030776978, "eta": "8m 31s", "running_accuracy": {"scoring": 0.0}}}
+{"timestamp": "2026-05-29T14:04:11.902113", "event": "checkpoint", "data": {"completed": 30, "total": 500, "elapsed_sec": 29.281511068344116, "eta": "7m 38s", "running_accuracy": {"scoring": 0.0}}}
+{"timestamp": "2026-05-29T14:04:18.241817", "event": "checkpoint", "data": {"completed": 40, "total": 500, "elapsed_sec": 35.62118339538574, "eta": "6m 49s", "running_accuracy": {"scoring": 0.0}}}
+{"timestamp": "2026-05-29T14:04:26.124695", "event": "checkpoint", "data": {"completed": 50, "total": 500, "elapsed_sec": 43.50416684150696, "eta": "6m 31s", "running_accuracy": {"scoring": 0.0}}}
+{"timestamp": "2026-05-29T14:04:32.085786", "event": "checkpoint", "data": {"completed": 60, "total": 500, "elapsed_sec": 49.46512269973755, "eta": "6m 2s", "running_accuracy": {"scoring": 0.0}}}
+{"timestamp": "2026-05-29T14:04:40.520303", "event": "checkpoint", "data": {"completed": 70, "total": 500, "elapsed_sec": 57.899667739868164, "eta": "5m 55s", "running_accuracy": {"scoring": 0.0}}}
+{"timestamp": "2026-05-29T14:04:46.905502", "event": "checkpoint", "data": {"completed": 80, "total": 500, "elapsed_sec": 64.2849018573761, "eta": "5m 37s", "running_accuracy": {"scoring": 0.0}}}
+{"timestamp": "2026-05-29T14:04:55.271994", "event": "checkpoint", "data": {"completed": 90, "total": 500, "elapsed_sec": 72.65138626098633, "eta": "5m 30s", "running_accuracy": {"scoring": 0.0}}}
+{"timestamp": "2026-05-29T14:05:04.951916", "event": "checkpoint", "data": {"completed": 100, "total": 500, "elapsed_sec": 82.33133506774902, "eta": "5m 29s", "running_accuracy": {"scoring": 0.0}}}
+{"timestamp": "2026-05-29T14:05:15.382329", "event": "checkpoint", "data": {"completed": 110, "total": 500, "elapsed_sec": 92.76167893409729, "eta": "5m 28s", "running_accuracy": {"scoring": 0.0}}}
+{"timestamp": "2026-05-29T14:05:24.259620", "event": "checkpoint", "data": {"completed": 120, "total": 500, "elapsed_sec": 101.63887929916382, "eta": "5m 21s", "running_accuracy": {"scoring": 0.0}}}
+{"timestamp": "2026-05-29T14:05:34.087512", "event": "checkpoint", "data": {"completed": 130, "total": 500, "elapsed_sec": 111.46678519248962, "eta": "5m 17s", "running_accuracy": {"scoring": 0.0}}}
+{"timestamp": "2026-05-29T14:05:43.111766", "event": "checkpoint", "data": {"completed": 140, "total": 500, "elapsed_sec": 120.49115896224976, "eta": "5m 9s", "running_accuracy": {"scoring": 0.0}}}
+{"timestamp": "2026-05-29T14:05:50.889030", "event": "checkpoint", "data": {"completed": 150, "total": 500, "elapsed_sec": 128.26836943626404, "eta": "4m 59s", "running_accuracy": {"scoring": 0.0}}}
+{"timestamp": "2026-05-29T14:06:02.837118", "event": "checkpoint", "data": {"completed": 160, "total": 500, "elapsed_sec": 140.21644186973572, "eta": "4m 57s", "running_accuracy": {"scoring": 0.0}}}
+{"timestamp": "2026-05-29T14:06:12.183398", "event": "checkpoint", "data": {"completed": 170, "total": 500, "elapsed_sec": 149.56280660629272, "eta": "4m 50s", "running_accuracy": {"scoring": 0.0}}}
+{"timestamp": "2026-05-29T14:06:21.270770", "event": "checkpoint", "data": {"completed": 180, "total": 500, "elapsed_sec": 158.65006828308105, "eta": "4m 42s", "running_accuracy": {"scoring": 0.0}}}
+{"timestamp": "2026-05-29T14:06:31.277973", "event": "checkpoint", "data": {"completed": 190, "total": 500, "elapsed_sec": 168.6574821472168, "eta": "4m 35s", "running_accuracy": {"scoring": 0.0}}}
+{"timestamp": "2026-05-29T14:06:37.489021", "event": "checkpoint", "data": {"completed": 200, "total": 500, "elapsed_sec": 174.86817359924316, "eta": "4m 22s", "running_accuracy": {"scoring": 0.0}}}
+{"timestamp": "2026-05-29T14:06:46.462240", "event": "checkpoint", "data": {"completed": 210, "total": 500, "elapsed_sec": 183.84157633781433, "eta": "4m 13s", "running_accuracy": {"scoring": 0.0}}}
+{"timestamp": "2026-05-29T14:06:55.733748", "event": "checkpoint", "data": {"completed": 220, "total": 500, "elapsed_sec": 193.1130874156952, "eta": "4m 5s", "running_accuracy": {"scoring": 0.0}}}
+{"timestamp": "2026-05-29T14:07:04.002478", "event": "checkpoint", "data": {"completed": 230, "total": 500, "elapsed_sec": 201.38186120986938, "eta": "3m 56s", "running_accuracy": {"scoring": 0.0}}}
+{"timestamp": "2026-05-29T14:07:14.958646", "event": "checkpoint", "data": {"completed": 240, "total": 500, "elapsed_sec": 212.33804321289062, "eta": "3m 50s", "running_accuracy": {"scoring": 0.0}}}
+{"timestamp": "2026-05-29T14:07:24.656560", "event": "checkpoint", "data": {"completed": 250, "total": 500, "elapsed_sec": 222.03589963912964, "eta": "3m 42s", "running_accuracy": {"scoring": 0.0}}}
+{"timestamp": "2026-05-29T14:07:31.503058", "event": "checkpoint", "data": {"completed": 260, "total": 500, "elapsed_sec": 228.88247418403625, "eta": "3m 31s", "running_accuracy": {"scoring": 0.0}}}
+{"timestamp": "2026-05-29T14:07:39.358234", "event": "checkpoint", "data": {"completed": 270, "total": 500, "elapsed_sec": 236.73752307891846, "eta": "3m 21s", "running_accuracy": {"scoring": 0.0}}}
+{"timestamp": "2026-05-29T14:07:45.804265", "event": "checkpoint", "data": {"completed": 280, "total": 500, "elapsed_sec": 243.18378686904907, "eta": "3m 11s", "running_accuracy": {"scoring": 0.0}}}
+{"timestamp": "2026-05-29T14:07:57.782988", "event": "checkpoint", "data": {"completed": 290, "total": 500, "elapsed_sec": 255.16226959228516, "eta": "3m 4s", "running_accuracy": {"scoring": 0.0}}}
+{"timestamp": "2026-05-29T14:08:08.393847", "event": "checkpoint", "data": {"completed": 300, "total": 500, "elapsed_sec": 265.77324891090393, "eta": "2m 57s", "running_accuracy": {"scoring": 0.0}}}
+{"timestamp": "2026-05-29T14:08:19.986947", "event": "checkpoint", "data": {"completed": 310, "total": 500, "elapsed_sec": 277.366259098053, "eta": "2m 49s", "running_accuracy": {"scoring": 0.0}}}
+{"timestamp": "2026-05-29T14:08:27.938118", "event": "checkpoint", "data": {"completed": 320, "total": 500, "elapsed_sec": 285.3174433708191, "eta": "2m 40s", "running_accuracy": {"scoring": 0.0}}}
+{"timestamp": "2026-05-29T14:08:38.493050", "event": "checkpoint", "data": {"completed": 330, "total": 500, "elapsed_sec": 295.87240648269653, "eta": "2m 32s", "running_accuracy": {"scoring": 0.0}}}
+{"timestamp": "2026-05-29T14:08:47.463775", "event": "checkpoint", "data": {"completed": 340, "total": 500, "elapsed_sec": 304.8430914878845, "eta": "2m 23s", "running_accuracy": {"scoring": 0.0}}}
+{"timestamp": "2026-05-29T14:08:54.274226", "event": "checkpoint", "data": {"completed": 350, "total": 500, "elapsed_sec": 311.65368270874023, "eta": "2m 13s", "running_accuracy": {"scoring": 0.0}}}
+{"timestamp": "2026-05-29T14:09:04.293126", "event": "checkpoint", "data": {"completed": 360, "total": 500, "elapsed_sec": 321.67241406440735, "eta": "2m 5s", "running_accuracy": {"scoring": 0.0}}}
+{"timestamp": "2026-05-29T14:09:12.722638", "event": "checkpoint", "data": {"completed": 370, "total": 500, "elapsed_sec": 330.10209035873413, "eta": "1m 55s", "running_accuracy": {"scoring": 0.0}}}
+{"timestamp": "2026-05-29T14:09:22.462755", "event": "checkpoint", "data": {"completed": 380, "total": 500, "elapsed_sec": 339.8415901660919, "eta": "1m 47s", "running_accuracy": {"scoring": 0.0}}}
+{"timestamp": "2026-05-29T14:09:30.356010", "event": "checkpoint", "data": {"completed": 390, "total": 500, "elapsed_sec": 347.73533058166504, "eta": "1m 38s", "running_accuracy": {"scoring": 0.0}}}
+{"timestamp": "2026-05-29T14:09:40.849796", "event": "checkpoint", "data": {"completed": 400, "total": 500, "elapsed_sec": 358.22918701171875, "eta": "1m 29s", "running_accuracy": {"scoring": 0.0}}}
+{"timestamp": "2026-05-29T14:09:48.577332", "event": "checkpoint", "data": {"completed": 410, "total": 500, "elapsed_sec": 365.9566419124603, "eta": "1m 20s", "running_accuracy": {"scoring": 0.0}}}
+{"timestamp": "2026-05-29T14:09:56.712638", "event": "checkpoint", "data": {"completed": 420, "total": 500, "elapsed_sec": 374.0920031070709, "eta": "1m 11s", "running_accuracy": {"scoring": 0.0}}}
+{"timestamp": "2026-05-29T14:10:07.047922", "event": "checkpoint", "data": {"completed": 430, "total": 500, "elapsed_sec": 384.42729020118713, "eta": "1m 2s", "running_accuracy": {"scoring": 0.0}}}
+{"timestamp": "2026-05-29T14:10:16.056511", "event": "checkpoint", "data": {"completed": 440, "total": 500, "elapsed_sec": 393.43589329719543, "eta": "54s", "running_accuracy": {"scoring": 0.0}}}
+{"timestamp": "2026-05-29T14:10:24.697723", "event": "checkpoint", "data": {"completed": 450, "total": 500, "elapsed_sec": 402.0770902633667, "eta": "45s", "running_accuracy": {"scoring": 0.0}}}
+{"timestamp": "2026-05-29T14:10:31.984662", "event": "checkpoint", "data": {"completed": 460, "total": 500, "elapsed_sec": 409.363972902298, "eta": "36s", "running_accuracy": {"scoring": 0.0}}}
+{"timestamp": "2026-05-29T14:10:40.088136", "event": "checkpoint", "data": {"completed": 470, "total": 500, "elapsed_sec": 417.4675943851471, "eta": "27s", "running_accuracy": {"scoring": 0.0}}}
+{"timestamp": "2026-05-29T14:10:49.833898", "event": "checkpoint", "data": {"completed": 480, "total": 500, "elapsed_sec": 427.21331667900085, "eta": "18s", "running_accuracy": {"scoring": 0.0}}}
+{"timestamp": "2026-05-29T14:10:59.426843", "event": "checkpoint", "data": {"completed": 490, "total": 500, "elapsed_sec": 436.8061532974243, "eta": "9s", "running_accuracy": {"scoring": 0.0}}}
+{"timestamp": "2026-05-29T14:11:09.883029", "event": "checkpoint", "data": {"completed": 500, "total": 500, "elapsed_sec": 447.2624022960663, "eta": "0s", "running_accuracy": {"scoring": 0.0}}}
+{"timestamp": "2026-05-29T14:11:09.884010", "event": "inference_end", "data": {"total_examples": 500, "total_rows": 500, "wall_time_sec": 447.26368141174316}}

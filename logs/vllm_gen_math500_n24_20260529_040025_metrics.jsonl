@@ -1,0 +1,57 @@
+{"timestamp": "2026-05-29T04:00:25.575727", "event": "environment", "data": {"python": "3.12.11", "torch": "2.11.0+cu130", "cuda_available": true, "gpu": "NVIDIA L4", "gpu_memory": "23.7 GB", "hostname": "cs-01ksrgwv5wjaftp9hte2b9tn1v", "timestamp": "2026-05-29T04:00:25.575491"}}
+{"timestamp": "2026-05-29T04:00:25.576189", "event": "phase_start", "data": {"phase": "dataset_loading", "details": "math500"}}
+{"timestamp": "2026-05-29T04:00:26.404452", "event": "phase_end", "data": {"phase": "dataset_loading", "duration_sec": 0.8281948566436768}}
+{"timestamp": "2026-05-29T04:00:27.213589", "event": "phase_start", "data": {"phase": "model_loading", "details": "vLLM: Qwen/Qwen2.5-7B-Instruct"}}
+{"timestamp": "2026-05-29T04:01:27.669852", "event": "phase_end", "data": {"phase": "model_loading", "duration_sec": 60.45629835128784}}
+{"timestamp": "2026-05-29T04:01:27.670460", "event": "inference_start", "data": {"total_examples": 500, "bon_n": 24}}
+{"timestamp": "2026-05-29T04:53:39.928771", "event": "checkpoint", "data": {"completed": 10, "total": 500, "elapsed_sec": 3132.258030653, "eta": "42h 38m 0s", "running_accuracy": {"vllm_generation": 0.0}}}
+{"timestamp": "2026-05-29T04:53:39.934274", "event": "checkpoint", "data": {"completed": 20, "total": 500, "elapsed_sec": 3132.263571023941, "eta": "20h 52m 54s", "running_accuracy": {"vllm_generation": 0.0}}}
+{"timestamp": "2026-05-29T04:53:39.939511", "event": "checkpoint", "data": {"completed": 30, "total": 500, "elapsed_sec": 3132.2688686847687, "eta": "13h 37m 52s", "running_accuracy": {"vllm_generation": 0.0}}}
+{"timestamp": "2026-05-29T04:53:39.944299", "event": "checkpoint", "data": {"completed": 40, "total": 500, "elapsed_sec": 3132.2736501693726, "eta": "10h 0m 21s", "running_accuracy": {"vllm_generation": 0.0}}}
+{"timestamp": "2026-05-29T04:53:39.949146", "event": "checkpoint", "data": {"completed": 50, "total": 500, "elapsed_sec": 3132.278482198715, "eta": "7h 49m 50s", "running_accuracy": {"vllm_generation": 0.0}}}
+{"timestamp": "2026-05-29T04:53:39.953578", "event": "checkpoint", "data": {"completed": 60, "total": 500, "elapsed_sec": 3132.282956600189, "eta": "6h 22m 50s", "running_accuracy": {"vllm_generation": 0.0}}}
+{"timestamp": "2026-05-29T04:53:39.958394", "event": "checkpoint", "data": {"completed": 70, "total": 500, "elapsed_sec": 3132.287687778473, "eta": "5h 20m 41s", "running_accuracy": {"vllm_generation": 0.0}}}
+{"timestamp": "2026-05-29T04:53:39.962968", "event": "checkpoint", "data": {"completed": 80, "total": 500, "elapsed_sec": 3132.2922914028168, "eta": "4h 34m 4s", "running_accuracy": {"vllm_generation": 0.0}}}
+{"timestamp": "2026-05-29T04:53:39.968019", "event": "checkpoint", "data": {"completed": 90, "total": 500, "elapsed_sec": 3132.2973008155823, "eta": "3h 57m 49s", "running_accuracy": {"vllm_generation": 0.0}}}
+{"timestamp": "2026-05-29T04:53:39.972959", "event": "checkpoint", "data": {"completed": 100, "total": 500, "elapsed_sec": 3132.3022553920746, "eta": "3h 28m 49s", "running_accuracy": {"vllm_generation": 0.0}}}
+{"timestamp": "2026-05-29T04:53:39.977775", "event": "checkpoint", "data": {"completed": 110, "total": 500, "elapsed_sec": 3132.3071002960205, "eta": "3h 5m 5s", "running_accuracy": {"vllm_generation": 0.0}}}
+{"timestamp": "2026-05-29T04:53:39.982519", "event": "checkpoint", "data": {"completed": 120, "total": 500, "elapsed_sec": 3132.311843395233, "eta": "2h 45m 18s", "running_accuracy": {"vllm_generation": 0.0}}}
+{"timestamp": "2026-05-29T04:53:39.987226", "event": "checkpoint", "data": {"completed": 130, "total": 500, "elapsed_sec": 3132.316525697708, "eta": "2h 28m 35s", "running_accuracy": {"vllm_generation": 0.0}}}
+{"timestamp": "2026-05-29T04:53:39.992197", "event": "checkpoint", "data": {"completed": 140, "total": 500, "elapsed_sec": 3132.3214917182922, "eta": "2h 14m 14s", "running_accuracy": {"vllm_generation": 0.0}}}
+{"timestamp": "2026-05-29T04:53:39.996782", "event": "checkpoint", "data": {"completed": 150, "total": 500, "elapsed_sec": 3132.326072216034, "eta": "2h 1m 48s", "running_accuracy": {"vllm_generation": 0.0}}}
+{"timestamp": "2026-05-29T04:53:40.002368", "event": "checkpoint", "data": {"completed": 160, "total": 500, "elapsed_sec": 3132.3316366672516, "eta": "1h 50m 56s", "running_accuracy": {"vllm_generation": 0.0}}}
+{"timestamp": "2026-05-29T04:53:40.007293", "event": "checkpoint", "data": {"completed": 170, "total": 500, "elapsed_sec": 3132.3365848064423, "eta": "1h 41m 20s", "running_accuracy": {"vllm_generation": 0.0}}}
+{"timestamp": "2026-05-29T04:53:40.012537", "event": "checkpoint", "data": {"completed": 180, "total": 500, "elapsed_sec": 3132.3418781757355, "eta": "1h 32m 48s", "running_accuracy": {"vllm_generation": 0.0}}}
+{"timestamp": "2026-05-29T04:53:40.017005", "event": "checkpoint", "data": {"completed": 190, "total": 500, "elapsed_sec": 3132.3463056087494, "eta": "1h 25m 10s", "running_accuracy": {"vllm_generation": 0.0}}}
+{"timestamp": "2026-05-29T04:53:40.021436", "event": "checkpoint", "data": {"completed": 200, "total": 500, "elapsed_sec": 3132.350729942322, "eta": "1h 18m 18s", "running_accuracy": {"vllm_generation": 0.0}}}
+{"timestamp": "2026-05-29T04:53:40.026130", "event": "checkpoint", "data": {"completed": 210, "total": 500, "elapsed_sec": 3132.355466604233, "eta": "1h 12m 5s", "running_accuracy": {"vllm_generation": 0.0}}}
+{"timestamp": "2026-05-29T04:53:40.030817", "event": "checkpoint", "data": {"completed": 220, "total": 500, "elapsed_sec": 3132.360119819641, "eta": "1h 6m 26s", "running_accuracy": {"vllm_generation": 0.0}}}
+{"timestamp": "2026-05-29T04:53:40.035439", "event": "checkpoint", "data": {"completed": 230, "total": 500, "elapsed_sec": 3132.3647487163544, "eta": "1h 1m 17s", "running_accuracy": {"vllm_generation": 0.0}}}
+{"timestamp": "2026-05-29T04:53:40.040457", "event": "checkpoint", "data": {"completed": 240, "total": 500, "elapsed_sec": 3132.3697435855865, "eta": "56m 33s", "running_accuracy": {"vllm_generation": 0.0}}}
+{"timestamp": "2026-05-29T04:53:40.045444", "event": "checkpoint", "data": {"completed": 250, "total": 500, "elapsed_sec": 3132.3747415542603, "eta": "52m 12s", "running_accuracy": {"vllm_generation": 0.0}}}
+{"timestamp": "2026-05-29T04:53:40.050012", "event": "checkpoint", "data": {"completed": 260, "total": 500, "elapsed_sec": 3132.3791749477386, "eta": "48m 11s", "running_accuracy": {"vllm_generation": 0.0}}}
+{"timestamp": "2026-05-29T04:53:40.054520", "event": "checkpoint", "data": {"completed": 270, "total": 500, "elapsed_sec": 3132.3838312625885, "eta": "44m 28s", "running_accuracy": {"vllm_generation": 0.0}}}
+{"timestamp": "2026-05-29T04:53:40.058762", "event": "checkpoint", "data": {"completed": 280, "total": 500, "elapsed_sec": 3132.3880758285522, "eta": "41m 1s", "running_accuracy": {"vllm_generation": 0.0}}}
+{"timestamp": "2026-05-29T04:53:40.063801", "event": "checkpoint", "data": {"completed": 290, "total": 500, "elapsed_sec": 3132.393093109131, "eta": "37m 48s", "running_accuracy": {"vllm_generation": 0.0}}}
+{"timestamp": "2026-05-29T04:53:40.068644", "event": "checkpoint", "data": {"completed": 300, "total": 500, "elapsed_sec": 3132.397946834564, "eta": "34m 48s", "running_accuracy": {"vllm_generation": 0.0}}}
+{"timestamp": "2026-05-29T04:53:40.073965", "event": "checkpoint", "data": {"completed": 310, "total": 500, "elapsed_sec": 3132.4032928943634, "eta": "31m 59s", "running_accuracy": {"vllm_generation": 0.0}}}
+{"timestamp": "2026-05-29T04:53:40.078453", "event": "checkpoint", "data": {"completed": 320, "total": 500, "elapsed_sec": 3132.4077594280243, "eta": "29m 21s", "running_accuracy": {"vllm_generation": 0.0}}}
+{"timestamp": "2026-05-29T04:53:40.083349", "event": "checkpoint", "data": {"completed": 330, "total": 500, "elapsed_sec": 3132.412645339966, "eta": "26m 53s", "running_accuracy": {"vllm_generation": 0.0}}}
+{"timestamp": "2026-05-29T04:53:40.088072", "event": "checkpoint", "data": {"completed": 340, "total": 500, "elapsed_sec": 3132.4173521995544, "eta": "24m 34s", "running_accuracy": {"vllm_generation": 0.0}}}
+{"timestamp": "2026-05-29T04:53:40.092550", "event": "checkpoint", "data": {"completed": 350, "total": 500, "elapsed_sec": 3132.4218776226044, "eta": "22m 22s", "running_accuracy": {"vllm_generation": 0.0}}}
+{"timestamp": "2026-05-29T04:53:40.097478", "event": "checkpoint", "data": {"completed": 360, "total": 500, "elapsed_sec": 3132.426847219467, "eta": "20m 18s", "running_accuracy": {"vllm_generation": 0.0}}}
+{"timestamp": "2026-05-29T04:53:40.102105", "event": "checkpoint", "data": {"completed": 370, "total": 500, "elapsed_sec": 3132.431391477585, "eta": "18m 20s", "running_accuracy": {"vllm_generation": 0.0}}}
+{"timestamp": "2026-05-29T04:53:40.106751", "event": "checkpoint", "data": {"completed": 380, "total": 500, "elapsed_sec": 3132.436117172241, "eta": "16m 29s", "running_accuracy": {"vllm_generation": 0.0}}}
+{"timestamp": "2026-05-29T04:53:40.111376", "event": "checkpoint", "data": {"completed": 390, "total": 500, "elapsed_sec": 3132.440662384033, "eta": "14m 43s", "running_accuracy": {"vllm_generation": 0.0}}}
+{"timestamp": "2026-05-29T04:53:40.115942", "event": "checkpoint", "data": {"completed": 400, "total": 500, "elapsed_sec": 3132.445282936096, "eta": "13m 3s", "running_accuracy": {"vllm_generation": 0.0}}}
+{"timestamp": "2026-05-29T04:53:40.120489", "event": "checkpoint", "data": {"completed": 410, "total": 500, "elapsed_sec": 3132.449782371521, "eta": "11m 27s", "running_accuracy": {"vllm_generation": 0.0}}}
+{"timestamp": "2026-05-29T04:53:40.125533", "event": "checkpoint", "data": {"completed": 420, "total": 500, "elapsed_sec": 3132.4548423290253, "eta": "9m 56s", "running_accuracy": {"vllm_generation": 0.0}}}
+{"timestamp": "2026-05-29T04:53:40.130284", "event": "checkpoint", "data": {"completed": 430, "total": 500, "elapsed_sec": 3132.459580183029, "eta": "8m 29s", "running_accuracy": {"vllm_generation": 0.0}}}
+{"timestamp": "2026-05-29T04:53:40.135198", "event": "checkpoint", "data": {"completed": 440, "total": 500, "elapsed_sec": 3132.4644598960876, "eta": "7m 7s", "running_accuracy": {"vllm_generation": 0.0}}}
+{"timestamp": "2026-05-29T04:53:40.139801", "event": "checkpoint", "data": {"completed": 450, "total": 500, "elapsed_sec": 3132.469156742096, "eta": "5m 48s", "running_accuracy": {"vllm_generation": 0.0}}}
+{"timestamp": "2026-05-29T04:53:40.144386", "event": "checkpoint", "data": {"completed": 460, "total": 500, "elapsed_sec": 3132.4736971855164, "eta": "4m 32s", "running_accuracy": {"vllm_generation": 0.0}}}
+{"timestamp": "2026-05-29T04:53:40.149379", "event": "checkpoint", "data": {"completed": 470, "total": 500, "elapsed_sec": 3132.4786219596863, "eta": "3m 19s", "running_accuracy": {"vllm_generation": 0.0}}}
+{"timestamp": "2026-05-29T04:53:40.154313", "event": "checkpoint", "data": {"completed": 480, "total": 500, "elapsed_sec": 3132.483651638031, "eta": "2m 10s", "running_accuracy": {"vllm_generation": 0.0}}}
+{"timestamp": "2026-05-29T04:53:40.159375", "event": "checkpoint", "data": {"completed": 490, "total": 500, "elapsed_sec": 3132.4887206554413, "eta": "1m 3s", "running_accuracy": {"vllm_generation": 0.0}}}
+{"timestamp": "2026-05-29T04:53:40.164445", "event": "checkpoint", "data": {"completed": 500, "total": 500, "elapsed_sec": 3132.4937493801117, "eta": "0s", "running_accuracy": {"vllm_generation": 0.0}}}
+{"timestamp": "2026-05-29T04:53:40.165069", "event": "inference_end", "data": {"total_examples": 500, "total_rows": 500, "wall_time_sec": 3132.494407892227}}

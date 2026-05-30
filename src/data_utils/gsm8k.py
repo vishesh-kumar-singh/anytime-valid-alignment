@@ -34,7 +34,7 @@ def load_gsm8k(
             download_config=DownloadConfig(local_files_only=True),
         )
     except Exception:
-        ds = load_dataset("gsm8k", "main", split=split)
+        ds = load_dataset("openai/gsm8k", "main", split=split)
 
     examples = []
     for i, item in enumerate(ds):

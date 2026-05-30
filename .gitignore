@@ -1,6 +1,5 @@
 # Ouputs
 *.out 
-logs/
 wandb/
 *.pkl
 
