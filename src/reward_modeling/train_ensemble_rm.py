@@ -138,7 +138,7 @@ def generate_preference_data_from_gsm8k(
         if generator is not None:
             # Generate candidates and classify as correct/incorrect
             candidates = generator.generate(question, n=4)
-            from src.data_utils.gsm8k import check_answer_correct
+            from ..data_utils.gsm8k import check_answer_correct
 
             correct = [c for c in candidates if check_answer_correct(c, gold)]
             incorrect = [c for c in candidates if not check_answer_correct(c, gold)]
@@ -331,14 +331,14 @@ def train_from_cli():
         generator_model: str = typer.Option("Qwen/Qwen2.5-7B-Instruct", help="Model for generating candidates."),
     ):
         """Train an ensemble of K reward models on GSM8K preference data."""
-        from src.data_utils.gsm8k import load_gsm8k
+        from ..data_utils.gsm8k import load_gsm8k
 
         print("Loading GSM8K training data...")
         train_examples = load_gsm8k(split="train", max_examples=max_pairs * 2)
 
         generator = None
         if use_generator:
-            from src.generation.generator import GenerationConfig, Generator
+            from ..generation.generator import GenerationConfig, Generator
             print(f"Loading generator: {generator_model}")
             generator = Generator(GenerationConfig(model_name=generator_model))
 

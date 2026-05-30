@@ -50,18 +50,18 @@ import numpy as np
 import typer
 from tqdm import tqdm
 
-from src.experiments.experiment_logger import ExperimentLogger
+from ..core.logger import ExperimentLogger
 
-from src.generation.generator import GenerationConfig, Generator
-from src.policies.controller import (
+from ..generation.generator import GenerationConfig, Generator
+from ..methods.adaptive.controller import (
     BudgetConfig, decide_path, summarize_uncertainty,
     thompson_sampling_select, lcb_select, cvar_select,
 )
-from src.policies.selection import greedy_argmax, risk_adjusted_argmax, sharpe_ratio_argmax
-from src.policies.selection import softbon_select
-from src.policies.selection import majority_of_bests, inverse_variance_weighted_aggregation
-from src.reward_modeling.inference import RewardEnsemble
-from src.sequential.search import (
+from ..methods.parallel.selection import greedy_argmax, risk_adjusted_argmax, sharpe_ratio_argmax
+from ..methods.parallel.selection import softbon_select
+from ..methods.parallel.selection import majority_of_bests, inverse_variance_weighted_aggregation
+from ..reward_modeling.inference import RewardEnsemble
+from ..methods.sequential.search import (
     rf_seqbon_vanilla,
     rf_seqbon_sharpe_ratio,
     rf_seqbon_linear_uncertainty,
@@ -105,7 +105,7 @@ class RobustURMScorer:
     """Wraps the uncertainty-aware RM ensemble (trained with MLE loss)."""
 
     def __init__(self, ensemble_dir: str, base_model_name: str = "microsoft/deberta-v3-base"):
-        from src.reward_modeling.uncertainty_rm import URMEnsemble
+        from ..reward_modeling.uncertainty_rm import URMEnsemble
         # Current trainer saves member_* directories; keep model_* for backward compatibility.
         model_paths = sorted(Path(ensemble_dir).glob("member_*"))
         if not model_paths:
@@ -166,13 +166,13 @@ def load_dataset_examples(
     """Load examples from the specified dataset."""
     dataset = dataset.lower()
     if dataset == "gsm8k":
-        from src.data_utils.gsm8k import load_gsm8k
+        from ..data_utils.gsm8k import load_gsm8k
         return load_gsm8k(split=split, max_examples=max_examples)
     elif dataset == "math500":
-        from src.data_utils.math500 import load_math500
+        from ..data_utils.math500 import load_math500
         return load_math500(max_examples=max_examples)
     elif dataset == "alpaca_eval":
-        from src.data_utils.alpaca_eval import load_alpaca_eval
+        from ..data_utils.alpaca_eval import load_alpaca_eval
         return load_alpaca_eval(max_examples=max_examples)
     else:
         raise ValueError(f"Unknown dataset: {dataset}. Choose from: gsm8k, math500, alpaca_eval")
@@ -182,10 +182,10 @@ def check_correctness(prediction: str, ground_truth: str, dataset: str) -> bool:
     """Check answer correctness based on dataset type."""
     dataset = dataset.lower()
     if dataset == "gsm8k":
-        from src.data_utils.gsm8k import check_answer_correct
+        from ..data_utils.gsm8k import check_answer_correct
         return check_answer_correct(prediction, ground_truth)
     elif dataset == "math500":
-        from src.data_utils.math500 import check_math_correct
+        from ..data_utils.math500 import check_math_correct
         return check_math_correct(prediction, ground_truth)
     elif dataset == "alpaca_eval":
         # Open-ended: no ground truth correctness, always False
@@ -1600,7 +1600,7 @@ def ideas_suite(
     dataset = dataset.lower()
     resolved_max = None if max_examples <= 0 else max_examples
     run_scope = "full" if resolved_max is None else "inf"
-    resolved_output = output_path or f"runs/{run_scope}_ideas_suite_{dataset}.jsonl"
+    resolved_output = output_path or f"runs/sequential/{run_scope}_ideas_suite_{dataset}.jsonl"
     parsed_rms = [s.strip() for s in reward_model_names.split(",") if s.strip()]
 
     cfg = ExperimentConfig(

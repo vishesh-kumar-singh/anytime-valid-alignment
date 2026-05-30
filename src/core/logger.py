@@ -1,7 +1,7 @@
-"""
-Experiment Logger — persistent, structured logging for all runs.
+"""Experiment Logger — persistent, structured logging for all runs.
 
-Writes a human-readable + machine-parseable log file under logs/ that tracks:
+Writes a human-readable + machine-parseable log file under ``logs/`` that
+tracks:
   - Experiment configuration (model, dataset, N, RM ensemble, etc.)
   - Per-example progress with running accuracy
   - Periodic checkpoints (every K examples) with intermediate results
@@ -9,13 +9,14 @@ Writes a human-readable + machine-parseable log file under logs/ that tracks:
   - Errors and crashes with full context
   - Wall-clock timing for each phase
 
-Log files are timestamped and never overwritten, so you always have
-a complete history of every experiment attempt.
+Log files are timestamped and never overwritten, so there is always a
+complete history of every experiment attempt.
 """
+
+from __future__ import annotations
 
 import json
 import logging
-import os
 import platform
 import time
 from dataclasses import asdict
@@ -27,7 +28,7 @@ from typing import Any, Dict, List, Optional
 class ExperimentLogger:
     """Structured experiment logger that writes to both console and file."""
 
-    def __init__(self, log_dir: str = "logs", experiment_name: str = "experiment"):
+    def __init__(self, log_dir: str = "logs", experiment_name: str = "experiment") -> None:
         self.log_dir = Path(log_dir)
         self.log_dir.mkdir(parents=True, exist_ok=True)
 
@@ -62,7 +63,7 @@ class ExperimentLogger:
         self.completed_examples: int = 0
         self.correct_by_method: Dict[str, int] = {}
         self.total_by_method: Dict[str, int] = {}
-        self.checkpoint_interval: int = 10  # log checkpoint every N examples
+        self.checkpoint_interval: int = 10
 
         self.logger.info(f"{'=' * 70}")
         self.logger.info(f"  Experiment Logger initialized: {self.run_id}")
@@ -70,12 +71,15 @@ class ExperimentLogger:
         self.logger.info(f"  Metrics:  {self.metrics_file}")
         self.logger.info(f"{'=' * 70}")
 
-    def log_environment(self):
+    def log_environment(self) -> None:
         """Log system environment info."""
         import torch
-        gpu_name = torch.cuda.get_device_name(0) if torch.cuda.is_available() else "N/A"
-        gpu_mem = f"{torch.cuda.get_device_properties(0).total_memory / 1e9:.1f} GB" if torch.cuda.is_available() else "N/A"
 
+        gpu_name = torch.cuda.get_device_name(0) if torch.cuda.is_available() else "N/A"
+        gpu_mem = (
+            f"{torch.cuda.get_device_properties(0).total_mem / 1e9:.1f} GB"
+            if torch.cuda.is_available() else "N/A"
+        )
         env_info = {
             "python": platform.python_version(),
             "torch": torch.__version__,
@@ -88,7 +92,7 @@ class ExperimentLogger:
         self.logger.info(f"Environment: GPU={gpu_name} ({gpu_mem}), PyTorch={torch.__version__}")
         self._write_metric("environment", env_info)
 
-    def log_config(self, cfg) -> None:
+    def log_config(self, cfg: Any) -> None:
         """Log experiment configuration."""
         cfg_dict = asdict(cfg) if hasattr(cfg, "__dataclass_fields__") else vars(cfg)
         self.logger.info(f"{'─' * 70}")
@@ -100,7 +104,7 @@ class ExperimentLogger:
         self._write_metric("config", cfg_dict)
 
     def log_phase_start(self, phase: str, details: str = "") -> None:
-        """Log the start of a major phase (model loading, dataset loading, inference)."""
+        """Log the start of a major phase."""
         msg = f"▶ PHASE: {phase}"
         if details:
             msg += f" — {details}"
@@ -131,14 +135,12 @@ class ExperimentLogger:
         elapsed = time.time() - self.start_time if self.start_time else 0
         pct = (self.completed_examples / self.total_examples * 100) if self.total_examples else 0
 
-        # Track running accuracy per method
         for r in method_results:
             method = r.get("method", "unknown")
             self.total_by_method[method] = self.total_by_method.get(method, 0) + 1
             if r.get("is_correct"):
                 self.correct_by_method[method] = self.correct_by_method.get(method, 0) + 1
 
-        # Estimate remaining time
         if self.completed_examples > 0 and elapsed > 0:
             rate = elapsed / self.completed_examples
             remaining = rate * (self.total_examples - self.completed_examples)
@@ -146,22 +148,20 @@ class ExperimentLogger:
         else:
             eta_str = "?"
 
-        # Log brief progress every example (DEBUG level, only goes to file)
         self.logger.debug(
             f"  [{self.completed_examples}/{self.total_examples}] "
             f"({pct:.0f}%) Example {example_idx} done | "
             f"Elapsed: {_format_duration(elapsed)} | ETA: {eta_str}"
         )
 
-        # Log detailed checkpoint every N examples (INFO level, goes to console too)
-        if self.completed_examples % self.checkpoint_interval == 0 or self.completed_examples == self.total_examples:
+        if self.completed_examples % self.checkpoint_interval == 0 or \
+           self.completed_examples == self.total_examples:
             self._log_checkpoint(elapsed, eta_str)
 
     def _log_checkpoint(self, elapsed: float, eta_str: str) -> None:
-        """Log a detailed checkpoint with running accuracy for all methods."""
+        """Log a detailed checkpoint with running accuracy."""
         pct = (self.completed_examples / self.total_examples * 100) if self.total_examples else 0
-
-        self.logger.info(f"")
+        self.logger.info("")
         self.logger.info(f"  ── CHECKPOINT [{self.completed_examples}/{self.total_examples}] ({pct:.0f}%) ──")
         self.logger.info(f"  Elapsed: {_format_duration(elapsed)} | ETA: {eta_str}")
 
@@ -172,8 +172,7 @@ class ExperimentLogger:
             self.logger.info(f"    {method:<32s}  {acc:>6.1%}  ({correct}/{total})")
 
         self.logger.info(f"  {'─' * 50}")
-
-        checkpoint_data = {
+        self._write_metric("checkpoint", {
             "completed": self.completed_examples,
             "total": self.total_examples,
             "elapsed_sec": elapsed,
@@ -182,14 +181,13 @@ class ExperimentLogger:
                 m: self.correct_by_method.get(m, 0) / self.total_by_method[m]
                 for m in self.total_by_method
             },
-        }
-        self._write_metric("checkpoint", checkpoint_data)
+        })
 
     def log_inference_end(self, total_rows: int) -> None:
         """Log the end of inference."""
         elapsed = time.time() - self.start_time if self.start_time else 0
         self.logger.info(f"{'=' * 70}")
-        self.logger.info(f"  INFERENCE COMPLETE")
+        self.logger.info("  INFERENCE COMPLETE")
         self.logger.info(f"  Total examples: {self.completed_examples}")
         self.logger.info(f"  Total rows:     {total_rows}")
         self.logger.info(f"  Wall time:      {_format_duration(elapsed)}")
@@ -208,6 +206,7 @@ class ExperimentLogger:
     def log_error(self, error: Exception, context: str = "") -> None:
         """Log an error with full context."""
         import traceback
+
         tb = traceback.format_exc()
         self.logger.error(f"ERROR during {context}: {error}")
         self.logger.error(tb)
@@ -234,11 +233,11 @@ class ExperimentLogger:
             with open(self.metrics_file, "a", encoding="utf-8") as f:
                 f.write(json.dumps(record, default=str, ensure_ascii=False) + "\n")
         except Exception:
-            pass  # Never crash on logging failure
+            pass  # never crash on logging failure
 
 
 def _format_duration(seconds: float) -> str:
-    """Format seconds into a human-readable string like '1h 23m 45s'."""
+    """Format seconds into a human-readable string like ``1h 23m 45s``."""
     if seconds < 60:
         return f"{seconds:.0f}s"
     elif seconds < 3600:

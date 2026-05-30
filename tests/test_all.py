@@ -4,12 +4,12 @@ Run: python -m pytest tests/ -v
 """
 
 import pytest
-from src.policies.selection import greedy_argmax, risk_adjusted_argmax, sharpe_ratio_argmax, softbon_select
-from src.policies.controller import (
+from src.methods.parallel.selection import greedy_argmax, risk_adjusted_argmax, sharpe_ratio_argmax, softbon_select
+from src.methods.adaptive.controller import (
     BudgetConfig, decide_path, summarize_uncertainty,
     thompson_sampling_select, lcb_select, cvar_select,
 )
-from src.sequential.search import rf_seqbon_vanilla, rf_seqbon_variance_aware
+from src.methods.sequential.search import rf_seqbon_vanilla, rf_seqbon_variance_aware
 from src.reward_modeling.inference import RewardStats
 from src.data_utils.gsm8k import extract_gsm8k_answer, check_answer_correct
 
@@ -245,20 +245,21 @@ class TestMATH500:
 class TestScorerInterface:
     def test_trivial_scorer_creates(self):
         """Test that TrivialEnsembleScorer can be instantiated (no GPU needed)."""
-        from src.experiments.run_risk_aware_inference import TrivialEnsembleScorer
+        from src.core.scorer import TrivialEnsembleScorer
         # Just check the class exists and has the right methods
         assert hasattr(TrivialEnsembleScorer, 'score')
         assert hasattr(TrivialEnsembleScorer, 'score_scalar')
 
     def test_robust_scorer_creates(self):
         """Test that RobustURMScorer class exists."""
-        from src.experiments.run_risk_aware_inference import RobustURMScorer
+        from src.core.scorer import RobustURMScorer
         assert hasattr(RobustURMScorer, 'score')
         assert hasattr(RobustURMScorer, 'score_scalar')
 
     def test_build_scorer_trivial(self):
         """Test factory rejects robust mode without ensemble dir."""
-        from src.experiments.run_risk_aware_inference import ExperimentConfig, build_scorer
+        from src.core.config import BaseExperimentConfig as ExperimentConfig
+        from src.core.scorer import build_scorer
         cfg = ExperimentConfig(rm_mode="robust", urm_ensemble_dir=None)
         with pytest.raises(ValueError, match="--urm-ensemble-dir required"):
             build_scorer(cfg)
@@ -270,11 +271,11 @@ class TestScorerInterface:
 
 class TestDatasetLoading:
     def test_load_dataset_unknown_raises(self):
-        from src.experiments.run_risk_aware_inference import load_dataset_examples
+        from src.core.data import load_dataset_examples
         with pytest.raises(ValueError, match="Unknown dataset"):
             load_dataset_examples("nonexistent_dataset")
 
     def test_check_correctness_alpaca(self):
-        from src.experiments.run_risk_aware_inference import check_correctness
+        from src.core.data import check_correctness
         # AlpacaEval has no correctness → always False
         assert check_correctness("any answer", "any ref", "alpaca_eval") is False

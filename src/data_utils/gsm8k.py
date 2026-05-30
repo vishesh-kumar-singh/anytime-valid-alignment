@@ -9,7 +9,7 @@ numeric answer appears after '####'.
 import re
 from typing import List, Optional, Tuple
 
-from datasets import DownloadConfig, load_dataset
+
 
 
 def load_gsm8k(
@@ -25,6 +25,8 @@ def load_gsm8k(
     Returns:
         List of dicts with 'question' and 'answer' keys.
     """
+    from datasets import DownloadConfig, load_dataset
+
     try:
         # Try fully offline load first to avoid unnecessary Hub SSL checks.
         ds = load_dataset(

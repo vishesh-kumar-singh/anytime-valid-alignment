@@ -2,7 +2,10 @@
 *.out 
 wandb/
 *.pkl
-
+report.tex
+proposal.md
+FUTURE_WORK.md
+run_demo.py
 # Experiment artifacts (large, generated)
 nohup*.log
 output.log
@@ -167,3 +170,4 @@ cython_debug/
 .venv/
 venv/
 .env
+runs/

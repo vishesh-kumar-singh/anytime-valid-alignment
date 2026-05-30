@@ -20,8 +20,9 @@ from tqdm import tqdm
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from src.experiments.experiment_logger import ExperimentLogger
-from src.experiments.run_risk_aware_inference import ExperimentConfig, build_scorer
+from src.core.logger import ExperimentLogger
+from src.core.config import BaseExperimentConfig as ExperimentConfig
+from src.core.scorer import build_scorer
 
 app = typer.Typer()
 

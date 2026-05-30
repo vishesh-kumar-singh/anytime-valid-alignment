@@ -1,131 +1,190 @@
-# Test-Time Alignment: Run Scripts
+# Test-Time Alignment: Run Guide
 
-All experiments automatically log to `logs/` with timestamped files.
-Monitor live: `tail -f logs/*.log`
+All experiment outputs are saved to `runs/parallel/<experiment_name>/` with `results.json`, `summary.txt`, and `plots/`.
 
 ---
 
-## 🚀 Strategy A: Modular Pipeline (RECOMMENDED)
+## 🚀 Pipeline Overview
 
-### Step 1: Generate Candidates (GPU, run once)
+```
+Step 1: Generate candidates (GPU, run once)  →  data/candidates/*.jsonl
+Step 2: Score with each RM   (GPU, run once)  →  data/scores/*.jsonl
+Step 3: Run hypotheses       (CPU, instant)   →  runs/parallel/<name>/
+```
 
-Generates 24 responses per question for the **FULL** datasets using a 7B model. 
-We use **vLLM** for this step because it batches everything and generates 10x-30x faster.
+---
+
+## Step 1: Generate Candidates (GPU, run once)
+
+Generates 24 responses per question using vLLM (10–30x faster than HuggingFace).
 
 ```bash
-# Generate for full GSM8K (1,319 examples)
-PYTHONUNBUFFERED=1 conda run -n cloudspace python scripts/generate_candidates_vllm.py \
+# GSM8K (1,319 examples)
+conda run -n langchain python scripts/generate_candidates_vllm.py \
     --model-name "Qwen/Qwen2.5-7B-Instruct" \
     --dataset gsm8k \
     --n-candidates 24 \
     --max-examples 0
 
-# Generate for full MATH500 (500 examples)
-PYTHONUNBUFFERED=1 conda run -n cloudspace python scripts/generate_candidates_vllm.py \
+# MATH500 (500 examples)
+conda run -n langchain python scripts/generate_candidates_vllm.py \
     --model-name "Qwen/Qwen2.5-7B-Instruct" \
     --dataset math500 \
     --n-candidates 24 \
     --max-examples 0
 ```
 
-Outputs: 
-- `data/candidates/gsm8k_n24_full_vllm.jsonl`
-- `data/candidates/math500_n24_full_vllm.jsonl`
+**Output:** `data/candidates/gsm8k_n24_full_vllm.jsonl`, `data/candidates/math500_n24_full_vllm.jsonl`
 
-### Step 2: Score with Each RM Separately (GPU, run once per RM)
+---
 
-Score all candidates with one RM at a time. Each RM produces its own file.
-Run these commands for whichever dataset you generated above (change `--candidates-path`).
+## Step 2: Score with Each RM (GPU, run once per RM)
+
+Score all candidates with one RM at a time.
 
 ```bash
 # RM 1: DeBERTa (small, fast baseline)
-PYTHONUNBUFFERED=1 conda run -n cloudspace python scripts/score_candidates.py \
+conda run -n langchain python scripts/score_candidates.py \
     --candidates-path data/candidates/gsm8k_n24_full_vllm.jsonl \
     --reward-model "OpenAssistant/reward-model-deberta-v3-large-v2" \
     --load-in-4bit
 
 # RM 2: OffsetBias (Robust Llama-3-8B)
-PYTHONUNBUFFERED=1 conda run -n cloudspace python scripts/score_candidates.py \
+conda run -n langchain python scripts/score_candidates.py \
     --candidates-path data/candidates/gsm8k_n24_full_vllm.jsonl \
     --reward-model "NCSOFT/Llama-3-OffsetBias-RM-8B" \
     --load-in-4bit
 
 # RM 3: ArmoRM (Mixture of Experts Llama-3-8B)
-PYTHONUNBUFFERED=1 conda run -n cloudspace python scripts/score_candidates.py \
+conda run -n langchain python scripts/score_candidates.py \
     --candidates-path data/candidates/gsm8k_n24_full_vllm.jsonl \
     --reward-model "RLHFlow/ArmoRM-Llama3-8B-v0.1" \
     --load-in-4bit
 
-# RM 4: Skywork Reward (State-of-the-art Llama-3.1-8B)
-PYTHONUNBUFFERED=1 conda run -n cloudspace python scripts/score_candidates.py \
+# RM 4: Skywork Reward (Llama-3.1-8B)
+conda run -n langchain python scripts/score_candidates.py \
     --candidates-path data/candidates/gsm8k_n24_full_vllm.jsonl \
     --reward-model "Skywork/Skywork-Reward-Llama-3.1-8B-v0.2" \
     --load-in-4bit
 
 # RM 5: FsfairX (Llama-3-8B)
-PYTHONUNBUFFERED=1 conda run -n cloudspace python scripts/score_candidates.py \
+conda run -n langchain python scripts/score_candidates.py \
     --candidates-path data/candidates/gsm8k_n24_full_vllm.jsonl \
     --reward-model "sfairXC/FsfairX-LLaMA3-RM-v0.1" \
     --load-in-4bit
 ```
 
-Output: `data/scores/gsm8k_n24_full_vllm_scores_<rm_name>.jsonl` (one per RM)
+**Output:** `data/scores/gsm8k_n24_full_vllm_scores_<rm_name>.jsonl` (one per RM)
 
-### Step 3: Evaluate Offline (NO GPU, instant)
+---
 
-Mix & match any RMs, sweep any N, tweak any hyperparameter — all for free.
+## Step 3: Run Hypotheses (NO GPU, instant)
+
+### List all available hypotheses
 
 ```bash
-# Use 2 RMs, sweep N values
-python scripts/evaluate_offline.py \
-    --candidates-path data/candidates/gsm8k_n24_full_vllm.jsonl \
-    --score-paths "data/scores/gsm8k_n24_full_vllm_scores_reward-model-deberta-v3-large-v2.jsonl,data/scores/gsm8k_n24_full_vllm_scores_Llama-3-OffsetBias-RM-8B.jsonl" \
-    --eval-n 1,4,8,16,24
+conda run -n langchain python experiments/run_hypothesis.py --list
+```
 
-# Use ALL score files at once (glob pattern)
-python scripts/evaluate_offline.py \
+### Run a single hypothesis
+
+```bash
+# H1: Reward hacking at scale (N-sweep analysis)
+# (Automatically generates Accuracy, Reward Hacking Proxy, and Variance Gap plots!)
+conda run -n langchain python experiments/run_hypothesis.py -H h1 \
+    --candidates-path data/candidates/gsm8k_n24_full_vllm.jsonl \
+    --score-paths "data/scores/gsm8k_n24_full_vllm_scores_*.jsonl" \
+    --eval-n 1,2,4,6,8,12,16,20,24
+
+# H2: Ensemble diversity (correlation + effective size)
+conda run -n langchain python experiments/run_hypothesis.py -H h2 \
+    --candidates-path data/candidates/gsm8k_n24_full_vllm.jsonl \
+    --score-paths "data/scores/gsm8k_n24_full_vllm_scores_*.jsonl"
+
+# H3: Variance normalization comparison
+conda run -n langchain python experiments/run_hypothesis.py -H h3 \
+    --candidates-path data/candidates/gsm8k_n24_full_vllm.jsonl \
+    --score-paths "data/scores/gsm8k_n24_full_vllm_scores_*.jsonl"
+
+# H5: Full offline method comparison
+conda run -n langchain python experiments/run_hypothesis.py -H h5 \
     --candidates-path data/candidates/gsm8k_n24_full_vllm.jsonl \
     --score-paths "data/scores/gsm8k_n24_full_vllm_scores_*.jsonl" \
     --eval-n 1,4,8,16,24
 
-# Try different normalization
-python scripts/evaluate_offline.py \
+# H6: Self-consistency + RM hybrid
+conda run -n langchain python experiments/run_hypothesis.py -H h6 \
     --candidates-path data/candidates/gsm8k_n24_full_vllm.jsonl \
-    --score-paths "data/scores/gsm8k_n24_full_vllm_scores_*.jsonl" \
-    --eval-n 8 \
-    --variance-norm zscore
+    --score-paths "data/scores/gsm8k_n24_full_vllm_scores_*.jsonl"
+```
 
-# Tweak linear penalty
-python scripts/evaluate_offline.py \
+### Run all hypotheses at once
+
+```bash
+conda run -n langchain python experiments/run_all.py \
     --candidates-path data/candidates/gsm8k_n24_full_vllm.jsonl \
     --score-paths "data/scores/gsm8k_n24_full_vllm_scores_*.jsonl" \
-    --eval-n 8 \
-    --lin-c 2.0
+    --eval-n 1,4,8,16,24
+```
+
+### Run a subset
+
+```bash
+conda run -n langchain python experiments/run_all.py \
+    --hypotheses h1,h3,h5 \
+    --candidates-path data/candidates/gsm8k_n24_full_vllm.jsonl \
+    --score-paths "data/scores/gsm8k_n24_full_vllm_scores_*.jsonl"
+```
+
+### With custom normalization
+
+```bash
+conda run -n langchain python experiments/run_hypothesis.py -H h5 \
+    --candidates-path data/candidates/gsm8k_n24_full_vllm.jsonl \
+    --score-paths "data/scores/gsm8k_n24_full_vllm_scores_*.jsonl" \
+    --variance-norm-mode zscore
 ```
 
 ---
 
-## Strategy B: Direction 3 — Sequential Methods (Ideas Suite)
+## Output Structure
 
-Tests Adaptive SeqBoN (cannot be done offline — requires live generation).
+Each hypothesis run creates:
 
-```bash
-PYTHONUNBUFFERED=1 PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True \
-  conda run -n cloudspace python -m src.experiments.run_risk_aware_inference \
-    ideas-suite \
-    --include-seq \
-    --model-name "Qwen/Qwen2.5-3B-Instruct" \
-    --dataset gsm8k \
-    --max-examples 200 \
-    --load-in-4bit \
-    --reward-load-in-4bit \
-    --reward-model-names "OpenAssistant/reward-model-deberta-v3-large-v2,NCSOFT/Llama-3-OffsetBias-RM-8B"
+```
+runs/parallel/h5_offline_parallel_methods_gsm8k_20260530_120000/
+├── results.json       # Structured metrics (machine-readable)
+├── summary.txt        # Human-readable summary table
+└── plots/
+    ├── accuracy_vs_n.png
+    └── method_comparison_bar.png
 ```
 
 ---
 
-## Before First Run (if cache is corrupted)
+## Hypothesis Reference
+
+| ID  | Name | What it tests |
+|-----|------|---------------|
+| h1  | Reward Hacking at Scale | Vanilla BoN plateaus at large N; Sharpe/Linear don't |
+| h2  | Ensemble Diversity | RM correlation heatmap, effective ensemble size |
+| h3  | Variance Normalization | zscore vs robust_zscore calibration |
+| h4  | Disagreement Hybrid | Switching policies based on RM disagreement |
+| h5  | Offline Methods | All parallel selection methods comparison |
+| h6  | Self-Consistency | Majority vote + RM hybrid scoring |
+| h7  | RM Debiasing | Length-conditional scoring, per-prompt normalization |
+| h8  | Rank-Based Selection | Rank aggregation + pessimistic BoN (β sweep) |
+| h9  | Difficulty-Stratified | Easy/medium/hard stratified analysis |
+| h10 | Pairwise Tournament | Bradley-Terry + tournament-style selection |
+
+---
+
+## Troubleshooting
 
 ```bash
+# Clear corrupted model cache
 rm -rf ~/.cache/huggingface/hub/models--Qwen--Qwen2.5-3B-Instruct
+
+# Verify installation
+conda run -n langchain python -c "from src.hypotheses import list_hypotheses; print(list_hypotheses())"
 ```

@@ -12,7 +12,7 @@ Subjects: algebra, number_theory, counting_and_probability,
 import re
 from typing import List, Optional
 
-from datasets import DownloadConfig, load_dataset
+
 
 
 def load_math500(
@@ -25,6 +25,8 @@ def load_math500(
     Returns:
         List of dicts with keys: question, answer, subject, level
     """
+    from datasets import DownloadConfig, load_dataset
+
     try:
         # Prefer local cache first to avoid Hub SSL checks in offline environments.
         ds = load_dataset(
