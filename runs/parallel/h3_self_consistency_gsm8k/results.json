@@ -1,0 +1,140 @@
+{
+  "hypothesis": "h3_self_consistency",
+  "dataset": "gsm8k",
+  "n_values": [
+    4,
+    8,
+    16,
+    24
+  ],
+  "n_examples": 1319,
+  "rm_names": [
+    "ArmoRM-Llama3-8B-v0.1",
+    "FsfairX-LLaMA3-RM-v0.1",
+    "Llama-3-OffsetBias-RM-8B",
+    "Skywork-Reward-Llama-3.1-8B-v0.2",
+    "reward-model-deberta-v3-large-v2"
+  ],
+  "variance_norm_mode": "robust_zscore",
+  "results_by_n": {
+    "4": {
+      "vanilla_bon (ArmoRM-Llama3-8B-v0.1)": 0.9234268385140257,
+      "vanilla_bon (FsfairX-LLaMA3-RM-v0.1)": 0.9052312357846853,
+      "vanilla_bon (Llama-3-OffsetBias-RM-8B)": 0.9006823351023503,
+      "vanilla_bon (Skywork-Reward-Llama-3.1-8B-v0.2)": 0.9067475360121304,
+      "vanilla_bon (reward-model-deberta-v3-large-v2)": 0.9044730856709629,
+      "vanilla_bon (ensemble)": 0.910538286580743,
+      "majority_vote": 0.9166034874905231,
+      "rm_within_majority": 0.9166034874905231,
+      "rm_consistency_agree": 0.9166034874905231
+    },
+    "8": {
+      "vanilla_bon (ArmoRM-Llama3-8B-v0.1)": 0.9264594389689158,
+      "vanilla_bon (FsfairX-LLaMA3-RM-v0.1)": 0.9067475360121304,
+      "vanilla_bon (Llama-3-OffsetBias-RM-8B)": 0.8984078847611827,
+      "vanilla_bon (Skywork-Reward-Llama-3.1-8B-v0.2)": 0.9052312357846853,
+      "vanilla_bon (reward-model-deberta-v3-large-v2)": 0.9006823351023503,
+      "vanilla_bon (ensemble)": 0.910538286580743,
+      "majority_vote": 0.9279757391963609,
+      "rm_within_majority": 0.9279757391963609,
+      "rm_consistency_agree": 0.9279757391963609
+    },
+    "16": {
+      "vanilla_bon (ArmoRM-Llama3-8B-v0.1)": 0.9302501895375285,
+      "vanilla_bon (FsfairX-LLaMA3-RM-v0.1)": 0.9029567854435178,
+      "vanilla_bon (Llama-3-OffsetBias-RM-8B)": 0.8984078847611827,
+      "vanilla_bon (Skywork-Reward-Llama-3.1-8B-v0.2)": 0.9059893858984079,
+      "vanilla_bon (reward-model-deberta-v3-large-v2)": 0.890068233510235,
+      "vanilla_bon (ensemble)": 0.9014404852160728,
+      "majority_vote": 0.9332827899924185,
+      "rm_within_majority": 0.9332827899924185,
+      "rm_consistency_agree": 0.9332827899924185
+    },
+    "24": {
+      "vanilla_bon (ArmoRM-Llama3-8B-v0.1)": 0.9241849886277483,
+      "vanilla_bon (FsfairX-LLaMA3-RM-v0.1)": 0.8923426838514026,
+      "vanilla_bon (Llama-3-OffsetBias-RM-8B)": 0.8862774829416225,
+      "vanilla_bon (Skywork-Reward-Llama-3.1-8B-v0.2)": 0.8968915845337376,
+      "vanilla_bon (reward-model-deberta-v3-large-v2)": 0.8779378316906747,
+      "vanilla_bon (ensemble)": 0.890068233510235,
+      "majority_vote": 0.9325246398786959,
+      "rm_within_majority": 0.9325246398786959,
+      "rm_consistency_agree": 0.9325246398786959
+    }
+  },
+  "oracle_by_n": {
+    "4": 0.9575435936315391,
+    "8": 0.9651250947687642,
+    "16": 0.9742228961334344,
+    "24": 0.978013646702047
+  },
+  "normalized_by_n": {
+    "4": {
+      "vanilla_bon (ArmoRM-Llama3-8B-v0.1)": 0.9643705463182898,
+      "vanilla_bon (FsfairX-LLaMA3-RM-v0.1)": 0.9453681710213777,
+      "vanilla_bon (Llama-3-OffsetBias-RM-8B)": 0.9406175771971497,
+      "vanilla_bon (Skywork-Reward-Llama-3.1-8B-v0.2)": 0.9469517022961204,
+      "vanilla_bon (reward-model-deberta-v3-large-v2)": 0.9445764053840063,
+      "vanilla_bon (ensemble)": 0.950910530482977,
+      "majority_vote": 0.9572446555819477,
+      "rm_within_majority": 0.9572446555819477,
+      "rm_consistency_agree": 0.9572446555819477
+    },
+    "8": {
+      "vanilla_bon (ArmoRM-Llama3-8B-v0.1)": 0.959937156323645,
+      "vanilla_bon (FsfairX-LLaMA3-RM-v0.1)": 0.9395129615082483,
+      "vanilla_bon (Llama-3-OffsetBias-RM-8B)": 0.9308719560094265,
+      "vanilla_bon (Skywork-Reward-Llama-3.1-8B-v0.2)": 0.9379418695993715,
+      "vanilla_bon (reward-model-deberta-v3-large-v2)": 0.9332285938727416,
+      "vanilla_bon (ensemble)": 0.94344069128044,
+      "majority_vote": 0.9615082482325216,
+      "rm_within_majority": 0.9615082482325216,
+      "rm_consistency_agree": 0.9615082482325216
+    },
+    "16": {
+      "vanilla_bon (ArmoRM-Llama3-8B-v0.1)": 0.954863813229572,
+      "vanilla_bon (FsfairX-LLaMA3-RM-v0.1)": 0.9268482490272374,
+      "vanilla_bon (Llama-3-OffsetBias-RM-8B)": 0.9221789883268483,
+      "vanilla_bon (Skywork-Reward-Llama-3.1-8B-v0.2)": 0.9299610894941635,
+      "vanilla_bon (reward-model-deberta-v3-large-v2)": 0.9136186770428015,
+      "vanilla_bon (ensemble)": 0.9252918287937744,
+      "majority_vote": 0.9579766536964981,
+      "rm_within_majority": 0.9579766536964981,
+      "rm_consistency_agree": 0.9579766536964981
+    },
+    "24": {
+      "vanilla_bon (ArmoRM-Llama3-8B-v0.1)": 0.9449612403100776,
+      "vanilla_bon (FsfairX-LLaMA3-RM-v0.1)": 0.9124031007751938,
+      "vanilla_bon (Llama-3-OffsetBias-RM-8B)": 0.9062015503875969,
+      "vanilla_bon (Skywork-Reward-Llama-3.1-8B-v0.2)": 0.9170542635658915,
+      "vanilla_bon (reward-model-deberta-v3-large-v2)": 0.8976744186046511,
+      "vanilla_bon (ensemble)": 0.9100775193798449,
+      "majority_vote": 0.9534883720930233,
+      "rm_within_majority": 0.9534883720930233,
+      "rm_consistency_agree": 0.9534883720930233
+    }
+  },
+  "overall": {
+    "vanilla_bon (ArmoRM-Llama3-8B-v0.1)": 0.9241849886277483,
+    "vanilla_bon (FsfairX-LLaMA3-RM-v0.1)": 0.8923426838514026,
+    "vanilla_bon (Llama-3-OffsetBias-RM-8B)": 0.8862774829416225,
+    "vanilla_bon (Skywork-Reward-Llama-3.1-8B-v0.2)": 0.8968915845337376,
+    "vanilla_bon (reward-model-deberta-v3-large-v2)": 0.8779378316906747,
+    "vanilla_bon (ensemble)": 0.890068233510235,
+    "majority_vote": 0.9325246398786959,
+    "rm_within_majority": 0.9325246398786959,
+    "rm_consistency_agree": 0.9325246398786959
+  },
+  "overall_normalized": {
+    "vanilla_bon (ArmoRM-Llama3-8B-v0.1)": 0.9449612403100776,
+    "vanilla_bon (FsfairX-LLaMA3-RM-v0.1)": 0.9124031007751938,
+    "vanilla_bon (Llama-3-OffsetBias-RM-8B)": 0.9062015503875969,
+    "vanilla_bon (Skywork-Reward-Llama-3.1-8B-v0.2)": 0.9170542635658915,
+    "vanilla_bon (reward-model-deberta-v3-large-v2)": 0.8976744186046511,
+    "vanilla_bon (ensemble)": 0.9100775193798449,
+    "majority_vote": 0.9534883720930233,
+    "rm_within_majority": 0.9534883720930233,
+    "rm_consistency_agree": 0.9534883720930233
+  },
+  "_saved_at": "2026-05-31T09:02:27.864879"
+}

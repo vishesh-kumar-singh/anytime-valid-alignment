@@ -1,0 +1,45 @@
+{
+  "gap_decomposition": {
+    "n_questions": 500,
+    "pass@1": 0.5724166666666667,
+    "oracle@N": 0.794,
+    "unsolvable": {
+      "count": 103,
+      "frac": 0.206
+    },
+    "plurality_correct": {
+      "count": 322,
+      "frac": 0.644
+    },
+    "minority_correct": {
+      "count": 75,
+      "frac": 0.15
+    },
+    "selection_headroom_frac": 0.15
+  },
+  "adaptive_stopping": {
+    "fixed_N24_majority": {
+      "acc": 0.644,
+      "mean_samples": 24.0
+    },
+    "adaptive_thr=0.9": {
+      "acc": 0.638,
+      "mean_samples": 9.0
+    },
+    "adaptive_thr=0.95": {
+      "acc": 0.646,
+      "mean_samples": 10.616
+    },
+    "adaptive_thr=0.99": {
+      "acc": 0.644,
+      "mean_samples": 11.49
+    }
+  },
+  "rm_names": [
+    "ArmoRM-Llama3-8B-v0.1",
+    "FsfairX-LLaMA3-RM-v0.1",
+    "Llama-3-OffsetBias-RM-8B",
+    "Skywork-Reward-Llama-3.1-8B-v0.2",
+    "reward-model-deberta-v3-large-v2"
+  ]
+}

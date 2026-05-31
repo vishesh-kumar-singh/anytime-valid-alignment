@@ -168,4 +168,4 @@ cython_debug/
 .venv/
 venv/
 .env
-runs/
+papers/
