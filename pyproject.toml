@@ -15,6 +15,9 @@ dependencies = [
     "numpy",
     "typer>=0.9",
     "tqdm",
+    "matplotlib",
+    "math-verify",          # rigorous MATH grading (replaces legacy substring grader)
+    "latex2sympy2-extended", # math-verify LaTeX backend
 ]
 
 [project.optional-dependencies]

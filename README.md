@@ -6,7 +6,7 @@ Research on improving LLM inference-time alignment using reward model ensembles 
 
 ## Background
 
-This project continues from prior UGP work ([noisy-reward-alignment.pdf](noisy-reward-alignment.pdf)) on uncertainty-guided policies for test-time alignment. The prior work showed that:
+This project continues from prior UGP work on uncertainty-guided policies for test-time alignment. The prior work showed that:
 
 - Ensemble RM disagreement is a useful signal for candidate quality
 - Robust normalization (z-score + tanh) is critical for heterogeneous RM ensembles  
@@ -27,18 +27,13 @@ However, the accuracy improvements were marginal (~0.1% on full GSM8K), limiting
 │   │   ├── results.py          #   MethodResult + ResultsManager
 │   │   ├── logger.py           #   ExperimentLogger
 │   │   └── method_runners.py   #   BoN wrapper functions
-│   ├── hypotheses/             # One file per hypothesis
+│   ├── hypotheses/             # One file per experiment
 │   │   ├── base.py             #   Abstract Hypothesis class
-│   │   ├── h1_reward_hacking_at_scale.py
-│   │   ├── h2_ensemble_diversity.py
-│   │   ├── h3_variance_normalization.py
-│   │   ├── h4_disagreement_hybrid.py
-│   │   ├── h5_offline_parallel_methods.py
-│   │   ├── h6_self_consistency.py
-│   │   ├── h7_rm_debiasing.py
-│   │   ├── h8_rank_based_selection.py
-│   │   ├── h9_difficulty_stratified.py
-│   │   └── h10_pairwise_tournament.py
+│   │   ├── h1_uncertainty_aware.py
+│   │   ├── h2_ensemble_aggregation.py
+│   │   ├── h3_self_consistency.py
+│   │   ├── h4_reward_weighted_self_consistency.py
+│   │   └── h5_single_best_rm_rwsc.py
 │   ├── methods/                # Selection strategy implementations
 │   │   ├── parallel/           #   BoN, Sharpe, SoftBoN, MoB, WBoN
 │   │   ├── sequential/         #   SeqBoN search
@@ -52,14 +47,6 @@ However, the accuracy improvements were marginal (~0.1% on full GSM8K), limiting
 ├── scripts/                    # Data pipeline (generate → score)
 │   ├── generate_candidates_vllm.py
 │   └── score_candidates.py
-├── runs/                       # Experiment outputs
-│   ├── parallel/               #   Parallel hypothesis results
-│   │   └── <experiment_name>/
-│   │       ├── config.json
-│   │       ├── results.json
-│   │       ├── summary.txt
-│   │       └── plots/
-│   └── sequential/             #   Sequential hypothesis results
 ├── configs/experiment.yaml
 └── tests/test_all.py
 ```
@@ -80,43 +67,43 @@ python scripts/score_candidates.py \
     --candidates-path data/candidates/gsm8k_n24_full_vllm.jsonl \
     --reward-model "OpenAssistant/reward-model-deberta-v3-large-v2"
 
-# Step 3: Run hypotheses (offline, no GPU needed)
+# Step 3: Run experiments (offline, no GPU needed)
 python experiments/run_hypothesis.py --list                    # see options
-python experiments/run_hypothesis.py -H h5 \
+python experiments/run_hypothesis.py -H h1 \
     --candidates-path data/candidates/gsm8k_n24_full_vllm.jsonl \
     --score-paths "data/scores/gsm8k_n24_full_vllm_scores_*.jsonl"
 
-# Run all hypotheses at once
+# Run all experiments at once
 python experiments/run_all.py \
     --candidates-path data/candidates/gsm8k_n24_full_vllm.jsonl \
     --score-paths "data/scores/gsm8k_n24_full_vllm_scores_*.jsonl"
 ```
 
-## Hypotheses
+## Experiments
+
+Correctness is graded with **`math_verify`** (the HF/Qwen/DeepSeek standard);
+the legacy substring grader inflated MATH500 accuracy by ~12 points and is no
+longer used. See `FUTURE_WORK.md` for why parallel selection saturates here.
 
 | ID  | Name | Description |
 |-----|------|-------------|
-| h1  | Reward Hacking at Scale | Vanilla BoN plateaus/drops at large N; uncertainty-aware methods don't |
-| h2  | Ensemble Diversity | Pairwise RM correlation + effective ensemble size analysis |
-| h3  | Variance Normalization | Robust normalization is critical for heterogeneous RM ensembles |
-| h4  | Disagreement Hybrid | Disagreement-gated policy switches methods based on RM agreement |
-| h5  | Offline Methods | Comprehensive comparison of all parallel selection methods |
-| h6  | Self-Consistency | Majority vote + RM hybrid selection |
-| h7  | RM Debiasing | Length-conditional scoring + per-prompt normalization |
-| h8  | Rank-Based Selection | Rank aggregation and pessimistic BoN |
-| h9  | Difficulty-Stratified | Stratified analysis by prompt difficulty |
-| h10 | Pairwise Tournament | Bradley-Terry + tournament-style selection |
+| h1  | Uncertainty-Aware BoN | Sharpe, Linear, SoftBoN variants vs vanilla argmax |
+| h2  | Ensemble Aggregation | Mixture-of-Bests (MoB) and Weighted BoN (WBoN) |
+| h3  | Self-Consistency | Majority vote, RM-within-majority, RM-consistency-agree |
+| h4  | Reward-Weighted Self-Consistency | Answer-level BoN: aggregate RM mass per answer |
+| h5  | Single-Best-RM RWSC | Drop the diluting ensemble; weight by the single strongest RM (best parallel method, ~70.6%) |
 
 ## Methods
 
 | Category | Method | Selection Rule |
-|----------|--------|---------------|
+|----------|--------|----------------|
 | Parallel | Vanilla BoN | argmax μ |
 | Parallel | Sharpe BoN | argmax μ/σ |
 | Parallel | Linear BoN | argmax (μ − c·σ) |
 | Parallel | SoftBoN variants | softmax over utilities |
 | Parallel | MoB | Bootstrap majority-of-bests |
 | Parallel | WBoN | Inverse-variance weighted aggregation |
+| Consensus | Majority Vote | Pure answer-level consistency |
+| Consensus | RM-within-Majority | RM-guided selection within majority cluster |
 | Sequential | Vanilla SeqBoN | accept if r ≥ γ |
 | Sequential | Sharpe SeqBoN | accept if μ/σ ≥ γ |
-| Routing | Hybrid | disagreement-gated switching |

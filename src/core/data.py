@@ -6,7 +6,125 @@ scripts never need to import from individual data_utils files directly.
 
 from __future__ import annotations
 
+import atexit
+import hashlib
+import os
+import pickle
+import threading
 from typing import List, Optional
+
+# ─────────────────────────────────────────────────────────────────────────
+# Rigorous math grading (math_verify) with a persistent disk cache.
+#
+# The legacy string grader in ``data_utils/math500.py`` is BOTH too lenient
+# (its ``gold in pred`` substring fallback marks "2" correct inside "12") and
+# too strict (exact match fails on equivalent LaTeX like ``11\sqrt2`` vs
+# ``11\sqrt{2}``).  Measured against math_verify it produced ~14% false
+# positives, inflating MATH500 accuracy by ~12 points.  We therefore grade
+# MATH500 with ``math_verify`` (the HF/Qwen/DeepSeek standard).  Results are
+# cached to disk keyed by (dataset, gold, prediction) so repeated hypothesis
+# runs over the same candidate set are effectively free after the first pass.
+# ─────────────────────────────────────────────────────────────────────────
+
+_GRADE_CACHE_PATH = os.path.join("data", "cache", "math_grade_cache.pkl")
+_GRADE_CACHE: Optional[dict] = None
+_GRADE_CACHE_LOCK = threading.Lock()
+_GRADE_CACHE_DIRTY = False
+_MV = None  # lazily-imported (parse, verify, CFG)
+
+
+def _load_grade_cache() -> dict:
+    global _GRADE_CACHE
+    if _GRADE_CACHE is None:
+        try:
+            with open(_GRADE_CACHE_PATH, "rb") as f:
+                _GRADE_CACHE = pickle.load(f)
+        except Exception:
+            _GRADE_CACHE = {}
+        atexit.register(_save_grade_cache)
+    return _GRADE_CACHE
+
+
+def _save_grade_cache() -> None:
+    global _GRADE_CACHE_DIRTY
+    if _GRADE_CACHE is None or not _GRADE_CACHE_DIRTY:
+        return
+    os.makedirs(os.path.dirname(_GRADE_CACHE_PATH), exist_ok=True)
+    tmp = _GRADE_CACHE_PATH + ".tmp"
+    with open(tmp, "wb") as f:
+        pickle.dump(_GRADE_CACHE, f, protocol=pickle.HIGHEST_PROTOCOL)
+    os.replace(tmp, _GRADE_CACHE_PATH)
+    _GRADE_CACHE_DIRTY = False
+
+
+def _grade_key(dataset: str, gold: str, pred: str) -> str:
+    h = hashlib.sha1()
+    h.update(dataset.encode("utf-8", "ignore"))
+    h.update(b"\x00")
+    h.update(gold.encode("utf-8", "ignore"))
+    h.update(b"\x00")
+    h.update(pred.encode("utf-8", "ignore"))
+    return h.hexdigest()
+
+
+def _get_mv():
+    global _MV
+    if _MV is None:
+        from math_verify import parse, verify  # type: ignore
+        from math_verify.parser import (  # type: ignore
+            ExprExtractionConfig,
+            LatexExtractionConfig,
+        )
+        _MV = (parse, verify, [LatexExtractionConfig(), ExprExtractionConfig()])
+    return _MV
+
+
+def math_verify_correct(prediction: str, ground_truth: str) -> bool:
+    """Rigorous correctness for MATH-style answers via math_verify.
+
+    Parses the *full* prediction text (extracts the last boxed/LaTeX/expression
+    automatically — this recovers answers even when ``\\boxed{}`` formatting is
+    imperfect) and checks symbolic/numeric equivalence against the gold answer.
+    """
+    if not prediction or not ground_truth:
+        return False
+    parse, verify, cfg = _get_mv()
+    # Gold answers are bare expressions; wrapping in $...$ parses most reliably.
+    gold_p = None
+    for g in (f"${ground_truth}$", ground_truth):
+        try:
+            gold_p = parse(g, extraction_config=cfg)
+        except Exception:
+            gold_p = None
+        if gold_p:
+            break
+    if not gold_p:
+        return False
+    try:
+        pred_p = parse(prediction, extraction_config=cfg)
+    except Exception:
+        return False
+    if not pred_p:
+        return False
+    try:
+        return bool(verify(gold_p, pred_p))
+    except Exception:
+        return False
+
+
+def check_math_correct_cached(prediction: str, ground_truth: str) -> bool:
+    """Disk-cached wrapper around :func:`math_verify_correct`."""
+    global _GRADE_CACHE_DIRTY
+    cache = _load_grade_cache()
+    key = _grade_key("math500", ground_truth, prediction)
+    with _GRADE_CACHE_LOCK:
+        if key in cache:
+            return cache[key]
+    val = math_verify_correct(prediction, ground_truth)
+    with _GRADE_CACHE_LOCK:
+        cache[key] = val
+        _GRADE_CACHE_DIRTY = True
+    return val
 
 
 def load_dataset_examples(
@@ -54,8 +172,13 @@ def check_correctness(prediction: str, ground_truth: str, dataset: str) -> bool:
         from ..data_utils.gsm8k import check_answer_correct
         return check_answer_correct(prediction, ground_truth)
     elif dataset == "math500":
-        from ..data_utils.math500 import check_math_correct
-        return check_math_correct(prediction, ground_truth)
+        # Rigorous, cached math_verify grading (see module docstring above).
+        # Falls back to the legacy string grader only if math_verify is missing.
+        try:
+            return check_math_correct_cached(prediction, ground_truth)
+        except ImportError:
+            from ..data_utils.math500 import check_math_correct
+            return check_math_correct(prediction, ground_truth)
     elif dataset == "alpaca_eval":
         return False  # open-ended: no ground-truth correctness
     return False

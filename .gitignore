@@ -9,9 +9,7 @@ run_demo.py
 # Experiment artifacts (large, generated)
 nohup*.log
 output.log
-runs/**/*.jsonl
-runs/**/*.log
-runs/**/plots*/
+
 
 # Keep lightweight result summaries and tables
 !runs/**/*summary*.txt

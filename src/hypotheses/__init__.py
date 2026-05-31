@@ -12,7 +12,7 @@ Usage::
         print(f"{hid}: {desc}")
 
     # Run one
-    h = get_hypothesis("h5")
+    h = get_hypothesis("h1")
     results = h.run(candidates_path="...", score_paths="...")
 """
 
@@ -24,9 +24,11 @@ from .base import Hypothesis
 
 # Lazy imports to avoid loading all hypothesis code at import time.
 _REGISTRY: Dict[str, str] = {
-    "h1": "src.hypotheses.h1_reward_hacking_at_scale.H1RewardHackingAtScale",
-    "h6": "src.hypotheses.h6_self_consistency.H6SelfConsistency",
-    "h9": "src.hypotheses.h9_difficulty_stratified.H9DifficultyStratified",
+    "h1": "src.hypotheses.h1_uncertainty_aware.H1UncertaintyAware",
+    "h2": "src.hypotheses.h2_ensemble_aggregation.H2EnsembleAggregation",
+    "h3": "src.hypotheses.h3_self_consistency.H3SelfConsistency",
+    "h4": "src.hypotheses.h4_reward_weighted_self_consistency.H4RewardWeightedSelfConsistency",
+    "h5": "src.hypotheses.h5_single_best_rm_rwsc.H5SingleBestRMRWSC",
 }
 
 

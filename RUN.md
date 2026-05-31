@@ -1,6 +1,6 @@
 # Test-Time Alignment: Run Guide
 
-All experiment outputs are saved to `runs/parallel/<experiment_name>/` with `results.json`, `summary.txt`, and `plots/`.
+All experiment outputs are saved to `runs/parallel/<experiment_name>/` with `results.json`, `summary.txt`, and `plots/`. Note that directories are not timestamped; re-running an experiment will cleanly overwrite the previous run.
 
 ---
 
@@ -80,6 +80,8 @@ conda run -n langchain python scripts/score_candidates.py \
 
 ## Step 3: Run Hypotheses (NO GPU, instant)
 
+Every hypothesis automatically generates N-scaling results (N=4, 8, 16, 24).
+
 ### List all available hypotheses
 
 ```bash
@@ -89,33 +91,24 @@ conda run -n langchain python experiments/run_hypothesis.py --list
 ### Run a single hypothesis
 
 ```bash
-# H1: Reward hacking at scale (N-sweep analysis)
-# (Automatically generates Accuracy, Reward Hacking Proxy, and Variance Gap plots!)
+# H1: Uncertainty-Aware BoN
+# (Automatically generates Accuracy vs N plots!)
 conda run -n langchain python experiments/run_hypothesis.py -H h1 \
     --candidates-path data/candidates/gsm8k_n24_full_vllm.jsonl \
     --score-paths "data/scores/gsm8k_n24_full_vllm_scores_*.jsonl" \
-    --eval-n 1,2,4,6,8,12,16,20,24
+    --eval-n 4,8,16,24
 
-# H2: Ensemble diversity (correlation + effective size)
+# H2: Ensemble Aggregation
 conda run -n langchain python experiments/run_hypothesis.py -H h2 \
     --candidates-path data/candidates/gsm8k_n24_full_vllm.jsonl \
-    --score-paths "data/scores/gsm8k_n24_full_vllm_scores_*.jsonl"
+    --score-paths "data/scores/gsm8k_n24_full_vllm_scores_*.jsonl" \
+    --eval-n 4,8,16,24
 
-# H3: Variance normalization comparison
+# H3: Self-Consistency
 conda run -n langchain python experiments/run_hypothesis.py -H h3 \
     --candidates-path data/candidates/gsm8k_n24_full_vllm.jsonl \
-    --score-paths "data/scores/gsm8k_n24_full_vllm_scores_*.jsonl"
-
-# H5: Full offline method comparison
-conda run -n langchain python experiments/run_hypothesis.py -H h5 \
-    --candidates-path data/candidates/gsm8k_n24_full_vllm.jsonl \
     --score-paths "data/scores/gsm8k_n24_full_vllm_scores_*.jsonl" \
-    --eval-n 1,4,8,16,24
-
-# H6: Self-consistency + RM hybrid
-conda run -n langchain python experiments/run_hypothesis.py -H h6 \
-    --candidates-path data/candidates/gsm8k_n24_full_vllm.jsonl \
-    --score-paths "data/scores/gsm8k_n24_full_vllm_scores_*.jsonl"
+    --eval-n 4,8,16,24
 ```
 
 ### Run all hypotheses at once
@@ -124,40 +117,21 @@ conda run -n langchain python experiments/run_hypothesis.py -H h6 \
 conda run -n langchain python experiments/run_all.py \
     --candidates-path data/candidates/gsm8k_n24_full_vllm.jsonl \
     --score-paths "data/scores/gsm8k_n24_full_vllm_scores_*.jsonl" \
-    --eval-n 1,4,8,16,24
-```
-
-### Run a subset
-
-```bash
-conda run -n langchain python experiments/run_all.py \
-    --hypotheses h1,h3,h5 \
-    --candidates-path data/candidates/gsm8k_n24_full_vllm.jsonl \
-    --score-paths "data/scores/gsm8k_n24_full_vllm_scores_*.jsonl"
-```
-
-### With custom normalization
-
-```bash
-conda run -n langchain python experiments/run_hypothesis.py -H h5 \
-    --candidates-path data/candidates/gsm8k_n24_full_vllm.jsonl \
-    --score-paths "data/scores/gsm8k_n24_full_vllm_scores_*.jsonl" \
-    --variance-norm-mode zscore
+    --eval-n 4,8,16,24
 ```
 
 ---
 
 ## Output Structure
 
-Each hypothesis run creates:
+Each hypothesis run creates a non-timestamped directory so re-runs stay clean:
 
 ```
-runs/parallel/h5_offline_parallel_methods_gsm8k_20260530_120000/
+runs/parallel/h1_uncertainty_aware_gsm8k/
 ├── results.json       # Structured metrics (machine-readable)
 ├── summary.txt        # Human-readable summary table
 └── plots/
-    ├── accuracy_vs_n.png
-    └── method_comparison_bar.png
+    └── accuracy_vs_n.png
 ```
 
 ---
@@ -166,16 +140,16 @@ runs/parallel/h5_offline_parallel_methods_gsm8k_20260530_120000/
 
 | ID  | Name | What it tests |
 |-----|------|---------------|
-| h1  | Reward Hacking at Scale | Vanilla BoN plateaus at large N; Sharpe/Linear don't |
-| h2  | Ensemble Diversity | RM correlation heatmap, effective ensemble size |
-| h3  | Variance Normalization | zscore vs robust_zscore calibration |
-| h4  | Disagreement Hybrid | Switching policies based on RM disagreement |
-| h5  | Offline Methods | All parallel selection methods comparison |
-| h6  | Self-Consistency | Majority vote + RM hybrid scoring |
-| h7  | RM Debiasing | Length-conditional scoring, per-prompt normalization |
-| h8  | Rank-Based Selection | Rank aggregation + pessimistic BoN (β sweep) |
-| h9  | Difficulty-Stratified | Easy/medium/hard stratified analysis |
-| h10 | Pairwise Tournament | Bradley-Terry + tournament-style selection |
+| h1  | Uncertainty-Aware BoN | Sharpe, Linear, and SoftBoN variants vs Vanilla BoN |
+| h2  | Ensemble Aggregation | MoB and WBoN variants |
+| h3  | Self-Consistency | Majority Vote, RM-within-Majority, RM-Consistency-Agree |
+| h4  | Reward-Weighted Self-Consistency | Answer-level BoN: sum RM mass per unique answer |
+| h5  | Single-Best-RM RWSC | RWSC weighted by the single strongest RM (best parallel method) |
+
+> **Grading:** MATH500 is scored with `math_verify` (cached to
+> `data/cache/math_grade_cache.pkl`). The first run on a new candidate set
+> populates the cache (~1 min for 12k answers); subsequent runs are instant.
+> Install with `pip install math-verify latex2sympy2-extended`.
 
 ---
 
