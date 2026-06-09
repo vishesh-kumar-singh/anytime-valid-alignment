@@ -9,56 +9,46 @@
   ],
   "n_examples": 500,
   "rm_names": [
-    "ArmoRM-Llama3-8B-v0.1",
     "FsfairX-LLaMA3-RM-v0.1",
     "Llama-3-OffsetBias-RM-8B",
-    "Skywork-Reward-Llama-3.1-8B-v0.2",
     "reward-model-deberta-v3-large-v2"
   ],
   "variance_norm_mode": "robust_zscore",
   "results_by_n": {
     "4": {
-      "vanilla_bon (ArmoRM-Llama3-8B-v0.1)": 0.618,
       "vanilla_bon (FsfairX-LLaMA3-RM-v0.1)": 0.618,
       "vanilla_bon (Llama-3-OffsetBias-RM-8B)": 0.606,
-      "vanilla_bon (Skywork-Reward-Llama-3.1-8B-v0.2)": 0.622,
       "vanilla_bon (reward-model-deberta-v3-large-v2)": 0.598,
-      "vanilla_bon (ensemble)": 0.626,
+      "vanilla_bon (ensemble)": 0.616,
       "majority_vote": 0.606,
       "rm_within_majority": 0.606,
       "rm_consistency_agree": 0.606
     },
     "8": {
-      "vanilla_bon (ArmoRM-Llama3-8B-v0.1)": 0.648,
       "vanilla_bon (FsfairX-LLaMA3-RM-v0.1)": 0.62,
       "vanilla_bon (Llama-3-OffsetBias-RM-8B)": 0.63,
-      "vanilla_bon (Skywork-Reward-Llama-3.1-8B-v0.2)": 0.656,
       "vanilla_bon (reward-model-deberta-v3-large-v2)": 0.618,
-      "vanilla_bon (ensemble)": 0.65,
+      "vanilla_bon (ensemble)": 0.644,
       "majority_vote": 0.62,
-      "rm_within_majority": 0.628,
-      "rm_consistency_agree": 0.626
+      "rm_within_majority": 0.622,
+      "rm_consistency_agree": 0.62
     },
     "16": {
-      "vanilla_bon (ArmoRM-Llama3-8B-v0.1)": 0.658,
       "vanilla_bon (FsfairX-LLaMA3-RM-v0.1)": 0.626,
       "vanilla_bon (Llama-3-OffsetBias-RM-8B)": 0.65,
-      "vanilla_bon (Skywork-Reward-Llama-3.1-8B-v0.2)": 0.68,
       "vanilla_bon (reward-model-deberta-v3-large-v2)": 0.618,
-      "vanilla_bon (ensemble)": 0.672,
+      "vanilla_bon (ensemble)": 0.656,
       "majority_vote": 0.626,
-      "rm_within_majority": 0.638,
+      "rm_within_majority": 0.632,
       "rm_consistency_agree": 0.63
     },
     "24": {
-      "vanilla_bon (ArmoRM-Llama3-8B-v0.1)": 0.672,
       "vanilla_bon (FsfairX-LLaMA3-RM-v0.1)": 0.62,
       "vanilla_bon (Llama-3-OffsetBias-RM-8B)": 0.644,
-      "vanilla_bon (Skywork-Reward-Llama-3.1-8B-v0.2)": 0.692,
       "vanilla_bon (reward-model-deberta-v3-large-v2)": 0.628,
-      "vanilla_bon (ensemble)": 0.674,
+      "vanilla_bon (ensemble)": 0.648,
       "majority_vote": 0.632,
-      "rm_within_majority": 0.64,
+      "rm_within_majority": 0.636,
       "rm_consistency_agree": 0.634
     }
   },
@@ -70,71 +60,59 @@
   },
   "normalized_by_n": {
     "4": {
-      "vanilla_bon (ArmoRM-Llama3-8B-v0.1)": 0.9196428571428571,
       "vanilla_bon (FsfairX-LLaMA3-RM-v0.1)": 0.9196428571428571,
       "vanilla_bon (Llama-3-OffsetBias-RM-8B)": 0.9017857142857143,
-      "vanilla_bon (Skywork-Reward-Llama-3.1-8B-v0.2)": 0.9255952380952381,
       "vanilla_bon (reward-model-deberta-v3-large-v2)": 0.8898809523809523,
-      "vanilla_bon (ensemble)": 0.9315476190476191,
+      "vanilla_bon (ensemble)": 0.9166666666666666,
       "majority_vote": 0.9017857142857143,
       "rm_within_majority": 0.9017857142857143,
       "rm_consistency_agree": 0.9017857142857143
     },
     "8": {
-      "vanilla_bon (ArmoRM-Llama3-8B-v0.1)": 0.8950276243093923,
       "vanilla_bon (FsfairX-LLaMA3-RM-v0.1)": 0.856353591160221,
       "vanilla_bon (Llama-3-OffsetBias-RM-8B)": 0.8701657458563536,
-      "vanilla_bon (Skywork-Reward-Llama-3.1-8B-v0.2)": 0.9060773480662984,
       "vanilla_bon (reward-model-deberta-v3-large-v2)": 0.8535911602209945,
-      "vanilla_bon (ensemble)": 0.8977900552486188,
+      "vanilla_bon (ensemble)": 0.8895027624309392,
       "majority_vote": 0.856353591160221,
-      "rm_within_majority": 0.8674033149171271,
-      "rm_consistency_agree": 0.8646408839779005
+      "rm_within_majority": 0.8591160220994475,
+      "rm_consistency_agree": 0.856353591160221
     },
     "16": {
-      "vanilla_bon (ArmoRM-Llama3-8B-v0.1)": 0.8501291989664083,
       "vanilla_bon (FsfairX-LLaMA3-RM-v0.1)": 0.8087855297157622,
       "vanilla_bon (Llama-3-OffsetBias-RM-8B)": 0.8397932816537468,
-      "vanilla_bon (Skywork-Reward-Llama-3.1-8B-v0.2)": 0.8785529715762274,
       "vanilla_bon (reward-model-deberta-v3-large-v2)": 0.7984496124031008,
-      "vanilla_bon (ensemble)": 0.8682170542635659,
+      "vanilla_bon (ensemble)": 0.8475452196382429,
       "majority_vote": 0.8087855297157622,
-      "rm_within_majority": 0.8242894056847545,
+      "rm_within_majority": 0.8165374677002584,
       "rm_consistency_agree": 0.813953488372093
     },
     "24": {
-      "vanilla_bon (ArmoRM-Llama3-8B-v0.1)": 0.8463476070528967,
       "vanilla_bon (FsfairX-LLaMA3-RM-v0.1)": 0.7808564231738035,
       "vanilla_bon (Llama-3-OffsetBias-RM-8B)": 0.8110831234256927,
-      "vanilla_bon (Skywork-Reward-Llama-3.1-8B-v0.2)": 0.871536523929471,
       "vanilla_bon (reward-model-deberta-v3-large-v2)": 0.7909319899244333,
-      "vanilla_bon (ensemble)": 0.8488664987405542,
+      "vanilla_bon (ensemble)": 0.8161209068010076,
       "majority_vote": 0.7959697732997482,
-      "rm_within_majority": 0.8060453400503779,
+      "rm_within_majority": 0.801007556675063,
       "rm_consistency_agree": 0.7984886649874056
     }
   },
   "overall": {
-    "vanilla_bon (ArmoRM-Llama3-8B-v0.1)": 0.672,
     "vanilla_bon (FsfairX-LLaMA3-RM-v0.1)": 0.62,
     "vanilla_bon (Llama-3-OffsetBias-RM-8B)": 0.644,
-    "vanilla_bon (Skywork-Reward-Llama-3.1-8B-v0.2)": 0.692,
     "vanilla_bon (reward-model-deberta-v3-large-v2)": 0.628,
-    "vanilla_bon (ensemble)": 0.674,
+    "vanilla_bon (ensemble)": 0.648,
     "majority_vote": 0.632,
-    "rm_within_majority": 0.64,
+    "rm_within_majority": 0.636,
     "rm_consistency_agree": 0.634
   },
   "overall_normalized": {
-    "vanilla_bon (ArmoRM-Llama3-8B-v0.1)": 0.8463476070528967,
     "vanilla_bon (FsfairX-LLaMA3-RM-v0.1)": 0.7808564231738035,
     "vanilla_bon (Llama-3-OffsetBias-RM-8B)": 0.8110831234256927,
-    "vanilla_bon (Skywork-Reward-Llama-3.1-8B-v0.2)": 0.871536523929471,
     "vanilla_bon (reward-model-deberta-v3-large-v2)": 0.7909319899244333,
-    "vanilla_bon (ensemble)": 0.8488664987405542,
+    "vanilla_bon (ensemble)": 0.8161209068010076,
     "majority_vote": 0.7959697732997482,
-    "rm_within_majority": 0.8060453400503779,
+    "rm_within_majority": 0.801007556675063,
     "rm_consistency_agree": 0.7984886649874056
   },
-  "_saved_at": "2026-05-31T09:02:06.187951"
+  "_saved_at": "2026-06-09T12:02:30.204559"
 }

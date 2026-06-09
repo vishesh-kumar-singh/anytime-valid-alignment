@@ -1,0 +1,10 @@
+{"timestamp": "2026-06-07T18:15:11.455948", "event": "environment", "data": {"python": "3.12.2", "torch": "2.7.1+cu126", "cuda_available": true, "gpu": "NVIDIA GeForce RTX 2050", "gpu_memory": "4.0 GB", "hostname": "JARVIS", "timestamp": "2026-06-07T18:15:11.455842"}}
+{"timestamp": "2026-06-07T18:15:11.456087", "event": "phase_start", "data": {"phase": "dataset_loading", "details": "math500"}}
+{"timestamp": "2026-06-07T18:15:16.177744", "event": "phase_end", "data": {"phase": "dataset_loading", "duration_sec": 4.721523284912109}}
+{"timestamp": "2026-06-07T18:15:17.167272", "event": "phase_start", "data": {"phase": "model_loading", "details": "HF 4-bit: Qwen/Qwen2.5-Math-1.5B-Instruct"}}
+{"timestamp": "2026-06-07T18:15:22.917553", "event": "phase_end", "data": {"phase": "model_loading", "duration_sec": 5.750324249267578}}
+{"timestamp": "2026-06-07T18:15:22.917692", "event": "inference_start", "data": {"total_examples": 500, "bon_n": 32}}
+{"timestamp": "2026-06-07T19:10:13.934751", "event": "checkpoint", "data": {"completed": 10, "total": 500, "elapsed_sec": 3291.0152945518494, "eta": "44h 47m 39s", "running_accuracy": {"hf_generation": 0.0}}}
+{"timestamp": "2026-06-07T20:10:49.212215", "event": "checkpoint", "data": {"completed": 20, "total": 500, "elapsed_sec": 6926.294326543808, "eta": "46h 10m 31s", "running_accuracy": {"hf_generation": 0.0}}}
+{"timestamp": "2026-06-07T21:05:07.076384", "event": "checkpoint", "data": {"completed": 30, "total": 500, "elapsed_sec": 10184.158521413803, "eta": "44h 19m 11s", "running_accuracy": {"hf_generation": 0.0}}}
+{"timestamp": "2026-06-07T21:45:02.516376", "event": "checkpoint", "data": {"completed": 40, "total": 500, "elapsed_sec": 12579.598536252975, "eta": "40h 11m 5s", "running_accuracy": {"hf_generation": 0.0}}}

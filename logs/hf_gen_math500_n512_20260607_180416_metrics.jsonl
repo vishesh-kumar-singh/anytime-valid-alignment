@@ -1,0 +1,4 @@
+{"timestamp": "2026-06-07T18:04:16.979847", "event": "environment", "data": {"python": "3.12.2", "torch": "2.7.1+cu126", "cuda_available": true, "gpu": "NVIDIA GeForce RTX 2050", "gpu_memory": "4.0 GB", "hostname": "JARVIS", "timestamp": "2026-06-07T18:04:16.979724"}}
+{"timestamp": "2026-06-07T18:04:16.980006", "event": "phase_start", "data": {"phase": "dataset_loading", "details": "math500"}}
+{"timestamp": "2026-06-07T18:04:22.212469", "event": "phase_end", "data": {"phase": "dataset_loading", "duration_sec": 5.232422828674316}}
+{"timestamp": "2026-06-07T18:04:23.208893", "event": "phase_start", "data": {"phase": "model_loading", "details": "HF 4-bit: Qwen/Qwen2.5-Math-1.5B-Instruct"}}

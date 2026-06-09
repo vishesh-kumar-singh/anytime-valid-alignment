@@ -272,6 +272,30 @@ def inverse_variance_weighted_aggregation(
     return weighted_means, weighted_variances
 
 
+def minimax_argmax(member_scores: list) -> int:
+    """Worst-Case Optimization (Minimax): select candidate with highest minimum RM score.
+
+    For each candidate, computes the minimum score assigned by any reward model.
+    Selects the candidate that maximizes this minimum score.
+
+    Args:
+        member_scores: Shape (K, N) — K models, N candidates.
+
+    Returns:
+        Index of the selected candidate.
+    """
+    arr = np.asarray(member_scores, dtype=float)
+    if arr.ndim != 2:
+        raise ValueError(f"member_scores must be (K, N), got shape={arr.shape}")
+    
+    # Compute minimum score across all K models for each candidate N
+    # min_scores shape: (N,)
+    min_scores = np.min(arr, axis=0)
+    
+    # Return index of candidate with the maximum minimum score
+    return int(np.argmax(min_scores))
+
+
 __all__ = [
     "greedy_argmax",
     "risk_adjusted_argmax",
@@ -280,4 +304,5 @@ __all__ = [
     "softbon_select",
     "majority_of_bests",
     "inverse_variance_weighted_aggregation",
+    "minimax_argmax",
 ]

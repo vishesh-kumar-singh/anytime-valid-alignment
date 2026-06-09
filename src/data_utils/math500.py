@@ -129,10 +129,6 @@ def check_math_correct(prediction: str, ground_truth: str) -> bool:
     if pred == gold:
         return True
 
-    # Symbolic containment fallback for short symbolic targets (e.g., p-q).
-    if len(gold) <= 32 and (gold in pred or pred in gold):
-        return True
-
     # Try numeric comparison
     try:
         p = float(pred.replace(",", ""))

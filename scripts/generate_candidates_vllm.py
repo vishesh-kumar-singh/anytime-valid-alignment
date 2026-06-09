@@ -36,7 +36,7 @@ app = typer.Typer()
 @app.command()
 def main(
     model_name: str = typer.Option("Qwen/Qwen2.5-3B-Instruct", help="Generator model."),
-    dataset: str = typer.Option("gsm8k", help="Dataset: gsm8k or math500."),
+    dataset: str = typer.Option("gsm8k", help="Dataset: gsm8k, math500, or alpaca_eval."),
     n_candidates: int = typer.Option(24, help="Number of candidates per example."),
     max_examples: int = typer.Option(200, help="Max examples. 0 = full dataset."),
     temperature: float = typer.Option(0.7, help="Generation temperature."),
@@ -158,7 +158,8 @@ def main(
         for ex, vllm_out in zip(examples_to_run, outputs):
             idx = ex["_global_index"]
             prompt = ex["question"]
-            gold_answer = ex.get("answer", "")
+            # math datasets carry "answer"; alpaca_eval carries "reference"
+            gold_answer = ex.get("answer") or ex.get("reference", "")
             
             # Extract all N generated texts
             candidates = [out.text.strip() for out in vllm_out.outputs]

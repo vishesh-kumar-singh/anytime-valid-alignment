@@ -20,6 +20,7 @@ from ..methods.parallel.selection import (
     risk_adjusted_argmax,
     sharpe_ratio_argmax,
     softbon_select,
+    minimax_argmax,
 )
 
 
@@ -304,6 +305,34 @@ def run_wbon_sharpe(
         reward_mean=w_means[idx],
         reward_variance=w_variances[idx],
         score=sharpe_scores[idx],
+        n_candidates=len(candidates),
+        n_rm_calls=1,
+        latency_sec=time.perf_counter() - t0,
+    )
+
+
+def run_minimax(
+    candidates: List[str],
+    member_scores: List[List[float]],
+) -> MethodResult:
+    """Minimax BoN: worst-case optimization across RM ensemble."""
+    t0 = time.perf_counter()
+    if member_scores is None:
+        raise ValueError("Minimax requires member_scores.")
+    idx = minimax_argmax(member_scores)
+    
+    # Calculate means and variances manually for the returned result
+    arr = np.asarray(member_scores, dtype=float)
+    means = arr.mean(axis=0).tolist()
+    variances = arr.var(axis=0, ddof=0).tolist()
+    min_scores = arr.min(axis=0).tolist()
+    
+    return MethodResult(
+        method="minimax",
+        selected_answer=candidates[idx],
+        reward_mean=means[idx],
+        reward_variance=variances[idx],
+        score=min_scores[idx],
         n_candidates=len(candidates),
         n_rm_calls=1,
         latency_sec=time.perf_counter() - t0,

@@ -1,62 +1,54 @@
 Hypothesis: h1_uncertainty_aware
 Description: Uncertainty-aware BoN methods (Sharpe, Linear, SoftBoN) resist reward hacking better than vanilla argmax.
 Category: parallel
-Timestamp: 2026-05-31T09:02:19.245534
+Timestamp: 2026-06-09T09:52:20.702773
 
 Results by N  (Acc = accuracy;  ONA = oracle-normalized = Acc / Oracle@N):
 ----------------------------------------------------------------------
 
   N = 4   (Oracle@N = 95.8%):
-    vanilla_bon (ArmoRM-Llama3-8B-v0.1)       Acc  92.3%   ONA  96.4%
     vanilla_bon (FsfairX-LLaMA3-RM-v0.1)      Acc  90.5%   ONA  94.5%
     vanilla_bon (Llama-3-OffsetBias-RM-8B)    Acc  90.1%   ONA  94.1%
-    vanilla_bon (Skywork-Reward-Llama-3.1-8B-v0.2)  Acc  90.7%   ONA  94.7%
     vanilla_bon (reward-model-deberta-v3-large-v2)  Acc  90.4%   ONA  94.5%
-    vanilla_bon (ensemble)                    Acc  91.1%   ONA  95.1%
-    bon_sharpe                                Acc  91.6%   ONA  95.6%
-    bon_linear                                Acc  91.6%   ONA  95.6%
-    soft_bon                                  Acc  90.7%   ONA  94.7%
-    softbon_sharpe                            Acc  91.0%   ONA  95.0%
-    softbon_linear                            Acc  90.8%   ONA  94.8%
+    vanilla_bon (ensemble)                    Acc  90.0%   ONA  94.0%
+    bon_sharpe                                Acc  90.4%   ONA  94.4%
+    bon_linear                                Acc  90.4%   ONA  94.4%
+    soft_bon                                  Acc  89.8%   ONA  93.8%
+    softbon_sharpe                            Acc  90.5%   ONA  94.5%
+    softbon_linear                            Acc  89.9%   ONA  93.9%
 
   N = 8   (Oracle@N = 96.5%):
-    vanilla_bon (ArmoRM-Llama3-8B-v0.1)       Acc  92.6%   ONA  96.0%
     vanilla_bon (FsfairX-LLaMA3-RM-v0.1)      Acc  90.7%   ONA  94.0%
     vanilla_bon (Llama-3-OffsetBias-RM-8B)    Acc  89.8%   ONA  93.1%
-    vanilla_bon (Skywork-Reward-Llama-3.1-8B-v0.2)  Acc  90.5%   ONA  93.8%
     vanilla_bon (reward-model-deberta-v3-large-v2)  Acc  90.1%   ONA  93.3%
-    vanilla_bon (ensemble)                    Acc  91.1%   ONA  94.3%
-    bon_sharpe                                Acc  91.7%   ONA  95.1%
-    bon_linear                                Acc  91.9%   ONA  95.2%
-    soft_bon                                  Acc  90.8%   ONA  94.1%
-    softbon_sharpe                            Acc  92.3%   ONA  95.6%
-    softbon_linear                            Acc  90.5%   ONA  93.8%
+    vanilla_bon (ensemble)                    Acc  90.0%   ONA  93.2%
+    bon_sharpe                                Acc  90.9%   ONA  94.2%
+    bon_linear                                Acc  90.5%   ONA  93.8%
+    soft_bon                                  Acc  91.1%   ONA  94.4%
+    softbon_sharpe                            Acc  91.7%   ONA  95.0%
+    softbon_linear                            Acc  89.8%   ONA  93.1%
 
   N = 16   (Oracle@N = 97.4%):
-    vanilla_bon (ArmoRM-Llama3-8B-v0.1)       Acc  93.0%   ONA  95.5%
     vanilla_bon (FsfairX-LLaMA3-RM-v0.1)      Acc  90.3%   ONA  92.7%
     vanilla_bon (Llama-3-OffsetBias-RM-8B)    Acc  89.8%   ONA  92.2%
-    vanilla_bon (Skywork-Reward-Llama-3.1-8B-v0.2)  Acc  90.6%   ONA  93.0%
     vanilla_bon (reward-model-deberta-v3-large-v2)  Acc  89.0%   ONA  91.4%
-    vanilla_bon (ensemble)                    Acc  90.1%   ONA  92.5%
-    bon_sharpe                                Acc  91.7%   ONA  94.2%
-    bon_linear                                Acc  91.4%   ONA  93.8%
-    soft_bon                                  Acc  89.4%   ONA  91.8%
-    softbon_sharpe                            Acc  90.9%   ONA  93.3%
-    softbon_linear                            Acc  90.7%   ONA  93.1%
+    vanilla_bon (ensemble)                    Acc  89.5%   ONA  91.8%
+    bon_sharpe                                Acc  90.4%   ONA  92.8%
+    bon_linear                                Acc  89.8%   ONA  92.1%
+    soft_bon                                  Acc  88.9%   ONA  91.2%
+    softbon_sharpe                            Acc  90.6%   ONA  93.0%
+    softbon_linear                            Acc  90.1%   ONA  92.5%
 
   N = 24   (Oracle@N = 97.8%):
-    vanilla_bon (ArmoRM-Llama3-8B-v0.1)       Acc  92.4%   ONA  94.5%
     vanilla_bon (FsfairX-LLaMA3-RM-v0.1)      Acc  89.2%   ONA  91.2%
     vanilla_bon (Llama-3-OffsetBias-RM-8B)    Acc  88.6%   ONA  90.6%
-    vanilla_bon (Skywork-Reward-Llama-3.1-8B-v0.2)  Acc  89.7%   ONA  91.7%
     vanilla_bon (reward-model-deberta-v3-large-v2)  Acc  87.8%   ONA  89.8%
-    vanilla_bon (ensemble)                    Acc  89.0%   ONA  91.0%
-    bon_sharpe                                Acc  91.2%   ONA  93.3%
-    bon_linear                                Acc  90.4%   ONA  92.5%
-    soft_bon                                  Acc  89.9%   ONA  91.9%
-    softbon_sharpe                            Acc  91.8%   ONA  93.9%
-    softbon_linear                            Acc  90.4%   ONA  92.4%
+    vanilla_bon (ensemble)                    Acc  88.6%   ONA  90.5%
+    bon_sharpe                                Acc  90.4%   ONA  92.4%
+    bon_linear                                Acc  88.9%   ONA  90.9%
+    soft_bon                                  Acc  88.9%   ONA  90.9%
+    softbon_sharpe                            Acc  91.0%   ONA  93.0%
+    softbon_linear                            Acc  89.8%   ONA  91.8%
 
 Generated Plots:
   - accuracy_vs_n.png

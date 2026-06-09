@@ -38,7 +38,8 @@ def main(
         print(f"ERROR: Cannot find {in_path}")
         raise typer.Exit(1)
         
-    dataset = "gsm8k" if "gsm8k" in in_path.name.lower() else "math500"
+    _name = in_path.name.lower()
+    dataset = "gsm8k" if "gsm8k" in _name else ("alpaca_eval" if "alpaca" in _name else "math500")
     rm_short = reward_model.split("/")[-1]
 
     if output_path is None:

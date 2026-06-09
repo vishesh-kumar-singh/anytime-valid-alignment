@@ -53,6 +53,10 @@ def main() -> None:
         "--variance-norm-mode", type=str, default="robust_zscore",
         help="Normalization mode (default: robust_zscore).",
     )
+    parser.add_argument(
+        "--experiment-suffix", type=str, default="",
+        help="Optional suffix to append to the experiment output directory name.",
+    )
 
     args = parser.parse_args()
 
@@ -87,7 +91,10 @@ def main() -> None:
                 variance_norm_mode=args.variance_norm_mode,
             )
             dataset = results.get("dataset", "unknown")
-            manager = h.save(results, dataset=dataset)
+            exp_name = h.make_experiment_name(dataset)
+            if args.experiment_suffix:
+                exp_name += args.experiment_suffix
+            manager = h.save(results, dataset=dataset, experiment_name=exp_name)
             elapsed = time.time() - t0
             results_summary[hid] = {
                 "status": "success",

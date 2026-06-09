@@ -153,6 +153,83 @@ runs/parallel/h1_uncertainty_aware_gsm8k/
 
 ---
 
+## Alignment track (open-ended, LLM-judge win-rate)
+
+The math track above measures **RM selection quality** on verifiable tasks. The
+alignment track measures **preference quality** on open-ended instructions
+(AlpacaEval), where the gold signal is a **Gemini-judged win-rate vs the
+reference** (the arm the URM paper used alongside math BoN). Same selection
+methods, different gold metric. The headline is the **reward-overoptimization
+curve**: as N grows, proxy reward rises but does win-rate rise-then-*fall* for
+vanilla BoN, while uncertainty-aware / pessimistic BoN (Sharpe, μ−β·σ) holds up?
+
+### One-time setup
+
+```bash
+# 1. Judge keys — put 1-3 free Gemini keys (different accounts) in .env:
+#    GEMINI_API_KEY=...
+#    GEMINI_API_KEY_2=...        # optional, pools quota (round-robin + failover)
+#    GEMINI_API_KEY_3=...
+#    GEMINI_JUDGE_MODEL=gemini-flash-lite-latest   # 500 req/day on free tier
+# 2. Deps (already installed in `langchain`): google-genai, datasets
+# 3. Smoke-test the judge (2 live calls):
+conda run -n langchain python -m src.eval.llm_judge --smoke
+```
+
+### Step A1: Generate AlpacaEval candidates (GPU, run once)
+
+```bash
+conda run -n langchain python scripts/generate_candidates_vllm.py \
+    --model-name "Qwen/Qwen2.5-1.5B-Instruct" \
+    --dataset alpaca_eval \
+    --n-candidates 16 \
+    --max-examples 150 \
+    --max-new-tokens 1024
+# -> data/candidates/alpaca_eval_n16_150ex_vllm.jsonl
+```
+
+### Step A2: Score with a SMALL RM ensemble (GPU, run once per RM)
+
+Use **≥2 RMs** — uncertainty methods (Sharpe / pessimism) need ensemble
+disagreement (variance); with 1 RM they collapse to vanilla BoN. The DeBERTa RM
+is small enough to run on a modest GPU.
+
+```bash
+conda run -n langchain python scripts/score_candidates.py \
+    --candidates-path data/candidates/alpaca_eval_n16_150ex_vllm.jsonl \
+    --reward-model "OpenAssistant/reward-model-deberta-v3-large-v2" --load-in-4bit
+# repeat with a second (and third) RM, e.g. Skywork / ArmoRM (8B, needs more VRAM)
+# -> data/scores/alpaca_eval_n16_150ex_vllm_scores_<rm>.jsonl
+```
+
+### Step A3: Alignment eval — judge win-rate + overoptimization (CPU + judge API)
+
+```bash
+conda run -n langchain python experiments/run_alignment_eval.py \
+    --candidates-path data/candidates/alpaca_eval_n16_150ex_vllm.jsonl \
+    --score-paths "data/scores/alpaca_eval_n16_150ex_vllm_scores_*.jsonl" \
+    --eval-n 1,4,8,16 \
+    --beta 1.0 \
+    --max-judge-calls 1200       # safety cap on LIVE judge calls per run
+```
+
+**Outputs** → `runs/alignment/<candidates-stem>/`:
+`results.json`, `summary.txt`, `judgments.jsonl` (every verdict, streamed),
+`run.log` (full run log + judge call counts + any errors).
+
+**Quota & resume:** verdicts are disk-cached (`data/cache/judge_cache.pkl`), so
+only *new* (instruction, response, reference) triples cost quota and **every
+rerun is free**. If keys hit their daily cap mid-run it saves partial results
+and marks `status=incomplete:quota` — just rerun later to continue off the
+cache. Keys are round-robined; a blocked/denied key is parked and skipped.
+
+> **Offline analyses (no GPU, no API):** `experiments/analyze_now.py` (gap
+> decomposition + adaptive stopping) and `experiments/analyze_difficulty.py`
+> (MATH500 by level/subject) run on the cached data and write to
+> `runs/analysis/`.
+
+---
+
 ## Troubleshooting
 
 ```bash

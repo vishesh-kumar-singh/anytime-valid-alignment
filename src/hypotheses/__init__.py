@@ -29,6 +29,10 @@ _REGISTRY: Dict[str, str] = {
     "h3": "src.hypotheses.h3_self_consistency.H3SelfConsistency",
     "h4": "src.hypotheses.h4_reward_weighted_self_consistency.H4RewardWeightedSelfConsistency",
     "h5": "src.hypotheses.h5_single_best_rm_rwsc.H5SingleBestRMRWSC",
+    "h6": "src.hypotheses.h6_mbr_ensemble_aggregation.H6MBREnsembleAggregation",
+    "h7": "src.hypotheses.h7_threshold_sc.H7ThresholdSC",
+    "h8": "src.hypotheses.h8_top_k_mbr_rwsc.H8TopKMBRRWSC",
+    "lit_review_baselines": "src.hypotheses.lit_review_baselines.LitReviewBaselines",
 }
 
 

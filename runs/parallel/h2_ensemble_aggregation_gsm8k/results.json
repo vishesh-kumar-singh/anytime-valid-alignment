@@ -9,61 +9,51 @@
   ],
   "n_examples": 1319,
   "rm_names": [
-    "ArmoRM-Llama3-8B-v0.1",
     "FsfairX-LLaMA3-RM-v0.1",
     "Llama-3-OffsetBias-RM-8B",
-    "Skywork-Reward-Llama-3.1-8B-v0.2",
     "reward-model-deberta-v3-large-v2"
   ],
   "variance_norm_mode": "robust_zscore",
   "results_by_n": {
     "4": {
-      "vanilla_bon (ArmoRM-Llama3-8B-v0.1)": 0.9234268385140257,
       "vanilla_bon (FsfairX-LLaMA3-RM-v0.1)": 0.9052312357846853,
       "vanilla_bon (Llama-3-OffsetBias-RM-8B)": 0.9006823351023503,
-      "vanilla_bon (Skywork-Reward-Llama-3.1-8B-v0.2)": 0.9067475360121304,
       "vanilla_bon (reward-model-deberta-v3-large-v2)": 0.9044730856709629,
-      "vanilla_bon (ensemble)": 0.910538286580743,
-      "mob_vanilla": 0.9128127369219106,
-      "mob_sharpe": 0.913570887035633,
-      "wbon_inv_var": 0.9075056861258529,
-      "wbon_sharpe": 0.909021986353298
+      "vanilla_bon (ensemble)": 0.8999241849886277,
+      "mob_vanilla": 0.8984078847611827,
+      "mob_sharpe": 0.9052312357846853,
+      "wbon_inv_var": 0.9021986353297953,
+      "wbon_sharpe": 0.9044730856709629
     },
     "8": {
-      "vanilla_bon (ArmoRM-Llama3-8B-v0.1)": 0.9264594389689158,
       "vanilla_bon (FsfairX-LLaMA3-RM-v0.1)": 0.9067475360121304,
       "vanilla_bon (Llama-3-OffsetBias-RM-8B)": 0.8984078847611827,
-      "vanilla_bon (Skywork-Reward-Llama-3.1-8B-v0.2)": 0.9052312357846853,
       "vanilla_bon (reward-model-deberta-v3-large-v2)": 0.9006823351023503,
-      "vanilla_bon (ensemble)": 0.910538286580743,
-      "mob_vanilla": 0.913570887035633,
-      "mob_sharpe": 0.9181197877179682,
-      "wbon_inv_var": 0.9059893858984079,
-      "wbon_sharpe": 0.9014404852160728
+      "vanilla_bon (ensemble)": 0.8999241849886277,
+      "mob_vanilla": 0.9052312357846853,
+      "mob_sharpe": 0.9120545868081881,
+      "wbon_inv_var": 0.8991660348749052,
+      "wbon_sharpe": 0.9021986353297953
     },
     "16": {
-      "vanilla_bon (ArmoRM-Llama3-8B-v0.1)": 0.9302501895375285,
       "vanilla_bon (FsfairX-LLaMA3-RM-v0.1)": 0.9029567854435178,
       "vanilla_bon (Llama-3-OffsetBias-RM-8B)": 0.8984078847611827,
-      "vanilla_bon (Skywork-Reward-Llama-3.1-8B-v0.2)": 0.9059893858984079,
       "vanilla_bon (reward-model-deberta-v3-large-v2)": 0.890068233510235,
-      "vanilla_bon (ensemble)": 0.9014404852160728,
-      "mob_vanilla": 0.9014404852160728,
-      "mob_sharpe": 0.9181197877179682,
-      "wbon_inv_var": 0.9014404852160728,
-      "wbon_sharpe": 0.9006823351023503
+      "vanilla_bon (ensemble)": 0.8946171341925702,
+      "mob_vanilla": 0.8931008339651251,
+      "mob_sharpe": 0.9037149355572404,
+      "wbon_inv_var": 0.8961334344200151,
+      "wbon_sharpe": 0.9037149355572404
     },
     "24": {
-      "vanilla_bon (ArmoRM-Llama3-8B-v0.1)": 0.9241849886277483,
       "vanilla_bon (FsfairX-LLaMA3-RM-v0.1)": 0.8923426838514026,
       "vanilla_bon (Llama-3-OffsetBias-RM-8B)": 0.8862774829416225,
-      "vanilla_bon (Skywork-Reward-Llama-3.1-8B-v0.2)": 0.8968915845337376,
       "vanilla_bon (reward-model-deberta-v3-large-v2)": 0.8779378316906747,
-      "vanilla_bon (ensemble)": 0.890068233510235,
-      "mob_vanilla": 0.8915845337376801,
-      "mob_sharpe": 0.9128127369219106,
-      "wbon_inv_var": 0.8938589840788476,
-      "wbon_sharpe": 0.9021986353297953
+      "vanilla_bon (ensemble)": 0.8855193328279,
+      "mob_vanilla": 0.8855193328279,
+      "mob_sharpe": 0.9029567854435178,
+      "wbon_inv_var": 0.8862774829416225,
+      "wbon_sharpe": 0.9006823351023503
     }
   },
   "oracle_by_n": {
@@ -74,77 +64,65 @@
   },
   "normalized_by_n": {
     "4": {
-      "vanilla_bon (ArmoRM-Llama3-8B-v0.1)": 0.9643705463182898,
       "vanilla_bon (FsfairX-LLaMA3-RM-v0.1)": 0.9453681710213777,
       "vanilla_bon (Llama-3-OffsetBias-RM-8B)": 0.9406175771971497,
-      "vanilla_bon (Skywork-Reward-Llama-3.1-8B-v0.2)": 0.9469517022961204,
       "vanilla_bon (reward-model-deberta-v3-large-v2)": 0.9445764053840063,
-      "vanilla_bon (ensemble)": 0.950910530482977,
-      "mob_vanilla": 0.953285827395091,
-      "mob_sharpe": 0.9540775930324624,
-      "wbon_inv_var": 0.9477434679334917,
-      "wbon_sharpe": 0.9493269992082344
+      "vanilla_bon (ensemble)": 0.9398258115597783,
+      "mob_vanilla": 0.9382422802850356,
+      "mob_sharpe": 0.9453681710213777,
+      "wbon_inv_var": 0.9422011084718923,
+      "wbon_sharpe": 0.9445764053840063
     },
     "8": {
-      "vanilla_bon (ArmoRM-Llama3-8B-v0.1)": 0.959937156323645,
       "vanilla_bon (FsfairX-LLaMA3-RM-v0.1)": 0.9395129615082483,
       "vanilla_bon (Llama-3-OffsetBias-RM-8B)": 0.9308719560094265,
-      "vanilla_bon (Skywork-Reward-Llama-3.1-8B-v0.2)": 0.9379418695993715,
       "vanilla_bon (reward-model-deberta-v3-large-v2)": 0.9332285938727416,
-      "vanilla_bon (ensemble)": 0.94344069128044,
-      "mob_vanilla": 0.9465828750981933,
-      "mob_sharpe": 0.9512961508248232,
-      "wbon_inv_var": 0.9387274155538099,
-      "wbon_sharpe": 0.9340141398271798
+      "vanilla_bon (ensemble)": 0.9324430479183032,
+      "mob_vanilla": 0.9379418695993715,
+      "mob_sharpe": 0.9450117831893166,
+      "wbon_inv_var": 0.9316575019638649,
+      "wbon_sharpe": 0.9347996857816182
     },
     "16": {
-      "vanilla_bon (ArmoRM-Llama3-8B-v0.1)": 0.954863813229572,
       "vanilla_bon (FsfairX-LLaMA3-RM-v0.1)": 0.9268482490272374,
       "vanilla_bon (Llama-3-OffsetBias-RM-8B)": 0.9221789883268483,
-      "vanilla_bon (Skywork-Reward-Llama-3.1-8B-v0.2)": 0.9299610894941635,
       "vanilla_bon (reward-model-deberta-v3-large-v2)": 0.9136186770428015,
-      "vanilla_bon (ensemble)": 0.9252918287937744,
-      "mob_vanilla": 0.9252918287937744,
-      "mob_sharpe": 0.9424124513618677,
-      "wbon_inv_var": 0.9252918287937744,
-      "wbon_sharpe": 0.9245136186770428
+      "vanilla_bon (ensemble)": 0.9182879377431906,
+      "mob_vanilla": 0.9167315175097276,
+      "mob_sharpe": 0.9276264591439689,
+      "wbon_inv_var": 0.9198443579766536,
+      "wbon_sharpe": 0.9276264591439689
     },
     "24": {
-      "vanilla_bon (ArmoRM-Llama3-8B-v0.1)": 0.9449612403100776,
       "vanilla_bon (FsfairX-LLaMA3-RM-v0.1)": 0.9124031007751938,
       "vanilla_bon (Llama-3-OffsetBias-RM-8B)": 0.9062015503875969,
-      "vanilla_bon (Skywork-Reward-Llama-3.1-8B-v0.2)": 0.9170542635658915,
       "vanilla_bon (reward-model-deberta-v3-large-v2)": 0.8976744186046511,
-      "vanilla_bon (ensemble)": 0.9100775193798449,
-      "mob_vanilla": 0.9116279069767442,
-      "mob_sharpe": 0.9333333333333333,
-      "wbon_inv_var": 0.913953488372093,
-      "wbon_sharpe": 0.9224806201550387
+      "vanilla_bon (ensemble)": 0.9054263565891473,
+      "mob_vanilla": 0.9054263565891473,
+      "mob_sharpe": 0.9232558139534883,
+      "wbon_inv_var": 0.9062015503875969,
+      "wbon_sharpe": 0.9209302325581395
     }
   },
   "overall": {
-    "vanilla_bon (ArmoRM-Llama3-8B-v0.1)": 0.9241849886277483,
     "vanilla_bon (FsfairX-LLaMA3-RM-v0.1)": 0.8923426838514026,
     "vanilla_bon (Llama-3-OffsetBias-RM-8B)": 0.8862774829416225,
-    "vanilla_bon (Skywork-Reward-Llama-3.1-8B-v0.2)": 0.8968915845337376,
     "vanilla_bon (reward-model-deberta-v3-large-v2)": 0.8779378316906747,
-    "vanilla_bon (ensemble)": 0.890068233510235,
-    "mob_vanilla": 0.8915845337376801,
-    "mob_sharpe": 0.9128127369219106,
-    "wbon_inv_var": 0.8938589840788476,
-    "wbon_sharpe": 0.9021986353297953
+    "vanilla_bon (ensemble)": 0.8855193328279,
+    "mob_vanilla": 0.8855193328279,
+    "mob_sharpe": 0.9029567854435178,
+    "wbon_inv_var": 0.8862774829416225,
+    "wbon_sharpe": 0.9006823351023503
   },
   "overall_normalized": {
-    "vanilla_bon (ArmoRM-Llama3-8B-v0.1)": 0.9449612403100776,
     "vanilla_bon (FsfairX-LLaMA3-RM-v0.1)": 0.9124031007751938,
     "vanilla_bon (Llama-3-OffsetBias-RM-8B)": 0.9062015503875969,
-    "vanilla_bon (Skywork-Reward-Llama-3.1-8B-v0.2)": 0.9170542635658915,
     "vanilla_bon (reward-model-deberta-v3-large-v2)": 0.8976744186046511,
-    "vanilla_bon (ensemble)": 0.9100775193798449,
-    "mob_vanilla": 0.9116279069767442,
-    "mob_sharpe": 0.9333333333333333,
-    "wbon_inv_var": 0.913953488372093,
-    "wbon_sharpe": 0.9224806201550387
+    "vanilla_bon (ensemble)": 0.9054263565891473,
+    "mob_vanilla": 0.9054263565891473,
+    "mob_sharpe": 0.9232558139534883,
+    "wbon_inv_var": 0.9062015503875969,
+    "wbon_sharpe": 0.9209302325581395
   },
-  "_saved_at": "2026-05-31T09:02:25.974239"
+  "_saved_at": "2026-06-09T09:52:27.025300"
 }

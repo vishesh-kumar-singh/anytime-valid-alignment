@@ -1,0 +1,6 @@
+{"timestamp": "2026-06-09T02:23:45.124269", "event": "environment", "data": {"python": "3.12.2", "torch": "2.7.1+cu126", "cuda_available": true, "gpu": "NVIDIA GeForce RTX 2050", "gpu_memory": "4.0 GB", "hostname": "JARVIS", "timestamp": "2026-06-09T02:23:45.124149"}}
+{"timestamp": "2026-06-09T02:23:45.124460", "event": "phase_start", "data": {"phase": "dataset_loading", "details": "math500"}}
+{"timestamp": "2026-06-09T02:23:48.919754", "event": "phase_end", "data": {"phase": "dataset_loading", "duration_sec": 3.795225143432617}}
+{"timestamp": "2026-06-09T02:23:49.756418", "event": "phase_start", "data": {"phase": "model_loading", "details": "HF 4-bit: Qwen/Qwen2.5-Math-1.5B-Instruct"}}
+{"timestamp": "2026-06-09T02:24:43.467930", "event": "phase_end", "data": {"phase": "model_loading", "duration_sec": 53.698824644088745}}
+{"timestamp": "2026-06-09T02:24:43.473600", "event": "inference_start", "data": {"total_examples": 500, "bon_n": 512}}

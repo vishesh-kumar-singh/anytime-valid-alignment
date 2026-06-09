@@ -2,7 +2,7 @@
 *.out 
 wandb/
 *.pkl
-report.tex
+*.tex
 proposal.md
 FUTURE_WORK.md
 run_demo.py
