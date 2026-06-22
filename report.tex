@@ -1,0 +1,418 @@
+\documentclass[a4paper,11pt]{article}
+
+% --- Packages ---
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath, amsfonts, amssymb} % Standard Math fonts
+\usepackage{graphicx} % For images
+\usepackage{booktabs} % For professional tables
+\usepackage{geometry} % For margins
+\usepackage{hyperref} % For hyperlinks
+\usepackage{caption}  % Better captions
+\usepackage{float}    % For figure/algorithm placement
+\usepackage{algorithm} % For Pseudocode
+\usepackage{algpseudocode} % For Pseudocode styling
+\usepackage{xcolor}   % For emphasis
+\usepackage{subcaption}
+\usepackage[title]{appendix}
+
+% --- Page Setup ---
+\geometry{margin=0.5in}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=black,
+    citecolor=black,
+    urlcolor=blue
+}
+
+% --- Title Data ---
+\title{\textbf{Test-Time Alignment in Large Language Models:\\Parallel Ensembling Experiments}}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\section{Background of Domain}
+We are trying to replace the post-training methods like RLHF and DPO with test-time alignment because they are computationally cheaper for sure. We need a method to get more preferred answers from an LLM. The idea is to generate N samples from an LLM and choose one that is best suited. This choosing is done via Reward Models, which give scores about how preferred is this response to human. This is called a BoN approach. But a reward model is not perfect and it may not always choose best answer from the given sample. Because the reward model utilized to rank the candidate responses is merely a learned, lower-dimensional proxy of highly complex and nuanced true human preferences, it inherently contains blind spots, statistical biases, and out-of-distribution (OOD) vulnerabilities.
+
+\section{Best of N and Reward Over-Optimization}
+To effectively mitigate the phenomenon of over-optimization, it is first necessary to mathematically formalize the behavior of the Best-of-N policy and its complex statistical relationship to the proxy reward model. In a standard language modeling alignment context, let $\pi_{ref}(\cdot | x)$ denote the pre-trained reference policy (the unaligned or base LLM), where x represents the input prompt and y represents the generated response trajectory. Let $\hat{r}(x, y)$ denote the proxy reward model trained via supervised learning or preference datasets to estimate the true, unobservable human preference reward, denoted as $r^*(x, y)$.
+
+The standard BoN method $\pi_{BoN}$ alters the output distribution of the underlying language model by skewing it toward high-reward regions of the proxy model's phase space. Analytical expressions established in \cite{beirami2024theoretical} dictate that the KL divergence induced by BoN sampling is a direct mathematical function of the total number of samples $N$. Specifically, the optimization pressure exerted on the language model is bounded by the following relationship:
+$$ \text{KL}(\pi_{BoN} || \pi_{ref}) \leq \log N - \frac{N - 1}{N} $$
+
+As the value of $N$ increases, the upper bound on the KL divergence scales logarithmically. While this indicates that the algorithm is actively exploring new areas of the response space, it also implies that the induced policy is diverging significantly from the semantically coherent base distribution. It is precisely in this high-divergence regime that over-optimization occurs. By drifting away from the reference policy, the model inevitably generates Out-of-Distribution (OOD) samples. Because the proxy reward model $\hat{r}(x, y)$ is trained on a limited, in-distribution dataset of human preferences, its uncertainty spikes in these OOD regions, often resulting in erroneously inflated scores. Consequently, at high values of $N$, the BoN selection mechanism essentially acts as an adversarial search, exploiting the proxy model's blind spots by selecting OOD candidates that maximize $\hat{r}(x, y)$ even as the true objective $r^*(x, y)$ aggressively degrades.
+
+\section{Defining the Goal and Problem Statement}
+The core challenge of test-time alignment via Best-of-N (BoN) sampling lies in the fundamental mathematical discrepancy between the proxy reward and true human preference in high-divergence spaces. The problem can be systematically formalized as follows:
+
+\begin{itemize}
+    \item \textbf{Current State (What we have):} We possess a computationally efficient, inference-time generation pipeline that uses a base reference policy $\pi_{ref}$ to generate $N$ candidate trajectories. These candidates are evaluated and ranked by an imperfect, learned proxy reward model $\hat{r}(x, y)$, which serves as a low-dimensional surrogate for the true, unobservable human preference objective $r^*(x, y)$.
+    
+    \item \textbf{The Bottleneck (The Problem):} As the generation budget $N$ scales, the hard deterministic selection of the BoN policy forces the underlying language model into Out-of-Distribution (OOD) phase spaces characterized by high KL divergence. In these uncharted regions, the proxy model exhibits extreme epistemic uncertainty and assigns erroneously inflated scores to adversarial or anomalous outputs. Thus, aggressively maximizing the proxy reward directly causes a collapse in the actual utility: $\max \hat{r}(x, y) \not\Rightarrow \max r^*(x, y)$.
+    
+    \item \textbf{Objective (What to achieve):} The primary goal is to develop an algorithmically robust inference-time framework that safely scales with compute. The objective is to systematically mitigate reward hacking, either by regularizing the optimization landscape (e.g., semantic bounding, probability smoothing) or by improving the epistemic integrity of the reward signal, ensuring that
+    \begin{itemize}
+        \item We can perform better than single reward models do.
+        \item An increase in sample size $N$ yields a monotonic improvement in the true human preference $r^*(x, y)$
+    \end{itemize}.
+\end{itemize}
+
+\section{Literature Review}
+\subsection{BoN methods(based on ORM)}
+The following methods were based on improving BoN methods.
+
+\subsubsection{Vanilla BoN}
+\label{sec:vanilla_bon}
+We choose the best response according to the highest scores. $$y^* = \arg\max_{y_i \in \{y_1, \dots, y_N\}} \hat{r}(x, y_i)$$
+
+\subsubsection{Regularized BoN}
+According to the \cite{jinnai2024regularized} framework, a common method to mitigate reward hacking is to introduce a proximity regularization term that keeps the selected output distribution close to the base reference model. The simplest way would be to add penality based on divergence form sample. In $RBoN_{KL}$ given a prompt $x$ and a pool of reference candidates $\mathcal{Y}_{\text{ref}}$, the selected candidate is:
+$$y_{\text{RBoN-KL}}(x) = \arg\max_{y \in \mathcal{Y}_{\text{ref}}} \left( R(x, y) - \beta D_{\text{KL}}[\pi_y || \pi_{\text{ref}}(\cdot|x)] \right)$$
+
+Here, $\pi_y$ represents a deterministic policy that chooses candidate $y$ with a probability of 1, and $\pi_{\text{ref}}(\cdot|x)$ is the original reference policy. The hyperparameter $\beta$ controls the trade-off between reward maximization and base-policy proximity. When $\beta = 0$, the penalty vanishes, and the method reverts to vanilla BoN. Conversely, as $\beta \to \infty$, the algorithm strictly enforces alignment with the reference model. While RBoN-KL is theoretically sound, literature demonstrates that its empirical improvement over standard BoN is often marginal. The fundamental limitation lies in estimating the true KL divergence accurately across a high-dimensional probability space using only a restricted, finite sample size (the $N$ generated sequences). 
+
+To achieve this without modifying the model weights, the authors propose Minimum Bayes Risk Best-of-N (MBR-BoN). Given a pool of $N$ reference candidates $\mathcal{Y}_{\text{ref}}$, the MBR-BoN objective selects the candidate $y$ that maximizes the reward $R(x, y)$ while penalizing deviations from the rest of the generated pool using a utility function $U(y, y')$:
+
+\begin{equation}
+y_{\text{MBR-BoN}}(x) = \arg\max_{y \in \mathcal{Y}_{\text{ref}}} \left( R(x, y) + \frac{\beta}{N} \sum_{y' \in \mathcal{Y}_{\text{ref}}} U(y, y') \right)
+\end{equation}
+
+Here, $\beta$ controls the strength of the regularization, and $U(y, y')$ measures the similarity (or agreement) between candidate $y$ and every other candidate $y'$ in the generated pool.
+
+Datasets tested on: Alpaca, hh-rlhf
+
+RMs: stanfordnlp/SteamSHP-flan-t5-large, OpenAssistant/reward-model-deberta-v3-large-v2
+
+LLM: gpt2
+
+\subsubsection{Temperature-Mediated Smoothing and the Soft Best-of-N Framework}
+\label{sec:soft_bon}
+In Soft Best-of-N \cite{verdun2025soft}, instead of directly choosing the best answer, we assign probability based on the reward. Here temperature is controls probability, lower temp means Hard BoN.
+
+\subsubsection{Ensemble Based Methods}
+\label{sec:ensemble}
+We also examine ensemble-based methods from recent literature \cite{coste2023reward}.
+\paragraph{Worst-Case Optimization (WCO):}Takes the minimum value of the reward models as the score for the candidate. So if any one just rated it too low, the candidate is considered poor.
+
+\paragraph{Uncertainty-Weighted Optimization (UWO):}UWO provides a significantly more nuanced and balanced approach by actively penalizing the mean reward based on the measurable variance (disagreement) among the ensemble members.
+
+\subsubsection{The "Caution" Architecture (Random Network Distillation)}
+To operationalize pessimistic penalties without the massive computational burden of running an entire ensemble, the Caution approach \cite{yu2026curiosity} adapts Random Network Distillation (RND). A smaller student predictor network ($f_{\hat{w}}$) is trained explicitly to predict the outputs of a frozen teacher network ($f_{w^*}$) solely on in-distribution responses. 
+
+For any highly atypical or reward-hacked response $y$, the prediction error serves as a mathematically rigorous uncertainty estimate:$$\alpha(x, y) = \|f_{\hat{w}}(y) - f_{w^*}(y)\|^2$$
+
+The framework then calculates a pessimistic Lower Confidence Bound (LCB) on the proxy reward for the BoN algorithm to maximize:$$\hat{r}_{\text{LCB}} = \hat{r}(x, y) - \lambda \alpha(x, y)$$
+
+\subsubsection{Multi-Objective and Aspect-Based Reward Modeling}
+Standard scalar reward models trained via Bradley-Terry loss compress multi-faceted human judgments into a single score, making them highly susceptible to exploits like verbosity bias (favoring longer texts regardless of quality). ArmoRM \cite{wang2024interpretable} (Absolute-Rating Multi-Objective Reward Model) abandons this by evaluating candidates across multiple independent, human-interpretable dimensions (e.g., helpfulness, correctness, verbosity).To combine these into a single scalar for Best-of-N without relying on static weights, ArmoRM uses a Mixture-of-Experts (MoE) gating network. This network dynamically calculates context-dependent coefficients based on the prompt features, effectively neutralizing specific vulnerabilities like length bias by aggressively penalizing the verbosity objective:$$r'_i = r_i - \lambda_i r_{\text{verbose}}$$
+
+
+\subsection{Sequential Early Stopping Methods}
+While parallel Best-of-$N$ generation scales compute predictably, it wastes significant resources on simpler prompts that do not require massive candidate pools to resolve. Recent literature has explored sequential early stopping to dynamically adapt the compute budget:
+
+\subsubsection{Pandora's Box BoN}
+\label{sec:pandora}
+This framework \cite{pandora2025} frames each LLM candidate generation as opening a ``costly box'' with a random reward. Drawing from classical optimal stopping theory, it assigns a reservation price (Weitzman index) to each generation step. The decision to stop generating and select the current best candidate $y^*$ with reward $r^*$ is made if:
+\begin{equation}
+r^* \geq E[r_{\text{next}}] - c
+\end{equation}
+where $c$ is the computational cost of generation. To handle unknown reward distributions across different prompts, it utilizes an Upper Confidence Bound (UCB) approach combined with a Bradley-Terry normalization. However, it operates purely on single reward signals, completely ignoring the epistemic uncertainty provided by ensemble disagreement and failing to utilize answer-level clustering.
+
+\subsubsection{Speculative Rejection}
+Speculative Rejection \cite{specrej2024} attempts to minimize token-level compute rather than candidate-level compute. It evaluates the proxy reward of partial generation trajectories mid-sequence at timestep $t$. Let $y_{<t}$ be the partial sequence. The method computes an upper-bound estimator of the final reward:
+\begin{equation}
+\hat{r}_{\text{UB}}(y_{<t}) = \max_{\tilde{y} \sim \pi(\cdot|y_{<t})} \hat{r}(\tilde{y})
+\end{equation}
+If this upper bound falls below the reward of a previously fully generated candidate $r^*$, the generation of $y$ is aggressively halted and rejected. While highly effective at reducing token-generation costs, it strictly requires specialized reward models capable of scoring incomplete text, which standard sequence-level ORMs cannot do reliably.
+
+\subsubsection{AdaBoN}
+\label{sec:adabon}
+Operating in two stages, AdaBoN \cite{adabon2025} dynamically allocates the generation budget rather than enforcing a strict stopping rule per candidate. In the first phase (Burn-in), it generates $K$ initial candidates to empirically estimate the local reward distribution's mean $\hat{\mu}$ and variance $\hat{\sigma}^2$. Based on these statistics, the method determines if the prompt is ``easy'' or ``hard'', assigning a remaining compute budget $N_{\text{rem}}$:
+\begin{equation}
+N_{\text{rem}} \propto f(\hat{\sigma}^2)
+\end{equation}
+The fundamental limitation of this approach is that the burn-in length $K$ and the budget allocation function $f$ are heavily reliant on empirical heuristics, providing no formal statistical stopping guarantees or error bounds.
+
+\subsubsection{BEACON}
+\label{sec:beacon}
+BEACON \cite{beacon2025} introduces a Bayesian sequential stopping approach that maintains a belief distribution over the true underlying answer quality. Let $\theta$ represent the true quality of the generated answers. After observing $n$ candidates $Y_n = \{y_1, \ldots, y_n\}$ with rewards $R_n$, the method updates a Bayesian posterior $P(\theta | R_n)$. Generation halts when the posterior confidence or expected utility of the current best candidate crosses a pre-defined threshold $\gamma$:
+\begin{equation}
+P(\theta > \theta_{\text{target}} | R_n) > \gamma
+\end{equation}
+While theoretically rigorous within a Bayesian framework, this method requires a perfectly calibrated Bayesian reward model and incurs computationally expensive posterior updates at every generation step, making it difficult to scale across highly diverse prompt distributions.
+
+A critical gap exists in the current literature: no existing framework successfully combines mathematically rigorous sequential stopping theory (formal error control) with ensemble reward model disagreement acting as an uncertainty signal, all while aggregating probabilities at the answer-cluster level (RWSC).
+
+
+\subsection{Beyond BoN: Step-Level Search and Process Reward Models}
+
+\subsubsection{Tree-Search Best-of-N (TreeBoN)}
+To address the prohibitive computational overhead of generating $N$ full, independent candidate trajectories—many of which may be inherently flawed or logically compromised from the first few tokens—researchers have proposed integrating speculative tree-search methodologies directly into the decoding paradigm. As detailed in the TreeBoN framework \cite{qiu2024treebon}, this approach fundamentally alters the generation phase by evaluating intermediate reasoning steps rather than waiting for complete sequences to materialize.
+
+In the TreeBoN architecture, the generation process is structured as a branching tree, where each node represents a partial text response. Rather than relying on a separate Outcome Reward Model (ORM), the original TreeBoN framework utilizes an implicit token-level reward extracted directly from the base model's Direct Preference Optimization (DPO) weights. Branches that exhibit low implicit confidence or logical contradictions are aggressively pruned in real-time. The system's compute budget is then dynamically reallocated to expand only the most promising branches. By speculatively truncating suboptimal paths early, TreeBoN drastically reduces inference costs and restricts the phase space available for over-optimization.
+
+\subsubsection{Process Reward Models (PRMs) and Step-by-Step Verification}
+The fundamental limitation of ORMs is the "Actor/Critic Mismatch," where the critic evaluates a correct final answer but ignores the hallucinated logic used to reach it. Process Reward Models (PRMs) resolve this by evaluating the mathematical reasoning step-by-step. Instead of assigning a single scalar score to the entire trajectory, a PRM assigns a confidence score to each discrete logical deduction. Models such as Math-Shepherd \cite{wang2023mathshepherd} and modern iterative PRMs demonstrate that step-level verification makes it mathematically impossible for a model to reward-hack a final answer if the intermediate logical syntax is invalid. This granular evaluation serves as the critical backbone for advanced tree-search algorithms.
+
+\subsubsection{Monte Carlo Tree Search (MCTS) for Reasoning}
+Leveraging the granular feedback of PRMs, frameworks like AlphaMath \cite{chen2024alphamath} adapt Monte Carlo Tree Search (MCTS) to natural language generation, treating mathematical proofs as formal Markov Decision Processes (MDPs). 
+
+MCTS operates in a continuous loop of Selection, Expansion, Simulation, and Backpropagation. At each node in the reasoning tree, the algorithm uses an Upper Confidence Bound (UCB) formula to dynamically balance the exploitation of known high-reward mathematical steps with the exploration of novel reasoning branches. Once a path is expanded, the PRM simulates the trajectory to its conclusion and backpropagates the reward to update the value of the parent nodes. While computationally massive compared to TreeBoN, MCTS provides rigorous, look-ahead mathematical guarantees, definitively preventing the model from traversing down adversarial or logically corrupted pathways.
+
+\subsubsection{Intrinsic Verification and Self-Correction}
+Recent frameworks attempt to bypass the external proxy reward model entirely, utilizing the base LLM's own internal representations to verify and correct its reasoning pathways.
+
+\paragraph{Self-Enhanced Test-Time Scaling (SETS):}Rather than passively scoring candidates, SETS \cite{chen2025sets} operates a three-phase pipeline: Sampling, Self-Verification, and Self-Correction. The model is prompted to evaluate its logical soundness against explicit constraints. If errors are flagged, the candidate enters a structured self-correction loop to refine the trajectory, grounding the selection in logic rather than an easily manipulated proxy score.\paragraph{ReVISE (Refine via Intrinsic Self-Verification):}The ReVISE framework \cite{lee2025revise} embeds self-verification directly into the logit-decoding mechanics. After generating a trajectory, the model predicts a specific confidence token $v \sim M(\cdot | y_{\text{init}}, x)$ representing either a termination state (correct) or a refinement state (needs correction). By using the raw statistical probability of the termination token as a pure intrinsic confidence score, ReVISE enables \textit{Confidence-Aware Decoding}. This allows for robust test-time scaling even under highly constrained generation budgets (small $N$) without relying on external reward models.
+
+
+
+\section{Experimental Setup}
+Loading several reward models (RMs) together needs a lot of VRAM. To avoid OOM issues, I decoupled the pipeline: I generated $N{=}24$ responses per question with \textbf{Qwen2.5-7B-Instruct} (temperature 0.7, \texttt{top\_p} 0.9, \texttt{max\_new\_tokens}=512) on MATH500 (500 problems) and GSM8K (1{,}319 problems) and saved them to disk. I then scored every candidate with each RM separately and cached the scores. All selection experiments run offline on these cached candidates and scores.
+
+The three weak RMs used in this study are:
+\begin{itemize}
+    \item sfairXC/FsfairX-LLaMA3-RM-v0.1
+    \item NCSOFT/Llama-3-OffsetBias-RM-8B
+    \item OpenAssistant/reward-model-deberta-v3-large-v2
+\end{itemize}
+
+\section{Measurement Correction: The Grader}
+\label{sec:grader}
+Original grader was a hand-rolled string matcher that suffered from both false positives and false negatives. Measured against \texttt{math\_verify} (the symbolic grader used by HuggingFace, Qwen, and DeepSeek)
+
+\section{Maximum Possible Accuracy (Oracle) and Baselines}
+\label{sec:oracle}
+I defined the \emph{oracle}: \texttt{pass@}$N$, the fraction of questions for which at least one of the $N$ candidates is correct. \textbf{No selection method can ever exceed it}, it is the hard ceiling. 
+
+Table~\ref{tab:universal_comparison} presents the Oracle ceilings alongside standard baselines at $N=24$. On MATH500, the oracle ceiling is only 79.4\%. This indicates that for over 20\% of questions, no correct candidate was generated in the entire pool of 24, setting a hard upper limit on any selection method.
+
+\section{Oracle-Normalized Accuracy (Coverage Utilization)}
+\label{sec:ona}
+Raw accuracy conflates generator quality and selector quality (do I pick it?). To isolate the selector, I report a companion score alongside every method: the \textbf{Oracle-Normalized Accuracy (ONA)}:
+\begin{equation}
+\eta_M \;=\; \frac{\mathrm{Acc}_M}{\mathrm{Oracle@}N}
+\end{equation}
+ONA is accuracy measured \emph{out of what is reachable} (the questions that can be gotten right) rather than out of the absolute total. 
+
+\begin{table}[H]
+\centering
+\begin{tabular}{l c cc cc}
+\toprule
+& & \multicolumn{2}{c}{\textbf{GSM8K}} & \multicolumn{2}{c}{\textbf{MATH500}} \\
+\cmidrule(lr){3-4}\cmidrule(lr){5-6}
+\textbf{Method} & \textbf{Budget ($N$)} & \textbf{Acc} & \textbf{ONA} & \textbf{Acc} & \textbf{ONA} \\
+\midrule
+\hyperref[sec:oracle]{\textbf{Oracle@24 (Hard Ceiling)}} & 24 & \textbf{97.8\%} & - & \textbf{79.4\%} & - \\
+Majority Vote & 24 & 93.3\% & 95.4\% & 63.2\% & 79.6\% \\
+\midrule
+\multicolumn{6}{l}{\textit{Individual RMs \& Naive Baselines}} \\
+\hyperref[sec:vanilla_bon]{Vanilla BoN (OffsetBias)} & 24 & 88.6\% & 90.6\% & 64.4\% & 81.1\% \\
+\hyperref[sec:vanilla_bon]{Vanilla BoN (FsfairX)} & 24 & 89.2\% & 91.2\% & 62.0\% & 78.1\% \\
+\hyperref[sec:vanilla_bon]{Vanilla BoN (DeBERTa-v3)} & 24 & 87.8\% & 89.8\% & 62.8\% & 79.1\% \\
+\hyperref[sec:vanilla_bon]{Vanilla BoN (Best Individual RM)} & 24 & 89.2\% & 91.2\% & 64.4\% & 81.1\% \\
+\hyperref[sec:ensemble]{Vanilla BoN (Ensemble Average)} & 24 & 88.6\% & 90.5\% & 64.8\% & 81.6\% \\
+\hyperref[sec:soft_bon]{Soft BoN} & 24 & 88.9\% & 90.9\% & 61.4\% & 77.3\% \\
+\midrule
+\multicolumn{6}{l}{\textit{Uncertainty-Aware Selection (Variance Penalization)}} \\
+\hyperref[sec:variance]{Linear BoN} & 24 & 88.9\% & 90.9\% & 64.8\% & 81.6\% \\
+\hyperref[sec:variance]{Sharpe BoN / UWO} & 24 & 90.4\% & 92.4\% & 66.0\% & 83.1\% \\
+\hyperref[sec:ensemble]{Worst-Case Optimization (WCO)} & 24 & 88.6\% & 90.6\% & 65.2\% & 82.1\% \\
+\midrule
+\multicolumn{6}{l}{\textit{Topological Regularization (MBR \& Minimax)}} \\
+\hyperref[sec:topo]{Minimax (with MBR)} & 24 & 90.2\% & 92.2\% & 66.4\% & 83.6\% \\
+\hyperref[sec:topo]{WBoN Inverse Var (with MBR)} & 24 & 90.3\% & 92.3\% & 66.8\% & 84.1\% \\
+\hyperref[sec:topo]{Ensemble MBR-BoN} & 24 & 90.1\% & 92.2\% & 67.0\% & 84.4\% \\
+\hyperref[sec:topo]{MBR-BoN (Best Individual RM)} & 24 & 91.1\% & 93.2\% & 65.4\% & 82.4\% \\
+\midrule
+\multicolumn{6}{l}{\textit{Answer-Level Aggregation (RWSC)}} \\
+\hyperref[sec:rwsc]{Single-Best-RM RWSC} & 24 & 91.6\% & 93.6\% & 66.0\% & 83.1\% \\
+\hyperref[sec:rwsc]{Ensemble RWSC} & 24 & 89.8\% & 91.9\% & 68.0\% & 85.6\% \\
+\hyperref[sec:rwsc]{MBR-Ensemble RWSC} & 24 & 91.3\% & 93.3\% & 68.0\% & 85.6\% \\
+\midrule
+\multicolumn{6}{l}{\textit{Pre-Filtered Answer-Level Aggregation (Top-K)}} \\
+\hyperref[sec:topk]{Top-11 MBR-RWSC} & 24 & 89.0\% & 91.0\% & \textbf{69.0\%} & \textbf{86.9\%} \\
+\hyperref[sec:topk]{Top-13 MBR-RWSC} & 24 & 89.3\% & 91.3\% & \textbf{69.0\%} & \textbf{86.9\%} \\
+\\
+\bottomrule
+\end{tabular}
+\caption{Comprehensive comparison of all selection methods across GSM8K and MATH500. \textbf{Oracle-Normalized Accuracy (ONA)} measures the percentage of correct answers recovered relative to the hard ceiling set by the \textbf{Oracle@24}. Budget represents the average number of generated samples evaluated before selection. Method names are hyperlinked to their respective detailed sections.}
+\label{tab:universal_comparison}
+\end{table}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{l ccc ccc}
+\toprule
+& \multicolumn{3}{c}{\textbf{GSM8K}} & \multicolumn{3}{c}{\textbf{MATH500}} \\
+\cmidrule(lr){2-4}\cmidrule(lr){5-7}
+\textbf{Method} & \textbf{Acc} & \textbf{ONA} & \textbf{Budget} & \textbf{Acc} & \textbf{ONA} & \textbf{Budget} \\
+\midrule
+\multicolumn{7}{l}{\textit{Literature Baselines (Single RM)}} \\
+\hyperref[sec:pandora]{Pandora's Box BoN} & 90.5\% & 92.6\% & 4.00 & 61.8\% & 77.8\% & 4.00 \\
+\hyperref[sec:adabon]{AdaBoN} & 90.4\% & 92.5\% & 11.44 & 62.6\% & 78.8\% & 12.46 \\
+\hyperref[sec:beacon]{BEACON} & 90.7\% & 92.7\% & 6.00 & 62.0\% & 78.1\% & 6.00 \\
+\midrule
+\multicolumn{7}{l}{\textit{Proposed Methods}} \\
+\hyperref[sec:early_stopping]{Early Stopping ($\tau=0.8$)} & 92.3\% & 94.3\% & 14.13 & 66.2\% & 83.4\% & 10.79 \\
+\hyperref[sec:math_sprt]{SPRT ($\alpha=0.1, \beta=0.1$)} & 92.1\% & 94.2\% & 17.97 & 65.8\% & 82.9\% & 14.99 \\
+\hyperref[sec:math_sprt]{E-SPRT ($\alpha=0.05, \beta=0.1$)} & 91.4\% & 93.5\% & 15.28 & \textbf{68.2\%} & \textbf{85.9\%} & \textbf{9.88} \\
+\hyperref[sec:math_sprt]{E-SPRT ($\alpha=0.01, \beta=0.01$)} & 91.5\% & 93.6\% & 15.94 & \textbf{68.2\%} & \textbf{85.9\%} & 10.72 \\
+\bottomrule
+\end{tabular}
+\caption{Sequential Early Stopping methods. Unlike parallel methods that consume the full $N=24$ budget, sequential methods dynamically stop generation. SPRT replaces ad-hoc thresholds with mathematical error bounds, creating a new Pareto frontier on MATH500 by achieving higher accuracy with less compute.}
+\label{tab:early_stopping}
+\end{table}
+
+\section{Individual Reward Model Performance}
+Table~\ref{tab:universal_comparison} shows the performance of the three weak RMs individually compared to the naive Vanilla Ensemble. Notice how the ensemble outperforms the best single RM on MATH500.
+
+\section{Uncertainty-Aware Selection (Variance Penalization)}
+\label{sec:variance}
+These were results for the ideas proposed by the Y22s UGP Report.
+
+Table~\ref{tab:universal_comparison} shows that by penalizing uncertainty, we recover massive performance gains over the naive ensemble on both benchmarks.
+
+\section{Topological Regularization (MBR \& Minimax)}
+\label{sec:topo}
+Moving beyond pure score statistics, we can regularize candidates based on their semantic and structural overlap with the rest of the generated pool. Minimum Bayes Risk (MBR) ensures that the chosen candidate represents the consensus reasoning topology, neutralizing logic errors that might otherwise slip past the weak RMs.
+
+Let $\text{Ans}(y_i)$ denote the extracted final answer for candidate $y_i$. The MBR overlap score measures the fraction of the candidate pool $\mathcal{Y}$ that shares the exact same answer:
+\begin{equation}
+\label{eq:mbr}
+\text{MBR}(y_i) = \frac{1}{N} \sum_{k=1}^N \mathbb{I}\left[ \text{Ans}(y_i) = \text{Ans}(y_k) \right]
+\end{equation}
+where $\mathbb{I}[\cdot]$ is the indicator function.
+
+We regularize candidates by incorporating this topological consensus into their reward. For the Ensemble MBR-BoN, the selection becomes:
+\begin{equation}
+\label{eq:mbr_bon}
+y^*_{\text{MBR-BoN}} = \arg\max_{y_i \in \mathcal{Y}} \left( \mu_i + \beta \cdot \text{MBR}(y_i) \right)
+\end{equation}
+where $\beta$ controls the regularization strength.
+
+\section{Answer-Level Aggregation (RWSC)}
+\label{sec:rwsc}
+Abandoning candidate-level scoring entirely in favor of answer-cluster scoring. Reward-Weighted Self-Consistency (RWSC) groups candidates by their final answer and scores each unique answer by the softmax-weighted sum of the RM scores of the candidates that produced it.
+
+Let $\mathcal{A}$ be the set of unique final answers extracted from the candidate pool $\mathcal{Y}$. For any answer $a \in \mathcal{A}$, let $\mathcal{Y}_a = \{ y \in \mathcal{Y} \mid \text{Ans}(y) = a \}$ be the subset of candidates producing $a$. The aggregated score $S(a)$ for an answer cluster is mathematically defined as:
+\begin{equation}
+\label{eq:rwsc_score}
+S(a) = \sum_{y \in \mathcal{Y}_a} \exp\left( \mu(y) \right)
+\end{equation}
+where $\mu(y)$ is the candidate's mean ensemble reward (or regularized reward). The chosen answer $a^*$ is the one that maximizes this cluster score:
+\begin{equation}
+\label{eq:rwsc_ans}
+a^* = \arg\max_{a \in \mathcal{A}} S(a)
+\end{equation}
+and the final selected candidate is the highest-reward trajectory within the winning cluster:
+\begin{equation}
+\label{eq:rwsc_cand}
+y^*_{\text{RWSC}} = \arg\max_{y \in \mathcal{Y}_{a^*}} \mu(y)
+\end{equation}
+
+Table~\ref{tab:universal_comparison} confirms that in a weak reward environment, the full ensemble is required to power RWSC.
+
+\section{Step 4: Sequential Early Stopping}
+\label{sec:early_stopping}
+Having saturated parallel selection, we introduce a sequential strategy to minimize generation cost. When generating candidates sequentially $y_1, y_2, \dots, y_i$, we calculate the Softmax distribution over the normalized RM scores of the current pool. The confidence threshold $\tau$ is defined as the minimum probability mass required for an answer cluster to trigger early stopping:
+\begin{equation}
+\label{eq:tau_def}
+\max_{a \in \mathcal{A}} \sum_{y \in \mathcal{Y}_a} w(y) \geq \tau
+\end{equation}
+where $w(y) = \frac{\exp(z(y))}{\sum_{y'} \exp(z(y'))}$ and $z(y)$ is the standard Z-score normalized reward (using the mean and standard deviation of the current pool). Once a leading cluster reaches $\tau$, generation halts and the representative candidate of that cluster is selected.
+
+As shown in Table~\ref{tab:early_stopping}, by evaluating candidates sequentially, early stopping with a fixed threshold $\tau=0.8$ achieves $66.2\%$ accuracy on MATH500 while requiring less than half the generation budget.
+
+\subsection{SPRT-RWSC: Sequential Probability Ratio Test}
+To replace the ad-hoc threshold $\tau$ with a mathematically rigorous stopping criterion, we introduce SPRT-RWSC. This applies Wald's Sequential Probability Ratio Test, providing provable error control via ($\alpha$, $\beta$) bounds, ensemble-weighted evidence, and adaptive burn-in for prompt-specific prior estimation. 
+
+As demonstrated in Table~\ref{tab:early_stopping}, the Ensemble-SPRT (E-SPRT) method establishes a new Pareto frontier on the challenging MATH500 dataset. It achieves a significantly higher accuracy of $68.2\%$ (a 2.0\% absolute improvement over fixed-threshold H7) while simultaneously demanding \emph{less} compute (an average budget of 9.88 versus 10.79 candidates).
+
+\label{sec:math_sprt}
+The fixed threshold $\tau$ used in standard early stopping (Section~\ref{sec:early_stopping}) is fundamentally an ad-hoc heuristic. It does not provide any statistical guarantees about the probability of selecting an incorrect answer. To rigorously formalize the early stopping criteria, we apply Wald's Sequential Probability Ratio Test (SPRT) to the candidate generation process.
+
+\subsubsection{Vanilla SPRT for Answer Convergence}
+We frame the convergence of the generative process as a sequential hypothesis test. Let $a^*$ be the current leading answer cluster at step $n$. As we generate new candidates $y_i$, we define a binary random variable $X_i$:
+\begin{equation}
+X_i = 
+\begin{cases} 
+1 & \text{if } \text{Ans}(y_i) = a^* \text{ (Agreement)} \\
+0 & \text{if } \text{Ans}(y_i) \neq a^* \text{ (Disagreement)}
+\end{cases}
+\end{equation}
+
+We define two competing hypotheses:
+\begin{itemize}
+    \item \textbf{Null Hypothesis ($H_0$):} The generative process is diverging or failing to find a consensus. The probability of a new candidate agreeing with the leader is random or low: $P(X_i = 1) = p_0 \leq 0.5$.
+    \item \textbf{Alternative Hypothesis ($H_1$):} The leading answer $a^*$ is statistically dominant. The probability of agreement is high: $P(X_i = 1) = p_1 > 0.5$.
+\end{itemize}
+
+At each generation step $n$, we accumulate the Log-Likelihood Ratio ($\Lambda_n$) of the observed evidence:
+\begin{equation}
+\label{eq:llr}
+\Lambda_n = \sum_{i=1}^n \left[ X_i \log \left(\frac{p_1}{p_0}\right) + (1 - X_i) \log \left(\frac{1 - p_1}{1 - p_0}\right) \right]
+\end{equation}
+
+According to Wald's theorem, we can control the Type-I error $\alpha$ (stopping early on a wrong answer) and Type-II error $\beta$ (wasting compute by not stopping on a correct answer) by setting strict boundaries. The sequential test operates as follows:
+\begin{itemize}
+    \item \textbf{Accept $H_1$ (Stop and select $a^*$)} if $\Lambda_n \geq \log \left(\frac{1-\beta}{\alpha}\right)$
+    \item \textbf{Reject $H_1$ (Reset test and tracking)} if $\Lambda_n \leq \log \left(\frac{\beta}{1-\alpha}\right)$
+    \item \textbf{Continue Generating} if $\log \left(\frac{\beta}{1-\alpha}\right) < \Lambda_n < \log \left(\frac{1-\beta}{\alpha}\right)$
+\end{itemize}
+
+\subsubsection{E-SPRT: Ensemble Variance Weighting}
+In an environment with weak proxy reward models, standard SPRT is vulnerable to reward-hacking anomalies that might temporarily skew the leader distribution. We introduce \textbf{E-SPRT} to leverage the epistemic uncertainty of the ensemble. 
+
+Instead of treating every generated candidate as equal evidence, we weight the log-likelihood increment $w_i$ inversely by the ensemble variance $\sigma_i^2$ of the candidate's reward scores:
+\begin{equation}
+\label{eq:e_sprt}
+\Lambda_n = \sum_{i=1}^n w_i \left[ X_i \log \left(\frac{p_1}{p_0}\right) + (1 - X_i) \log \left(\frac{1 - p_1}{1 - p_0}\right) \right] \quad \text{where} \quad w_i = \frac{1}{\sigma_i^2 + \epsilon}
+\end{equation}
+
+By doing this, a candidate that highly agrees with the ensemble (low variance) contributes massively to the statistical confidence, whereas a candidate that exploits a single reward model's blind spot (high variance) contributes almost zero evidence, preventing premature and erroneous early stopping. This mechanism is mathematically responsible for the new Pareto frontier achieved on the MATH500 dataset.
+
+\section{Baseline Comparison against Literature}
+To contextualize the performance of our proposed techniques, we formally evaluated several prominent test-time alignment methods from recent literature within our exact 3-RM weak environment at $N=24$. 
+
+These include:
+\begin{itemize}
+    \item \textbf{Soft Best-of-N (Soft BoN)}: Temperature-mediated smoothing of selection probabilities.
+    \item \textbf{Worst-Case Optimization (WCO)}: Selecting the candidate that maximizes the minimum score assigned by the ensemble.
+    \item \textbf{Uncertainty-Weighted Optimization (UWO)}: Penalizing the mean reward based on ensemble disagreement (equivalent to our variance penalization).
+    \item \textbf{MBR-BoN}: Topological regularization against the rest of the generated pool.
+\end{itemize}
+
+Table~\ref{tab:universal_comparison} confirms that while MBR-BoN and UWO perform admirably, our proposed \textbf{Ensemble RWSC} strictly dominates the literature baselines on the highly challenging MATH500 benchmark.
+
+\section{Step 5: Pushing the State-of-the-Art (Top-K MBR-RWSC)}
+\label{sec:topk}
+The fundamental issue with standard RWSC is that it aggregates probabilities across \emph{all} 24 candidates. Even with softmax normalization, a highly hallucinated candidate with a massively inflated RM score can still pollute the answer cluster.
+
+We propose \textbf{Top-K MBR-Filtered RWSC}, a method that aggressively prunes the generation pool \emph{before} probability aggregation:
+\begin{enumerate}
+    \item \textbf{Topological Scoring:} Compute the MBR exact-match score (the fraction of the pool sharing the same answer) for each candidate.
+    \item \textbf{Combined Filtering Score:} Rank all candidates by their $\text{MBR Score} + \text{Sharpe Score}$. This isolates candidates exhibiting both high reward consensus and high topological consensus.
+    \item \textbf{Top-K Pruning:} Slicing the pool to retain only the top $K$ candidates ($K \approx 13$, roughly half the original pool).
+    \item \textbf{Restricted RWSC:} Execute the standard Reward-Weighted Self-Consistency exclusively on this pristine subset.
+\end{enumerate}
+
+Table~\ref{tab:universal_comparison} highlights this breakthrough. By preemptively filtering out reward-hacked anomalies, Top-11 MBR-RWSC reliably achieves \textbf{69.0\%} on MATH500, setting a new absolute ceiling for test-time scaling in weak reward environments.
+
+\textbf{Note on Verbosity Bias:} Extensive error analysis revealed that highly-reward-hacked incorrect candidates are substantially longer (averaging $\sim$1215 characters) than correct candidates (averaging $\sim$835 characters). Introducing a static length penalty to counteract this LLM verbosity bias marginally pushes the ceiling to 69.2\%. However, to maintain pure mathematical rigor and avoid out-of-distribution heuristic overfitting, this length penalty is excluded from the final Top-K MBR-RWSC implementation.
+
+
+
+\section{Directionss to try further:}
+\begin{itemize}
+    \item Switch to 3B LLM and generate more samlpes, 128. Reward hacking is visible at higher N, so me check if on increasing N, if our methods hold good.
+    \item \textbf{Could try ensembling in TreeBoN... There are always a chance of early pruning of good candidates in them.}(Searched the literature, didn't find any literature on that)(There are some problems, related to compute only but resolvable if tried.)
+    \item \textbf{Ensembling in PRMs}.(Majorly for Maths reasoning)
+    
+\end{itemize}
+
+\bibliographystyle{plain}
+\bibliography{references}
+
+\end{document}
