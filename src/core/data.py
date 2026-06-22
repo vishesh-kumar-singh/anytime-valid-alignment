@@ -152,8 +152,11 @@ def load_dataset_examples(
     elif dataset == "alpaca_eval":
         from ..data_utils.alpaca_eval import load_alpaca_eval
         return load_alpaca_eval(max_examples=max_examples)
+    elif dataset == "alpaca":
+        from ..data_utils.alpaca import load_alpaca
+        return load_alpaca(max_examples=max_examples)
     else:
-        raise ValueError(f"Unknown dataset: {dataset}. Choose from: gsm8k, math500, alpaca_eval")
+        raise ValueError(f"Unknown dataset: {dataset}. Choose from: gsm8k, math500, alpaca_eval, alpaca")
 
 
 def check_correctness(prediction: str, ground_truth: str, dataset: str) -> bool:
@@ -179,7 +182,7 @@ def check_correctness(prediction: str, ground_truth: str, dataset: str) -> bool:
         except ImportError:
             from ..data_utils.math500 import check_math_correct
             return check_math_correct(prediction, ground_truth)
-    elif dataset == "alpaca_eval":
+    elif dataset in ("alpaca_eval", "alpaca"):
         return False  # open-ended: no ground-truth correctness
     return False
 
@@ -199,4 +202,6 @@ def dataset_system_message(dataset: str) -> str:
             "You are a helpful assistant for arithmetic word problems. "
             "Solve briefly and clearly. Put your final numerical answer after ####."
         )
+    if dataset == "alpaca":
+        return "You are a helpful, harmless, and honest assistant. Follow the instruction carefully."
     return "You are a helpful assistant."

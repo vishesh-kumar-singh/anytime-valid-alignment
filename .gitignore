@@ -9,6 +9,9 @@ run_demo.py
 # Experiment artifacts (large, generated)
 nohup*.log
 output.log
+data/candidates/
+data/scores/
+data/cache/
 
 
 # Keep lightweight result summaries and tables
