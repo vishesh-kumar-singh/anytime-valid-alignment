@@ -1,7 +1,7 @@
 Hypothesis: h9_sprt_rwsc
 Description: SPRT-RWSC: Sequential Probability Ratio Test for early stopping with provable error control, ensemble-weighted evidence, and adaptive burn-in prior estimation.
 Category: parallel
-Timestamp: 2026-06-22T11:03:18.574034
+Timestamp: 2026-06-22T12:18:31.238981
 
 Results by N  (Acc = accuracy;  ONA = oracle-normalized = Acc / Oracle@N):
 ----------------------------------------------------------------------

@@ -1,0 +1,58 @@
+{
+  "hypothesis": "h10_seq_baselines",
+  "dataset": "gsm8k",
+  "n_values": [
+    24
+  ],
+  "n_examples": 1319,
+  "rm_names": [
+    "FsfairX-LLaMA3-RM-v0.1",
+    "Llama-3-OffsetBias-RM-8B",
+    "reward-model-deberta-v3-large-v2"
+  ],
+  "variance_norm_mode": "robust_zscore",
+  "results_by_n": {
+    "24": {
+      "vanilla_bon (FsfairX-LLaMA3-RM-v0.1)": 0.8923426838514026,
+      "vanilla_bon (Llama-3-OffsetBias-RM-8B)": 0.8862774829416225,
+      "vanilla_bon (reward-model-deberta-v3-large-v2)": 0.8779378316906747,
+      "vanilla_bon (ensemble)": 0.8855193328279,
+      "baseline_adabon": 0.9044730856709629,
+      "baseline_beacon": 0.9067475360121304,
+      "baseline_pandora": 0.9052312357846853
+    }
+  },
+  "oracle_by_n": {
+    "24": 0.978013646702047
+  },
+  "normalized_by_n": {
+    "24": {
+      "vanilla_bon (FsfairX-LLaMA3-RM-v0.1)": 0.9124031007751938,
+      "vanilla_bon (Llama-3-OffsetBias-RM-8B)": 0.9062015503875969,
+      "vanilla_bon (reward-model-deberta-v3-large-v2)": 0.8976744186046511,
+      "vanilla_bon (ensemble)": 0.9054263565891473,
+      "baseline_adabon": 0.9248062015503876,
+      "baseline_beacon": 0.9271317829457364,
+      "baseline_pandora": 0.9255813953488372
+    }
+  },
+  "overall": {
+    "vanilla_bon (FsfairX-LLaMA3-RM-v0.1)": 0.8923426838514026,
+    "vanilla_bon (Llama-3-OffsetBias-RM-8B)": 0.8862774829416225,
+    "vanilla_bon (reward-model-deberta-v3-large-v2)": 0.8779378316906747,
+    "vanilla_bon (ensemble)": 0.8855193328279,
+    "baseline_adabon": 0.9044730856709629,
+    "baseline_beacon": 0.9067475360121304,
+    "baseline_pandora": 0.9052312357846853
+  },
+  "overall_normalized": {
+    "vanilla_bon (FsfairX-LLaMA3-RM-v0.1)": 0.9124031007751938,
+    "vanilla_bon (Llama-3-OffsetBias-RM-8B)": 0.9062015503875969,
+    "vanilla_bon (reward-model-deberta-v3-large-v2)": 0.8976744186046511,
+    "vanilla_bon (ensemble)": 0.9054263565891473,
+    "baseline_adabon": 0.9248062015503876,
+    "baseline_beacon": 0.9271317829457364,
+    "baseline_pandora": 0.9255813953488372
+  },
+  "_saved_at": "2026-06-22T12:32:30.987246"
+}

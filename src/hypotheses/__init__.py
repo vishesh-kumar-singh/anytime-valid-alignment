@@ -33,6 +33,7 @@ _REGISTRY: Dict[str, str] = {
     "h7": "src.hypotheses.h7_threshold_sc.H7ThresholdSC",
     "h8": "src.hypotheses.h8_top_k_mbr_rwsc.H8TopKMBRRWSC",
     "h9": "src.hypotheses.h9_sprt_rwsc.H9SPRTRWSC",
+    "h10": "src.hypotheses.h10_seq_baselines.H10SeqBaselines",
     "lit_review_baselines": "src.hypotheses.lit_review_baselines.LitReviewBaselines",
 }
 
