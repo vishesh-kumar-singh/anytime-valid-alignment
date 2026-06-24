@@ -1,0 +1,55 @@
+Hypothesis: h3_self_consistency
+Description: Self-consistency (majority vote) provides a free signal orthogonal to RM scoring; combining them yields better selection.
+Category: parallel
+Timestamp: 2026-06-24T04:44:41.679674
+
+Results by N  (Acc = accuracy;  ONA = oracle-normalized = Acc / Oracle@N):
+----------------------------------------------------------------------
+
+  N = 1   (Oracle@N = 65.8%):
+    vanilla_bon (FsfairX-LLaMA3-RM-v0.1)      Acc  65.8%   ONA 100.0%
+    vanilla_bon (Llama-3-OffsetBias-RM-8B)    Acc  65.8%   ONA 100.0%
+    vanilla_bon (reward-model-deberta-v3-large-v2)  Acc  65.8%   ONA 100.0%
+    vanilla_bon (ensemble)                    Acc  65.8%   ONA 100.0%
+    majority_vote                             Acc  65.8%   ONA 100.0%
+    rm_within_majority                        Acc  65.8%   ONA 100.0%
+    rm_consistency_agree                      Acc  65.8%   ONA 100.0%
+
+  N = 4   (Oracle@N = 82.8%):
+    vanilla_bon (FsfairX-LLaMA3-RM-v0.1)      Acc  68.7%   ONA  83.0%
+    vanilla_bon (Llama-3-OffsetBias-RM-8B)    Acc  67.4%   ONA  81.4%
+    vanilla_bon (reward-model-deberta-v3-large-v2)  Acc  66.3%   ONA  80.0%
+    vanilla_bon (ensemble)                    Acc  68.0%   ONA  82.2%
+    majority_vote                             Acc  68.4%   ONA  82.6%
+    rm_within_majority                        Acc  68.4%   ONA  82.6%
+    rm_consistency_agree                      Acc  68.4%   ONA  82.6%
+
+  N = 8   (Oracle@N = 88.3%):
+    vanilla_bon (FsfairX-LLaMA3-RM-v0.1)      Acc  68.7%   ONA  77.8%
+    vanilla_bon (Llama-3-OffsetBias-RM-8B)    Acc  67.5%   ONA  76.4%
+    vanilla_bon (reward-model-deberta-v3-large-v2)  Acc  66.5%   ONA  75.2%
+    vanilla_bon (ensemble)                    Acc  68.1%   ONA  77.1%
+    majority_vote                             Acc  69.7%   ONA  78.8%
+    rm_within_majority                        Acc  69.7%   ONA  78.8%
+    rm_consistency_agree                      Acc  69.7%   ONA  78.8%
+
+  N = 16   (Oracle@N = 91.8%):
+    vanilla_bon (FsfairX-LLaMA3-RM-v0.1)      Acc  68.1%   ONA  74.2%
+    vanilla_bon (Llama-3-OffsetBias-RM-8B)    Acc  66.6%   ONA  72.6%
+    vanilla_bon (reward-model-deberta-v3-large-v2)  Acc  66.5%   ONA  72.4%
+    vanilla_bon (ensemble)                    Acc  67.8%   ONA  73.9%
+    majority_vote                             Acc  70.1%   ONA  76.3%
+    rm_within_majority                        Acc  70.1%   ONA  76.3%
+    rm_consistency_agree                      Acc  70.1%   ONA  76.3%
+
+  N = 24   (Oracle@N = 93.4%):
+    vanilla_bon (FsfairX-LLaMA3-RM-v0.1)      Acc  67.6%   ONA  72.4%
+    vanilla_bon (Llama-3-OffsetBias-RM-8B)    Acc  66.1%   ONA  70.8%
+    vanilla_bon (reward-model-deberta-v3-large-v2)  Acc  66.7%   ONA  71.4%
+    vanilla_bon (ensemble)                    Acc  67.5%   ONA  72.3%
+    majority_vote                             Acc  70.4%   ONA  75.4%
+    rm_within_majority                        Acc  70.4%   ONA  75.4%
+    rm_consistency_agree                      Acc  70.4%   ONA  75.4%
+
+Generated Plots:
+  - accuracy_vs_n.png

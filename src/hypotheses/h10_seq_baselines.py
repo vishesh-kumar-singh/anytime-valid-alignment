@@ -21,7 +21,7 @@ from .base import Hypothesis, _extract_answer
 
 def _pick_best_rm(rm_names: List[str]) -> int:
     """Select the best RM for single-RM baselines."""
-    prefs = ["Skywork-Reward", "ArmoRM", "FsfairX", "Llama-3-OffsetBias", "reward-model-deberta"]
+    prefs = ["FsfairX", "Llama-3-OffsetBias", "reward-model-deberta"]
     for pref in prefs:
         for j, name in enumerate(rm_names):
             if pref.lower() in name.lower():
@@ -80,19 +80,27 @@ class H10SeqBaselines(Hypothesis):
         # 2. Simulated BEACON (Bayesian sequential stopping)
         # ---------------------------------------------------------
         # We model the reward as drawn from N(mu, sigma^2). 
-        # We maintain a posterior over mu. Stop when posterior variance drops below threshold.
+        # We maintain a posterior over mu. Stop when posterior confidence P(mu > theta_target) > gamma.
         prior_mu = 0.0
         prior_var = 1.0
         obs_var = 1.0 # Assumed observation noise
         
-        gamma = 0.15 # Stopping threshold for posterior variance
+        gamma = 0.85 # Stopping threshold for posterior confidence
+        theta_target = 0.5 # Target acceptable reward score (normalized z-score)
         stopped_beacon = False
         
-        post_var = prior_var
+        def norm_cdf(x):
+            return 0.5 * (1 + math.erf(x / math.sqrt(2)))
+            
         for i in range(1, N + 1):
+            current_scores = scores[:i]
             post_var = 1.0 / ((1.0 / prior_var) + (i / obs_var))
-            if post_var < gamma and i >= 4:
-                best_idx = int(np.argmax(scores[:i]))
+            post_mu = post_var * ((prior_mu / prior_var) + (np.sum(current_scores) / obs_var))
+            
+            prob_good = norm_cdf((post_mu - theta_target) / math.sqrt(post_var))
+            
+            if prob_good > gamma and i >= 4:
+                best_idx = int(np.argmax(current_scores))
                 results["baseline_beacon"] = candidates[best_idx]
                 self.steps_used["baseline_beacon"].append(i)
                 stopped_beacon = True
@@ -107,8 +115,8 @@ class H10SeqBaselines(Hypothesis):
         # 3. Simulated Pandora's Box (Weitzman UCB)
         # ---------------------------------------------------------
         # Stop when r* >= E[r_next] - c
-        # We approximate E[r_next] via UCB: mu_hat + alpha * (sigma_hat / sqrt(n))
-        c = 0.1 # Cost of generating one candidate
+        # We approximate E[r_next] via UCB of next observation: mu_hat + alpha * sigma_hat
+        c = 0.05 # Cost of generating one candidate
         alpha = 1.0 # UCB exploration parameter
         
         stopped_pandora = False
@@ -118,7 +126,8 @@ class H10SeqBaselines(Hypothesis):
             mu_hat = np.mean(current_scores)
             sigma_hat = np.std(current_scores)
             
-            ucb_next = mu_hat + alpha * (sigma_hat / math.sqrt(i))
+            # Fix: UCB of NEXT OBSERVATION uses sigma, not standard error of the mean (sigma/sqrt(i))
+            ucb_next = mu_hat + alpha * sigma_hat
             
             if r_star >= ucb_next - c:
                 best_idx = int(np.argmax(current_scores))
@@ -158,11 +167,24 @@ class H10SeqBaselines(Hypothesis):
         print(f"\n{'=' * 70}")
         print(f"  Sequential Baselines: Average Candidates Generated")
         print(f"{'=' * 70}")
+        avg_budget = {}
         for method_name in sorted(self.steps_used.keys()):
             steps = self.steps_used[method_name]
             avg_steps = np.mean(steps)
             std_steps = np.std(steps)
+            avg_budget[method_name] = {"mean": float(avg_steps), "std": float(std_steps)}
             print(f"    {method_name:<30s}: {avg_steps:6.2f} ± {std_steps:5.2f}")
         print(f"{'=' * 70}\n")
 
+        results["average_budget"] = avg_budget
         return results
+
+    def _build_summary(self, results: Dict[str, Any], plot_paths: list) -> str:
+        summary = super()._build_summary(results, plot_paths)
+        if "average_budget" in results:
+            summary += "Average Candidates Generated (Budget):\n"
+            summary += "-" * 70 + "\n"
+            for m, stats in sorted(results["average_budget"].items()):
+                summary += f"  {m:<40s}: {stats['mean']:6.2f} ± {stats['std']:5.2f}\n"
+            summary += "\n"
+        return summary

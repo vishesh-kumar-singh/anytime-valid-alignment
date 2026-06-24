@@ -32,6 +32,8 @@ def main(
     reward_model: str = typer.Option(..., help="Reward model name"),
     load_in_4bit: bool = typer.Option(False, help="Load RM in 4-bit"),
     output_path: Optional[str] = typer.Option(None, help="Output JSONL path"),
+    num_chunks: int = typer.Option(1, help="Total number of chunks to split the data into"),
+    chunk_idx: int = typer.Option(0, help="Index of the chunk to process (0 to num_chunks-1)"),
 ):
     in_path = Path(candidates_path)
     if not in_path.exists():
@@ -43,7 +45,8 @@ def main(
     rm_short = reward_model.split("/")[-1]
 
     if output_path is None:
-        out_name = in_path.stem + f"_scores_{rm_short}.jsonl"
+        chunk_suffix = f"_chunk{chunk_idx}of{num_chunks}" if num_chunks > 1 else ""
+        out_name = in_path.stem + f"_scores_{rm_short}{chunk_suffix}.jsonl"
         out_path_obj = in_path.parent.parent / "scores" / out_name
     else:
         out_path_obj = Path(output_path)
@@ -57,7 +60,7 @@ def main(
             for line in f:
                 row = json.loads(line)
                 completed_indices.add(row["example_index"])
-        print(f"Resuming: {len(completed_indices)} examples already scored.")
+        print(f"Resuming: {len(completed_indices)} examples already scored in this chunk.")
 
     # Load candidates
     examples = []
@@ -65,10 +68,18 @@ def main(
         for line in f:
             examples.append(json.loads(line))
 
+    # Slice examples for the current chunk
+    if num_chunks > 1:
+        chunk_size = len(examples) // num_chunks
+        start_idx = chunk_idx * chunk_size
+        end_idx = start_idx + chunk_size if chunk_idx < num_chunks - 1 else len(examples)
+        examples = examples[start_idx:end_idx]
+        print(f"Processing chunk {chunk_idx + 1}/{num_chunks}: {len(examples)} examples (from {start_idx} to {end_idx-1})")
+
     examples_to_score = [ex for ex in examples if ex["example_index"] not in completed_indices]
     
     if not examples_to_score:
-        print(f"All {len(examples)} examples already scored!")
+        print(f"All {len(examples)} examples in chunk already scored!")
         return
 
     # Logger

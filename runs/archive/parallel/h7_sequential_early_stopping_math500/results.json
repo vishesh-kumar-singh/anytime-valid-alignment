@@ -1,0 +1,110 @@
+{
+  "hypothesis": "h7_sequential_early_stopping",
+  "dataset": "math500",
+  "n_values": [
+    24
+  ],
+  "n_examples": 500,
+  "rm_names": [
+    "FsfairX-LLaMA3-RM-v0.1",
+    "Llama-3-OffsetBias-RM-8B",
+    "reward-model-deberta-v3-large-v2"
+  ],
+  "variance_norm_mode": "robust_zscore",
+  "results_by_n": {
+    "24": {
+      "vanilla_bon (FsfairX-LLaMA3-RM-v0.1)": 0.62,
+      "vanilla_bon (Llama-3-OffsetBias-RM-8B)": 0.644,
+      "vanilla_bon (reward-model-deberta-v3-large-v2)": 0.628,
+      "vanilla_bon (ensemble)": 0.648,
+      "seq_rwsc_thresh_0.2": 0.622,
+      "seq_rwsc_thresh_0.3": 0.622,
+      "seq_rwsc_thresh_0.4": 0.622,
+      "seq_rwsc_thresh_0.5": 0.624,
+      "seq_rwsc_thresh_0.6": 0.642,
+      "seq_rwsc_thresh_0.7": 0.654,
+      "seq_rwsc_thresh_0.8": 0.662,
+      "seq_rwsc_thresh_0.9": 0.66,
+      "seq_rwsc_thresh_0.95": 0.66,
+      "seq_pure_best_rm_thresh_5.0": 0.63,
+      "seq_pure_best_rm_thresh_10.0": 0.618,
+      "seq_pure_best_rm_thresh_15.0": 0.62,
+      "seq_pure_best_rm_thresh_20.0": 0.62,
+      "seq_pure_best_rm_thresh_25.0": 0.62,
+      "baseline_best_rm_bon_N": 0.62,
+      "baseline_rwsc_h5_N": 0.66
+    }
+  },
+  "oracle_by_n": {
+    "24": 0.794
+  },
+  "normalized_by_n": {
+    "24": {
+      "vanilla_bon (FsfairX-LLaMA3-RM-v0.1)": 0.7808564231738035,
+      "vanilla_bon (Llama-3-OffsetBias-RM-8B)": 0.8110831234256927,
+      "vanilla_bon (reward-model-deberta-v3-large-v2)": 0.7909319899244333,
+      "vanilla_bon (ensemble)": 0.8161209068010076,
+      "seq_rwsc_thresh_0.2": 0.783375314861461,
+      "seq_rwsc_thresh_0.3": 0.783375314861461,
+      "seq_rwsc_thresh_0.4": 0.783375314861461,
+      "seq_rwsc_thresh_0.5": 0.7858942065491183,
+      "seq_rwsc_thresh_0.6": 0.8085642317380353,
+      "seq_rwsc_thresh_0.7": 0.8236775818639799,
+      "seq_rwsc_thresh_0.8": 0.8337531486146096,
+      "seq_rwsc_thresh_0.9": 0.8312342569269522,
+      "seq_rwsc_thresh_0.95": 0.8312342569269522,
+      "seq_pure_best_rm_thresh_5.0": 0.7934508816120907,
+      "seq_pure_best_rm_thresh_10.0": 0.7783375314861462,
+      "seq_pure_best_rm_thresh_15.0": 0.7808564231738035,
+      "seq_pure_best_rm_thresh_20.0": 0.7808564231738035,
+      "seq_pure_best_rm_thresh_25.0": 0.7808564231738035,
+      "baseline_best_rm_bon_N": 0.7808564231738035,
+      "baseline_rwsc_h5_N": 0.8312342569269522
+    }
+  },
+  "overall": {
+    "vanilla_bon (FsfairX-LLaMA3-RM-v0.1)": 0.62,
+    "vanilla_bon (Llama-3-OffsetBias-RM-8B)": 0.644,
+    "vanilla_bon (reward-model-deberta-v3-large-v2)": 0.628,
+    "vanilla_bon (ensemble)": 0.648,
+    "seq_rwsc_thresh_0.2": 0.622,
+    "seq_rwsc_thresh_0.3": 0.622,
+    "seq_rwsc_thresh_0.4": 0.622,
+    "seq_rwsc_thresh_0.5": 0.624,
+    "seq_rwsc_thresh_0.6": 0.642,
+    "seq_rwsc_thresh_0.7": 0.654,
+    "seq_rwsc_thresh_0.8": 0.662,
+    "seq_rwsc_thresh_0.9": 0.66,
+    "seq_rwsc_thresh_0.95": 0.66,
+    "seq_pure_best_rm_thresh_5.0": 0.63,
+    "seq_pure_best_rm_thresh_10.0": 0.618,
+    "seq_pure_best_rm_thresh_15.0": 0.62,
+    "seq_pure_best_rm_thresh_20.0": 0.62,
+    "seq_pure_best_rm_thresh_25.0": 0.62,
+    "baseline_best_rm_bon_N": 0.62,
+    "baseline_rwsc_h5_N": 0.66
+  },
+  "overall_normalized": {
+    "vanilla_bon (FsfairX-LLaMA3-RM-v0.1)": 0.7808564231738035,
+    "vanilla_bon (Llama-3-OffsetBias-RM-8B)": 0.8110831234256927,
+    "vanilla_bon (reward-model-deberta-v3-large-v2)": 0.7909319899244333,
+    "vanilla_bon (ensemble)": 0.8161209068010076,
+    "seq_rwsc_thresh_0.2": 0.783375314861461,
+    "seq_rwsc_thresh_0.3": 0.783375314861461,
+    "seq_rwsc_thresh_0.4": 0.783375314861461,
+    "seq_rwsc_thresh_0.5": 0.7858942065491183,
+    "seq_rwsc_thresh_0.6": 0.8085642317380353,
+    "seq_rwsc_thresh_0.7": 0.8236775818639799,
+    "seq_rwsc_thresh_0.8": 0.8337531486146096,
+    "seq_rwsc_thresh_0.9": 0.8312342569269522,
+    "seq_rwsc_thresh_0.95": 0.8312342569269522,
+    "seq_pure_best_rm_thresh_5.0": 0.7934508816120907,
+    "seq_pure_best_rm_thresh_10.0": 0.7783375314861462,
+    "seq_pure_best_rm_thresh_15.0": 0.7808564231738035,
+    "seq_pure_best_rm_thresh_20.0": 0.7808564231738035,
+    "seq_pure_best_rm_thresh_25.0": 0.7808564231738035,
+    "baseline_best_rm_bon_N": 0.7808564231738035,
+    "baseline_rwsc_h5_N": 0.8312342569269522
+  },
+  "_saved_at": "2026-06-09T12:02:42.791116"
+}

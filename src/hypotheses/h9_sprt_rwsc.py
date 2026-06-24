@@ -218,6 +218,10 @@ def _sprt_stop(
             # Update leader tracking (may have shifted)
             if new_leader_ans != leader_ans:
                 leader_ans = new_leader_ans
+                # Mathematically, the Alternative Hypothesis H1 has changed.
+                # We MUST reset the accumulated log-likelihood to preserve SPRT validity.
+                log_lambda = 0.0
+                
                 p1 = max(new_leader_mass, 0.55)
                 n_unique_now = max(len(clusters_current), 2)
                 if p0_mode == "uniform":
@@ -246,8 +250,6 @@ def _sprt_stop(
 
 # Preference order of "strongest" general-purpose RM (reused from H7)
 _STRONGEST_RM_PREFERENCE = (
-    "Skywork-Reward",
-    "ArmoRM",
     "FsfairX",
     "Llama-3-OffsetBias",
     "reward-model-deberta",
@@ -415,6 +417,8 @@ class H9SPRTRWSC(Hypothesis):
         print(f"  SPRT-RWSC: Average Candidates Generated (Cost Analysis)")
         print(f"{'=' * 70}")
 
+        avg_budget = {}
+
         # Group methods
         sprt_methods = sorted([m for m in self.steps_used if m.startswith("sprt_")])
         esprt_methods = sorted([m for m in self.steps_used if m.startswith("esprt_")])
@@ -432,8 +436,20 @@ class H9SPRTRWSC(Hypothesis):
                     steps = self.steps_used[method_name]
                     avg_steps = np.mean(steps)
                     std_steps = np.std(steps)
+                    avg_budget[method_name] = {"mean": float(avg_steps), "std": float(std_steps)}
                     print(f"    {method_name:<40s}: {avg_steps:6.2f} ± {std_steps:5.2f}")
 
         print(f"\n{'=' * 70}\n")
-
+        
+        results["average_budget"] = avg_budget
         return results
+
+    def _build_summary(self, results: Dict[str, Any], plot_paths: list) -> str:
+        summary = super()._build_summary(results, plot_paths)
+        if "average_budget" in results:
+            summary += "Average Candidates Generated (Budget):\n"
+            summary += "-" * 70 + "\n"
+            for m, stats in sorted(results["average_budget"].items()):
+                summary += f"  {m:<40s}: {stats['mean']:6.2f} ± {stats['std']:5.2f}\n"
+            summary += "\n"
+        return summary

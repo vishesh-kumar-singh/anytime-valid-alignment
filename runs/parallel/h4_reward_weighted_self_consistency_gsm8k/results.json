@@ -2,6 +2,7 @@
   "hypothesis": "h4_reward_weighted_self_consistency",
   "dataset": "gsm8k",
   "n_values": [
+    1,
     4,
     8,
     16,
@@ -15,84 +16,99 @@
   ],
   "variance_norm_mode": "robust_zscore",
   "results_by_n": {
+    "1": {
+      "vanilla_bon (FsfairX-LLaMA3-RM-v0.1)": 0.7945413191811979,
+      "vanilla_bon (Llama-3-OffsetBias-RM-8B)": 0.7945413191811979,
+      "vanilla_bon (reward-model-deberta-v3-large-v2)": 0.7945413191811979,
+      "vanilla_bon (ensemble)": 0.7945413191811979,
+      "reward_weighted_self_consistency": 0.7945413191811979
+    },
     "4": {
-      "vanilla_bon (FsfairX-LLaMA3-RM-v0.1)": 0.9052312357846853,
-      "vanilla_bon (Llama-3-OffsetBias-RM-8B)": 0.9006823351023503,
-      "vanilla_bon (reward-model-deberta-v3-large-v2)": 0.9044730856709629,
-      "vanilla_bon (ensemble)": 0.8999241849886277,
-      "reward_weighted_self_consistency": 0.9021986353297953
+      "vanilla_bon (FsfairX-LLaMA3-RM-v0.1)": 0.8483699772554966,
+      "vanilla_bon (Llama-3-OffsetBias-RM-8B)": 0.8301743745261562,
+      "vanilla_bon (reward-model-deberta-v3-large-v2)": 0.8218347232752085,
+      "vanilla_bon (ensemble)": 0.8377558756633814,
+      "reward_weighted_self_consistency": 0.8438210765731615
     },
     "8": {
-      "vanilla_bon (FsfairX-LLaMA3-RM-v0.1)": 0.9067475360121304,
-      "vanilla_bon (Llama-3-OffsetBias-RM-8B)": 0.8984078847611827,
-      "vanilla_bon (reward-model-deberta-v3-large-v2)": 0.9006823351023503,
-      "vanilla_bon (ensemble)": 0.8999241849886277,
-      "reward_weighted_self_consistency": 0.9044730856709629
+      "vanilla_bon (FsfairX-LLaMA3-RM-v0.1)": 0.8597422289613343,
+      "vanilla_bon (Llama-3-OffsetBias-RM-8B)": 0.8286580742987112,
+      "vanilla_bon (reward-model-deberta-v3-large-v2)": 0.8278999241849886,
+      "vanilla_bon (ensemble)": 0.8483699772554966,
+      "reward_weighted_self_consistency": 0.868081880212282
     },
     "16": {
-      "vanilla_bon (FsfairX-LLaMA3-RM-v0.1)": 0.9029567854435178,
-      "vanilla_bon (Llama-3-OffsetBias-RM-8B)": 0.8984078847611827,
-      "vanilla_bon (reward-model-deberta-v3-large-v2)": 0.890068233510235,
-      "vanilla_bon (ensemble)": 0.8946171341925702,
-      "reward_weighted_self_consistency": 0.8999241849886277
+      "vanilla_bon (FsfairX-LLaMA3-RM-v0.1)": 0.865049279757392,
+      "vanilla_bon (Llama-3-OffsetBias-RM-8B)": 0.8369977255496588,
+      "vanilla_bon (reward-model-deberta-v3-large-v2)": 0.8278999241849886,
+      "vanilla_bon (ensemble)": 0.8536770280515542,
+      "reward_weighted_self_consistency": 0.8749052312357847
     },
     "24": {
-      "vanilla_bon (FsfairX-LLaMA3-RM-v0.1)": 0.8923426838514026,
-      "vanilla_bon (Llama-3-OffsetBias-RM-8B)": 0.8862774829416225,
-      "vanilla_bon (reward-model-deberta-v3-large-v2)": 0.8779378316906747,
-      "vanilla_bon (ensemble)": 0.8855193328279,
-      "reward_weighted_self_consistency": 0.8984078847611827
+      "vanilla_bon (FsfairX-LLaMA3-RM-v0.1)": 0.8529188779378317,
+      "vanilla_bon (Llama-3-OffsetBias-RM-8B)": 0.8248673237300985,
+      "vanilla_bon (reward-model-deberta-v3-large-v2)": 0.8225928733889311,
+      "vanilla_bon (ensemble)": 0.8423047763457164,
+      "reward_weighted_self_consistency": 0.8764215314632298
     }
   },
   "oracle_by_n": {
-    "4": 0.9575435936315391,
-    "8": 0.9651250947687642,
-    "16": 0.9742228961334344,
-    "24": 0.978013646702047
+    "1": 0.7945413191811979,
+    "4": 0.9241849886277483,
+    "8": 0.9529946929492039,
+    "16": 0.9643669446550417,
+    "24": 0.9689158453373768
   },
   "normalized_by_n": {
+    "1": {
+      "vanilla_bon (FsfairX-LLaMA3-RM-v0.1)": 1.0,
+      "vanilla_bon (Llama-3-OffsetBias-RM-8B)": 1.0,
+      "vanilla_bon (reward-model-deberta-v3-large-v2)": 1.0,
+      "vanilla_bon (ensemble)": 1.0,
+      "reward_weighted_self_consistency": 1.0
+    },
     "4": {
-      "vanilla_bon (FsfairX-LLaMA3-RM-v0.1)": 0.9453681710213777,
-      "vanilla_bon (Llama-3-OffsetBias-RM-8B)": 0.9406175771971497,
-      "vanilla_bon (reward-model-deberta-v3-large-v2)": 0.9445764053840063,
-      "vanilla_bon (ensemble)": 0.9398258115597783,
-      "reward_weighted_self_consistency": 0.9422011084718923
+      "vanilla_bon (FsfairX-LLaMA3-RM-v0.1)": 0.9179655455291222,
+      "vanilla_bon (Llama-3-OffsetBias-RM-8B)": 0.8982772764561116,
+      "vanilla_bon (reward-model-deberta-v3-large-v2)": 0.889253486464315,
+      "vanilla_bon (ensemble)": 0.9064807219031994,
+      "reward_weighted_self_consistency": 0.9130434782608695
     },
     "8": {
-      "vanilla_bon (FsfairX-LLaMA3-RM-v0.1)": 0.9395129615082483,
-      "vanilla_bon (Llama-3-OffsetBias-RM-8B)": 0.9308719560094265,
-      "vanilla_bon (reward-model-deberta-v3-large-v2)": 0.9332285938727416,
-      "vanilla_bon (ensemble)": 0.9324430479183032,
-      "reward_weighted_self_consistency": 0.9371563236449332
+      "vanilla_bon (FsfairX-LLaMA3-RM-v0.1)": 0.9021479713603818,
+      "vanilla_bon (Llama-3-OffsetBias-RM-8B)": 0.8695306284805091,
+      "vanilla_bon (reward-model-deberta-v3-large-v2)": 0.8687350835322196,
+      "vanilla_bon (ensemble)": 0.8902147971360382,
+      "reward_weighted_self_consistency": 0.9108989657915673
     },
     "16": {
-      "vanilla_bon (FsfairX-LLaMA3-RM-v0.1)": 0.9268482490272374,
-      "vanilla_bon (Llama-3-OffsetBias-RM-8B)": 0.9221789883268483,
-      "vanilla_bon (reward-model-deberta-v3-large-v2)": 0.9136186770428015,
-      "vanilla_bon (ensemble)": 0.9182879377431906,
-      "reward_weighted_self_consistency": 0.9237354085603113
+      "vanilla_bon (FsfairX-LLaMA3-RM-v0.1)": 0.8970125786163522,
+      "vanilla_bon (Llama-3-OffsetBias-RM-8B)": 0.8679245283018868,
+      "vanilla_bon (reward-model-deberta-v3-large-v2)": 0.8584905660377359,
+      "vanilla_bon (ensemble)": 0.8852201257861635,
+      "reward_weighted_self_consistency": 0.9072327044025157
     },
     "24": {
-      "vanilla_bon (FsfairX-LLaMA3-RM-v0.1)": 0.9124031007751938,
-      "vanilla_bon (Llama-3-OffsetBias-RM-8B)": 0.9062015503875969,
-      "vanilla_bon (reward-model-deberta-v3-large-v2)": 0.8976744186046511,
-      "vanilla_bon (ensemble)": 0.9054263565891473,
-      "reward_weighted_self_consistency": 0.9186046511627907
+      "vanilla_bon (FsfairX-LLaMA3-RM-v0.1)": 0.8802816901408451,
+      "vanilla_bon (Llama-3-OffsetBias-RM-8B)": 0.8513302034428795,
+      "vanilla_bon (reward-model-deberta-v3-large-v2)": 0.848982785602504,
+      "vanilla_bon (ensemble)": 0.8693270735524257,
+      "reward_weighted_self_consistency": 0.9045383411580594
     }
   },
   "overall": {
-    "vanilla_bon (FsfairX-LLaMA3-RM-v0.1)": 0.8923426838514026,
-    "vanilla_bon (Llama-3-OffsetBias-RM-8B)": 0.8862774829416225,
-    "vanilla_bon (reward-model-deberta-v3-large-v2)": 0.8779378316906747,
-    "vanilla_bon (ensemble)": 0.8855193328279,
-    "reward_weighted_self_consistency": 0.8984078847611827
+    "vanilla_bon (FsfairX-LLaMA3-RM-v0.1)": 0.8529188779378317,
+    "vanilla_bon (Llama-3-OffsetBias-RM-8B)": 0.8248673237300985,
+    "vanilla_bon (reward-model-deberta-v3-large-v2)": 0.8225928733889311,
+    "vanilla_bon (ensemble)": 0.8423047763457164,
+    "reward_weighted_self_consistency": 0.8764215314632298
   },
   "overall_normalized": {
-    "vanilla_bon (FsfairX-LLaMA3-RM-v0.1)": 0.9124031007751938,
-    "vanilla_bon (Llama-3-OffsetBias-RM-8B)": 0.9062015503875969,
-    "vanilla_bon (reward-model-deberta-v3-large-v2)": 0.8976744186046511,
-    "vanilla_bon (ensemble)": 0.9054263565891473,
-    "reward_weighted_self_consistency": 0.9186046511627907
+    "vanilla_bon (FsfairX-LLaMA3-RM-v0.1)": 0.8802816901408451,
+    "vanilla_bon (Llama-3-OffsetBias-RM-8B)": 0.8513302034428795,
+    "vanilla_bon (reward-model-deberta-v3-large-v2)": 0.848982785602504,
+    "vanilla_bon (ensemble)": 0.8693270735524257,
+    "reward_weighted_self_consistency": 0.9045383411580594
   },
-  "_saved_at": "2026-06-09T09:52:29.745390"
+  "_saved_at": "2026-06-22T22:52:18.067290"
 }

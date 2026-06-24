@@ -30,8 +30,6 @@ from .base import Hypothesis, _extract_answer
 # Preference order of "strongest" general-purpose RM (independent RewardBench
 # ranking, NOT tuned on MATH500). The first match present in the ensemble wins.
 _STRONGEST_RM_PREFERENCE = (
-    "Skywork-Reward",
-    "ArmoRM",
     "FsfairX",
     "Llama-3-OffsetBias",
     "reward-model-deberta",

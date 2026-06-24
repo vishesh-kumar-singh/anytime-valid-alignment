@@ -1,0 +1,50 @@
+Hypothesis: h5_single_best_rm_rwsc
+Description: Single-best-RM Reward-Weighted Self-Consistency: drop the diluting ensemble average, weight answer clusters by the single strongest RM.
+Category: parallel
+Timestamp: 2026-06-24T04:46:42.182155
+
+Results by N  (Acc = accuracy;  ONA = oracle-normalized = Acc / Oracle@N):
+----------------------------------------------------------------------
+
+  N = 1   (Oracle@N = 65.8%):
+    vanilla_bon (FsfairX-LLaMA3-RM-v0.1)      Acc  65.8%   ONA 100.0%
+    vanilla_bon (Llama-3-OffsetBias-RM-8B)    Acc  65.8%   ONA 100.0%
+    vanilla_bon (reward-model-deberta-v3-large-v2)  Acc  65.8%   ONA 100.0%
+    vanilla_bon (ensemble)                    Acc  65.8%   ONA 100.0%
+    single_best_rm_bon                        Acc  65.8%   ONA 100.0%
+    single_best_rm_rwsc                       Acc  65.8%   ONA 100.0%
+
+  N = 4   (Oracle@N = 82.8%):
+    vanilla_bon (FsfairX-LLaMA3-RM-v0.1)      Acc  68.7%   ONA  83.0%
+    vanilla_bon (Llama-3-OffsetBias-RM-8B)    Acc  67.4%   ONA  81.4%
+    vanilla_bon (reward-model-deberta-v3-large-v2)  Acc  66.3%   ONA  80.0%
+    vanilla_bon (ensemble)                    Acc  68.0%   ONA  82.2%
+    single_best_rm_bon                        Acc  68.7%   ONA  83.0%
+    single_best_rm_rwsc                       Acc  68.9%   ONA  83.2%
+
+  N = 8   (Oracle@N = 88.3%):
+    vanilla_bon (FsfairX-LLaMA3-RM-v0.1)      Acc  68.7%   ONA  77.8%
+    vanilla_bon (Llama-3-OffsetBias-RM-8B)    Acc  67.5%   ONA  76.4%
+    vanilla_bon (reward-model-deberta-v3-large-v2)  Acc  66.5%   ONA  75.2%
+    vanilla_bon (ensemble)                    Acc  68.1%   ONA  77.1%
+    single_best_rm_bon                        Acc  68.7%   ONA  77.8%
+    single_best_rm_rwsc                       Acc  69.8%   ONA  79.1%
+
+  N = 16   (Oracle@N = 91.8%):
+    vanilla_bon (FsfairX-LLaMA3-RM-v0.1)      Acc  68.1%   ONA  74.2%
+    vanilla_bon (Llama-3-OffsetBias-RM-8B)    Acc  66.6%   ONA  72.6%
+    vanilla_bon (reward-model-deberta-v3-large-v2)  Acc  66.5%   ONA  72.4%
+    vanilla_bon (ensemble)                    Acc  67.8%   ONA  73.9%
+    single_best_rm_bon                        Acc  68.1%   ONA  74.2%
+    single_best_rm_rwsc                       Acc  70.2%   ONA  76.5%
+
+  N = 24   (Oracle@N = 93.4%):
+    vanilla_bon (FsfairX-LLaMA3-RM-v0.1)      Acc  67.6%   ONA  72.4%
+    vanilla_bon (Llama-3-OffsetBias-RM-8B)    Acc  66.1%   ONA  70.8%
+    vanilla_bon (reward-model-deberta-v3-large-v2)  Acc  66.7%   ONA  71.4%
+    vanilla_bon (ensemble)                    Acc  67.5%   ONA  72.3%
+    single_best_rm_bon                        Acc  67.6%   ONA  72.4%
+    single_best_rm_rwsc                       Acc  70.3%   ONA  75.4%
+
+Generated Plots:
+  - accuracy_vs_n.png

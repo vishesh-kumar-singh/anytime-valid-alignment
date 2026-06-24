@@ -1,0 +1,50 @@
+Hypothesis: h7_sequential_early_stopping
+Description: RWSC Sequential Early Stopping: Stops generation once a candidate's answer cluster mass (using single strongest RM) exceeds a threshold.
+Category: parallel
+Timestamp: 2026-06-24T04:50:37.926456
+
+Results by N  (Acc = accuracy;  ONA = oracle-normalized = Acc / Oracle@N):
+----------------------------------------------------------------------
+
+  N = 24   (Oracle@N = 93.4%):
+    vanilla_bon (FsfairX-LLaMA3-RM-v0.1)      Acc  67.6%   ONA  72.4%
+    vanilla_bon (Llama-3-OffsetBias-RM-8B)    Acc  66.1%   ONA  70.8%
+    vanilla_bon (reward-model-deberta-v3-large-v2)  Acc  66.7%   ONA  71.4%
+    vanilla_bon (ensemble)                    Acc  67.5%   ONA  72.3%
+    seq_rwsc_thresh_0.2                       Acc  68.9%   ONA  73.8%
+    seq_rwsc_thresh_0.3                       Acc  68.9%   ONA  73.8%
+    seq_rwsc_thresh_0.4                       Acc  68.9%   ONA  73.8%
+    seq_rwsc_thresh_0.5                       Acc  69.0%   ONA  73.9%
+    seq_rwsc_thresh_0.6                       Acc  69.3%   ONA  74.2%
+    seq_rwsc_thresh_0.7                       Acc  70.0%   ONA  74.9%
+    seq_rwsc_thresh_0.8                       Acc  70.4%   ONA  75.4%
+    seq_rwsc_thresh_0.9                       Acc  70.6%   ONA  75.7%
+    seq_rwsc_thresh_0.95                      Acc  70.8%   ONA  75.8%
+    seq_pure_best_rm_thresh_5.0               Acc  67.6%   ONA  72.4%
+    seq_pure_best_rm_thresh_10.0              Acc  67.6%   ONA  72.4%
+    seq_pure_best_rm_thresh_15.0              Acc  67.6%   ONA  72.4%
+    seq_pure_best_rm_thresh_20.0              Acc  67.6%   ONA  72.4%
+    seq_pure_best_rm_thresh_25.0              Acc  67.6%   ONA  72.4%
+    baseline_best_rm_bon_N                    Acc  67.6%   ONA  72.4%
+    baseline_rwsc_h5_N                        Acc  70.3%   ONA  75.4%
+
+Generated Plots:
+  - accuracy_vs_n.pngAverage Candidates Generated (Budget):
+----------------------------------------------------------------------
+  baseline_rwsc_h5_N                      :  24.00 ±  0.00
+  baseline_skywork_bon_N                  :  24.00 ±  0.00
+  seq_pure_best_rm_thresh_10.0            :  23.99 ±  0.48
+  seq_pure_best_rm_thresh_15.0            :  24.00 ±  0.00
+  seq_pure_best_rm_thresh_20.0            :  24.00 ±  0.00
+  seq_pure_best_rm_thresh_25.0            :  24.00 ±  0.00
+  seq_pure_best_rm_thresh_5.0             :  14.98 ±  9.36
+  seq_rwsc_thresh_0.2                     :   4.00 ±  0.00
+  seq_rwsc_thresh_0.3                     :   4.00 ±  0.00
+  seq_rwsc_thresh_0.4                     :   4.00 ±  0.04
+  seq_rwsc_thresh_0.5                     :   4.03 ±  0.56
+  seq_rwsc_thresh_0.6                     :   4.31 ±  1.96
+  seq_rwsc_thresh_0.7                     :   5.07 ±  4.05
+  seq_rwsc_thresh_0.8                     :   6.69 ±  6.48
+  seq_rwsc_thresh_0.9                     :   8.90 ±  8.39
+  seq_rwsc_thresh_0.95                    :  10.15 ±  9.10
+

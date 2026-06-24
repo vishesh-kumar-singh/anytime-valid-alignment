@@ -1,82 +1,100 @@
 Hypothesis: h6_mbr_ensemble_aggregation
 Description: Evaluates advanced ensemble aggregation strategies including MBR regularization, robust normalization, and various selection policies.
 Category: parallel
-Timestamp: 2026-06-09T12:15:24.537770
+Timestamp: 2026-06-22T22:52:28.526044
 
 Results by N  (Acc = accuracy;  ONA = oracle-normalized = Acc / Oracle@N):
 ----------------------------------------------------------------------
 
-  N = 4   (Oracle@N = 95.8%):
-    vanilla_bon (FsfairX-LLaMA3-RM-v0.1)      Acc  90.5%   ONA  94.5%
-    vanilla_bon (Llama-3-OffsetBias-RM-8B)    Acc  90.1%   ONA  94.1%
-    vanilla_bon (reward-model-deberta-v3-large-v2)  Acc  90.4%   ONA  94.5%
-    vanilla_bon (ensemble)                    Acc  90.0%   ONA  94.0%
-    mbr_vanilla_bon                           Acc  90.6%   ONA  94.6%
-    mbr_bon_sharpe                            Acc  90.6%   ONA  94.6%
-    mbr_bon_linear                            Acc  90.8%   ONA  94.8%
-    mbr_soft_bon                              Acc  90.5%   ONA  94.5%
-    mbr_softbon_sharpe                        Acc  91.1%   ONA  95.2%
-    mbr_softbon_linear                        Acc  90.4%   ONA  94.4%
-    mbr_minimax                               Acc  91.1%   ONA  95.1%
-    mbr_mob_vanilla                           Acc  91.0%   ONA  95.0%
-    mbr_mob_sharpe                            Acc  90.1%   ONA  94.1%
-    mbr_wbon_inv_var                          Acc  90.8%   ONA  94.9%
-    mbr_wbon_sharpe                           Acc  90.8%   ONA  94.9%
-    mbr_rwsc                                  Acc  90.7%   ONA  94.7%
+  N = 1   (Oracle@N = 79.5%):
+    vanilla_bon (FsfairX-LLaMA3-RM-v0.1)      Acc  79.5%   ONA 100.0%
+    vanilla_bon (Llama-3-OffsetBias-RM-8B)    Acc  79.5%   ONA 100.0%
+    vanilla_bon (reward-model-deberta-v3-large-v2)  Acc  79.5%   ONA 100.0%
+    vanilla_bon (ensemble)                    Acc  79.5%   ONA 100.0%
+    mbr_vanilla_bon                           Acc  79.5%   ONA 100.0%
+    mbr_bon_sharpe                            Acc  79.5%   ONA 100.0%
+    mbr_bon_linear                            Acc  79.5%   ONA 100.0%
+    mbr_soft_bon                              Acc  79.5%   ONA 100.0%
+    mbr_softbon_sharpe                        Acc  79.5%   ONA 100.0%
+    mbr_softbon_linear                        Acc  79.5%   ONA 100.0%
+    mbr_minimax                               Acc  79.5%   ONA 100.0%
+    mbr_mob_vanilla                           Acc  79.5%   ONA 100.0%
+    mbr_mob_sharpe                            Acc  79.5%   ONA 100.0%
+    mbr_wbon_inv_var                          Acc  79.5%   ONA 100.0%
+    mbr_wbon_sharpe                           Acc  79.5%   ONA 100.0%
+    mbr_rwsc                                  Acc  79.5%   ONA 100.0%
 
-  N = 8   (Oracle@N = 96.5%):
-    vanilla_bon (FsfairX-LLaMA3-RM-v0.1)      Acc  90.7%   ONA  94.0%
-    vanilla_bon (Llama-3-OffsetBias-RM-8B)    Acc  89.8%   ONA  93.1%
-    vanilla_bon (reward-model-deberta-v3-large-v2)  Acc  90.1%   ONA  93.3%
-    vanilla_bon (ensemble)                    Acc  90.0%   ONA  93.2%
-    mbr_vanilla_bon                           Acc  91.1%   ONA  94.4%
-    mbr_bon_sharpe                            Acc  91.4%   ONA  94.7%
-    mbr_bon_linear                            Acc  91.1%   ONA  94.4%
-    mbr_soft_bon                              Acc  90.4%   ONA  93.6%
-    mbr_softbon_sharpe                        Acc  90.9%   ONA  94.2%
-    mbr_softbon_linear                        Acc  90.8%   ONA  94.1%
-    mbr_minimax                               Acc  91.3%   ONA  94.6%
-    mbr_mob_vanilla                           Acc  90.8%   ONA  94.1%
-    mbr_mob_sharpe                            Acc  91.3%   ONA  94.6%
-    mbr_wbon_inv_var                          Acc  91.5%   ONA  94.8%
-    mbr_wbon_sharpe                           Acc  91.7%   ONA  95.1%
-    mbr_rwsc                                  Acc  91.4%   ONA  94.7%
+  N = 4   (Oracle@N = 92.4%):
+    vanilla_bon (FsfairX-LLaMA3-RM-v0.1)      Acc  84.8%   ONA  91.8%
+    vanilla_bon (Llama-3-OffsetBias-RM-8B)    Acc  83.0%   ONA  89.8%
+    vanilla_bon (reward-model-deberta-v3-large-v2)  Acc  82.2%   ONA  88.9%
+    vanilla_bon (ensemble)                    Acc  83.8%   ONA  90.6%
+    mbr_vanilla_bon                           Acc  84.7%   ONA  91.6%
+    mbr_bon_sharpe                            Acc  84.2%   ONA  91.1%
+    mbr_bon_linear                            Acc  84.2%   ONA  91.1%
+    mbr_soft_bon                              Acc  83.5%   ONA  90.3%
+    mbr_softbon_sharpe                        Acc  83.5%   ONA  90.4%
+    mbr_softbon_linear                        Acc  83.1%   ONA  89.9%
+    mbr_minimax                               Acc  85.0%   ONA  92.0%
+    mbr_mob_vanilla                           Acc  84.6%   ONA  91.6%
+    mbr_mob_sharpe                            Acc  84.2%   ONA  91.1%
+    mbr_wbon_inv_var                          Acc  84.8%   ONA  91.7%
+    mbr_wbon_sharpe                           Acc  84.3%   ONA  91.2%
+    mbr_rwsc                                  Acc  85.2%   ONA  92.2%
 
-  N = 16   (Oracle@N = 97.4%):
-    vanilla_bon (FsfairX-LLaMA3-RM-v0.1)      Acc  90.3%   ONA  92.7%
-    vanilla_bon (Llama-3-OffsetBias-RM-8B)    Acc  89.8%   ONA  92.2%
-    vanilla_bon (reward-model-deberta-v3-large-v2)  Acc  89.0%   ONA  91.4%
-    vanilla_bon (ensemble)                    Acc  89.5%   ONA  91.8%
-    mbr_vanilla_bon                           Acc  90.4%   ONA  92.8%
-    mbr_bon_sharpe                            Acc  91.1%   ONA  93.5%
-    mbr_bon_linear                            Acc  90.8%   ONA  93.2%
-    mbr_soft_bon                              Acc  90.2%   ONA  92.6%
-    mbr_softbon_sharpe                        Acc  91.5%   ONA  93.9%
-    mbr_softbon_linear                        Acc  91.2%   ONA  93.6%
-    mbr_minimax                               Acc  90.8%   ONA  93.2%
-    mbr_mob_vanilla                           Acc  90.5%   ONA  92.9%
-    mbr_mob_sharpe                            Acc  91.1%   ONA  93.5%
-    mbr_wbon_inv_var                          Acc  90.6%   ONA  93.0%
-    mbr_wbon_sharpe                           Acc  91.6%   ONA  94.0%
-    mbr_rwsc                                  Acc  91.2%   ONA  93.6%
+  N = 8   (Oracle@N = 95.3%):
+    vanilla_bon (FsfairX-LLaMA3-RM-v0.1)      Acc  86.0%   ONA  90.2%
+    vanilla_bon (Llama-3-OffsetBias-RM-8B)    Acc  82.9%   ONA  87.0%
+    vanilla_bon (reward-model-deberta-v3-large-v2)  Acc  82.8%   ONA  86.9%
+    vanilla_bon (ensemble)                    Acc  84.8%   ONA  89.0%
+    mbr_vanilla_bon                           Acc  86.1%   ONA  90.4%
+    mbr_bon_sharpe                            Acc  86.1%   ONA  90.4%
+    mbr_bon_linear                            Acc  86.0%   ONA  90.2%
+    mbr_soft_bon                              Acc  83.9%   ONA  88.0%
+    mbr_softbon_sharpe                        Acc  84.5%   ONA  88.7%
+    mbr_softbon_linear                        Acc  84.8%   ONA  88.9%
+    mbr_minimax                               Acc  86.1%   ONA  90.3%
+    mbr_mob_vanilla                           Acc  86.0%   ONA  90.2%
+    mbr_mob_sharpe                            Acc  86.2%   ONA  90.5%
+    mbr_wbon_inv_var                          Acc  86.1%   ONA  90.3%
+    mbr_wbon_sharpe                           Acc  85.7%   ONA  90.0%
+    mbr_rwsc                                  Acc  87.2%   ONA  91.5%
 
-  N = 24   (Oracle@N = 97.8%):
-    vanilla_bon (FsfairX-LLaMA3-RM-v0.1)      Acc  89.2%   ONA  91.2%
-    vanilla_bon (Llama-3-OffsetBias-RM-8B)    Acc  88.6%   ONA  90.6%
-    vanilla_bon (reward-model-deberta-v3-large-v2)  Acc  87.8%   ONA  89.8%
-    vanilla_bon (ensemble)                    Acc  88.6%   ONA  90.5%
-    mbr_vanilla_bon                           Acc  90.1%   ONA  92.2%
-    mbr_bon_sharpe                            Acc  91.4%   ONA  93.5%
-    mbr_bon_linear                            Acc  90.4%   ONA  92.4%
-    mbr_soft_bon                              Acc  90.3%   ONA  92.3%
-    mbr_softbon_sharpe                        Acc  91.1%   ONA  93.2%
-    mbr_softbon_linear                        Acc  90.8%   ONA  92.8%
-    mbr_minimax                               Acc  90.2%   ONA  92.2%
-    mbr_mob_vanilla                           Acc  90.0%   ONA  92.0%
-    mbr_mob_sharpe                            Acc  91.2%   ONA  93.3%
-    mbr_wbon_inv_var                          Acc  90.3%   ONA  92.3%
-    mbr_wbon_sharpe                           Acc  91.7%   ONA  93.8%
-    mbr_rwsc                                  Acc  91.3%   ONA  93.3%
+  N = 16   (Oracle@N = 96.4%):
+    vanilla_bon (FsfairX-LLaMA3-RM-v0.1)      Acc  86.5%   ONA  89.7%
+    vanilla_bon (Llama-3-OffsetBias-RM-8B)    Acc  83.7%   ONA  86.8%
+    vanilla_bon (reward-model-deberta-v3-large-v2)  Acc  82.8%   ONA  85.8%
+    vanilla_bon (ensemble)                    Acc  85.4%   ONA  88.5%
+    mbr_vanilla_bon                           Acc  87.1%   ONA  90.3%
+    mbr_bon_sharpe                            Acc  86.3%   ONA  89.5%
+    mbr_bon_linear                            Acc  86.6%   ONA  89.8%
+    mbr_soft_bon                              Acc  84.8%   ONA  88.0%
+    mbr_softbon_sharpe                        Acc  84.8%   ONA  87.9%
+    mbr_softbon_linear                        Acc  84.9%   ONA  88.1%
+    mbr_minimax                               Acc  86.6%   ONA  89.8%
+    mbr_mob_vanilla                           Acc  87.1%   ONA  90.3%
+    mbr_mob_sharpe                            Acc  86.4%   ONA  89.5%
+    mbr_wbon_inv_var                          Acc  86.8%   ONA  90.0%
+    mbr_wbon_sharpe                           Acc  86.6%   ONA  89.8%
+    mbr_rwsc                                  Acc  89.0%   ONA  92.3%
+
+  N = 24   (Oracle@N = 96.9%):
+    vanilla_bon (FsfairX-LLaMA3-RM-v0.1)      Acc  85.3%   ONA  88.0%
+    vanilla_bon (Llama-3-OffsetBias-RM-8B)    Acc  82.5%   ONA  85.1%
+    vanilla_bon (reward-model-deberta-v3-large-v2)  Acc  82.3%   ONA  84.9%
+    vanilla_bon (ensemble)                    Acc  84.2%   ONA  86.9%
+    mbr_vanilla_bon                           Acc  86.4%   ONA  89.1%
+    mbr_bon_sharpe                            Acc  86.0%   ONA  88.7%
+    mbr_bon_linear                            Acc  87.0%   ONA  89.8%
+    mbr_soft_bon                              Acc  84.4%   ONA  87.1%
+    mbr_softbon_sharpe                        Acc  85.2%   ONA  87.9%
+    mbr_softbon_linear                        Acc  84.5%   ONA  87.2%
+    mbr_minimax                               Acc  86.7%   ONA  89.5%
+    mbr_mob_vanilla                           Acc  86.4%   ONA  89.2%
+    mbr_mob_sharpe                            Acc  86.1%   ONA  88.8%
+    mbr_wbon_inv_var                          Acc  86.4%   ONA  89.2%
+    mbr_wbon_sharpe                           Acc  85.6%   ONA  88.3%
+    mbr_rwsc                                  Acc  88.9%   ONA  91.7%
 
 Generated Plots:
   - accuracy_vs_n.png

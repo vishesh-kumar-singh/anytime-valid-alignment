@@ -107,6 +107,21 @@ def _extract_answer(text: str, dataset: str) -> Optional[str]:
         nums = re.findall(r"-?[\d,]+\.?\d*", text)
         if nums:
             return nums[-1].replace(",", "")
+
+            
+    if dataset == "mmlu":
+        match = re.search(r'(?:answer is|Answer:|\*\*Answer\*\*:?)\s*\(?([A-D])\)?', text, re.IGNORECASE)
+        if match:
+            return match.group(1).upper()
+        
+        match = re.search(r'\(([A-D])\)', text, re.IGNORECASE)
+        if match:
+            matches = re.findall(r'\(([A-D])\)', text, re.IGNORECASE)
+            return matches[-1].upper()
+            
+        matches = re.findall(r'\b([A-D])\b', text)
+        if matches:
+            return matches[-1].upper()
         return None
 
     return None
@@ -183,6 +198,10 @@ class Hypothesis(ABC):
             return "gsm8k"
         if "math500" in name:
             return "math500"
+        if "mmlu" in name:
+            return "mmlu"
+        if "alpaca" in name:
+            return "alpaca"
         return "unknown"
 
     @staticmethod

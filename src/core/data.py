@@ -155,8 +155,11 @@ def load_dataset_examples(
     elif dataset == "alpaca":
         from ..data_utils.alpaca import load_alpaca
         return load_alpaca(max_examples=max_examples)
+    elif dataset == "mmlu":
+        from ..data_utils.mmlu import load_mmlu
+        return load_mmlu(split=split, max_examples=max_examples)
     else:
-        raise ValueError(f"Unknown dataset: {dataset}. Choose from: gsm8k, math500, alpaca_eval, alpaca")
+        raise ValueError(f"Unknown dataset: {dataset}. Choose from: gsm8k, math500, alpaca_eval, alpaca, mmlu")
 
 
 def check_correctness(prediction: str, ground_truth: str, dataset: str) -> bool:
@@ -182,6 +185,9 @@ def check_correctness(prediction: str, ground_truth: str, dataset: str) -> bool:
         except ImportError:
             from ..data_utils.math500 import check_math_correct
             return check_math_correct(prediction, ground_truth)
+    elif dataset == "mmlu":
+        from ..data_utils.mmlu import check_answer_correct as check_mmlu_correct
+        return check_mmlu_correct(prediction, ground_truth)
     elif dataset in ("alpaca_eval", "alpaca"):
         return False  # open-ended: no ground-truth correctness
     return False
@@ -204,4 +210,6 @@ def dataset_system_message(dataset: str) -> str:
         )
     if dataset == "alpaca":
         return "You are a helpful, harmless, and honest assistant. Follow the instruction carefully."
+    if dataset == "mmlu":
+        return "You are a knowledgeable assistant. Answer the multiple choice question by selecting the correct option (A, B, C, or D). Provide a brief explanation followed by your final answer in the format: 'Answer: (X)' where X is the correct letter."
     return "You are a helpful assistant."

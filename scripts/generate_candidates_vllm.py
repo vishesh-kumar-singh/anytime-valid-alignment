@@ -43,6 +43,7 @@ def main(
     top_p: float = typer.Option(0.95, help="Generation top_p."),
     max_new_tokens: int = typer.Option(512, help="Max tokens per generation."),
     gpu_memory_utilization: float = typer.Option(0.85, help="vLLM memory utilization."),
+    num_gpus: int = typer.Option(1, help="Number of GPUs to use (tensor_parallel_size)."),
     output_path: Optional[str] = typer.Option(None, help="Output JSONL path."),
 ):
     """Generate N candidates using ultra-fast vLLM."""
@@ -101,6 +102,7 @@ def main(
     print(f"  Dataset:     {dataset} ({len(all_examples)} examples)")
     print(f"  Candidates:  {n_candidates} per example")
     print(f"  Remaining:   {total_to_do}")
+    print(f"  GPUs:        {num_gpus}")
     print(f"  Output:      {output_path}")
     print(f"{'=' * 70}\n")
 
@@ -129,8 +131,8 @@ def main(
     llm = LLM(
         model=model_name,
         gpu_memory_utilization=gpu_memory_utilization,
-        tensor_parallel_size=1,
-        trust_remote_code=True,
+        tensor_parallel_size=num_gpus,
+        trust_remote_code=True, enforce_eager=True,
     )
     exp_logger.log_phase_end("model_loading", time.time() - t0)
 
@@ -143,40 +145,50 @@ def main(
         seed=42,
     )
 
-    # Generate everything at once!
-    print("\nStarting batched generation...")
+    # Generate in chunks so we save progress and don't lose everything on a crash!
+    CHUNK_SIZE = 500
+    print(f"\nStarting batched generation in chunks of {CHUNK_SIZE} examples...")
     exp_logger.log_inference_start(total_to_do, n_candidates)
     
     t_gen_start = time.perf_counter()
-    outputs = llm.generate(formatted_prompts, sampling_params)
-    total_gen_time = time.perf_counter() - t_gen_start
     
-    avg_gen_time = total_gen_time / total_to_do if total_to_do > 0 else 0
+    for chunk_start in range(0, total_to_do, CHUNK_SIZE):
+        chunk_end = min(chunk_start + CHUNK_SIZE, total_to_do)
+        chunk_examples = examples_to_run[chunk_start:chunk_end]
+        chunk_prompts = formatted_prompts[chunk_start:chunk_end]
+        
+        print(f"\nProcessing chunk {chunk_start//CHUNK_SIZE + 1} ({chunk_start} to {chunk_end} of {total_to_do})...")
+        
+        chunk_t0 = time.perf_counter()
+        outputs = llm.generate(chunk_prompts, sampling_params)
+        chunk_gen_time = time.perf_counter() - chunk_t0
+        avg_gen_time = chunk_gen_time / len(chunk_examples) if len(chunk_examples) > 0 else 0
+        
+        # Save chunk to disk immediately
+        with out_path.open("a", encoding="utf-8") as f_out:
+            for ex, vllm_out in zip(chunk_examples, outputs):
+                idx = ex["_global_index"]
+                prompt = ex["question"]
+                gold_answer = ex.get("answer") or ex.get("reference", "")
+                
+                candidates = [out.text.strip() for out in vllm_out.outputs]
+                
+                row = {
+                    "example_index": idx,
+                    "prompt": prompt,
+                    "ground_truth": gold_answer,
+                    "candidates": candidates,
+                    "n_candidates": n_candidates,
+                    "gen_time_sec": avg_gen_time,
+                    "model_name": model_name,
+                    "dataset": dataset,
+                }
+                f_out.write(json.dumps(row, ensure_ascii=False) + "\n")
+                exp_logger.log_example_done(idx, [{"method": "vllm_generation", "is_correct": None}])
+        
+        print(f"✓ Saved chunk to {output_path}")
 
-    # Save to disk
-    with out_path.open("a", encoding="utf-8") as f_out:
-        for ex, vllm_out in zip(examples_to_run, outputs):
-            idx = ex["_global_index"]
-            prompt = ex["question"]
-            # math datasets carry "answer"; alpaca_eval carries "reference"
-            gold_answer = ex.get("answer") or ex.get("reference", "")
-            
-            # Extract all N generated texts
-            candidates = [out.text.strip() for out in vllm_out.outputs]
-            
-            row = {
-                "example_index": idx,
-                "prompt": prompt,
-                "ground_truth": gold_answer,
-                "candidates": candidates,
-                "n_candidates": n_candidates,
-                "gen_time_sec": avg_gen_time,  # Approximate per-example time
-                "model_name": model_name,
-                "dataset": dataset,
-            }
-            f_out.write(json.dumps(row, ensure_ascii=False) + "\n")
-            exp_logger.log_example_done(idx, [{"method": "vllm_generation", "is_correct": None}])
-
+    total_gen_time = time.perf_counter() - t_gen_start
     exp_logger.log_inference_end(total_to_do)
     print(f"\n✓ Generated {total_to_do} examples with {n_candidates} candidates each in {total_gen_time:.1f}s")
     print(f"✓ Saved to: {output_path}")

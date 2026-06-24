@@ -31,7 +31,7 @@ def load_alpaca_eval(
             download_config=DownloadConfig(local_files_only=True),
         )
     except Exception:
-        ds = load_dataset("tatsu-lab/alpaca_eval", "alpaca_eval", split="eval")
+        ds = load_dataset("tatsu-lab/alpaca_eval", "alpaca_eval", split="eval", trust_remote_code=True)
 
     examples = []
     for i, item in enumerate(ds):

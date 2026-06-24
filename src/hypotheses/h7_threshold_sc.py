@@ -183,13 +183,26 @@ class H7ThresholdSC(Hypothesis):
             **kwargs
         )
         
-        # Print average steps
         print(f"\n{'-'*60}")
         print(f"Average Candidates Generated (Cost):")
         print(f"{'-'*60}")
+        avg_budget = {}
         for method_name, steps in sorted(self.steps_used.items()):
             avg_steps = np.mean(steps)
+            std_steps = np.std(steps)
+            avg_budget[method_name] = {"mean": float(avg_steps), "std": float(std_steps)}
             print(f"  {method_name:<30s}: {avg_steps:.2f} candidates on average")
         print(f"{'-'*60}\n")
         
+        results["average_budget"] = avg_budget
         return results
+
+    def _build_summary(self, results: Dict[str, Any], plot_paths: list) -> str:
+        summary = super()._build_summary(results, plot_paths)
+        if "average_budget" in results:
+            summary += "Average Candidates Generated (Budget):\n"
+            summary += "-" * 70 + "\n"
+            for m, stats in sorted(results["average_budget"].items()):
+                summary += f"  {m:<40s}: {stats['mean']:6.2f} ± {stats['std']:5.2f}\n"
+            summary += "\n"
+        return summary

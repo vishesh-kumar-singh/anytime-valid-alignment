@@ -1,0 +1,85 @@
+Hypothesis: lit_review_baselines
+Description: Formal baselines from the literature review (Single RM MBR, Soft BoN, WCO, UWO).
+Category: parallel
+Timestamp: 2026-06-24T05:00:32.588230
+
+Results by N  (Acc = accuracy;  ONA = oracle-normalized = Acc / Oracle@N):
+----------------------------------------------------------------------
+
+  N = 1   (Oracle@N = 65.8%):
+    vanilla_bon (FsfairX-LLaMA3-RM-v0.1)      Acc  65.8%   ONA 100.0%
+    vanilla_bon (Llama-3-OffsetBias-RM-8B)    Acc  65.8%   ONA 100.0%
+    vanilla_bon (reward-model-deberta-v3-large-v2)  Acc  65.8%   ONA 100.0%
+    vanilla_bon (ensemble)                    Acc  65.8%   ONA 100.0%
+    single_rm_mbr_bon (FsfairX-LLaMA3-RM-v0.1)  Acc  65.8%   ONA 100.0%
+    single_rm_soft_bon (FsfairX-LLaMA3-RM-v0.1)  Acc  65.8%   ONA 100.0%
+    single_rm_mbr_bon (Llama-3-OffsetBias-RM-8B)  Acc  65.8%   ONA 100.0%
+    single_rm_soft_bon (Llama-3-OffsetBias-RM-8B)  Acc  65.8%   ONA 100.0%
+    single_rm_mbr_bon (reward-model-deberta-v3-large-v2)  Acc  65.8%   ONA 100.0%
+    single_rm_soft_bon (reward-model-deberta-v3-large-v2)  Acc  65.8%   ONA 100.0%
+    wco_minimax                               Acc  65.8%   ONA 100.0%
+    uwo_sharpe                                Acc  65.8%   ONA 100.0%
+    uwo_linear                                Acc  65.8%   ONA 100.0%
+
+  N = 4   (Oracle@N = 82.8%):
+    vanilla_bon (FsfairX-LLaMA3-RM-v0.1)      Acc  68.7%   ONA  83.0%
+    vanilla_bon (Llama-3-OffsetBias-RM-8B)    Acc  67.4%   ONA  81.4%
+    vanilla_bon (reward-model-deberta-v3-large-v2)  Acc  66.3%   ONA  80.0%
+    vanilla_bon (ensemble)                    Acc  68.0%   ONA  82.2%
+    single_rm_mbr_bon (FsfairX-LLaMA3-RM-v0.1)  Acc  68.7%   ONA  83.0%
+    single_rm_soft_bon (FsfairX-LLaMA3-RM-v0.1)  Acc  68.1%   ONA  82.3%
+    single_rm_mbr_bon (Llama-3-OffsetBias-RM-8B)  Acc  67.5%   ONA  81.5%
+    single_rm_soft_bon (Llama-3-OffsetBias-RM-8B)  Acc  67.1%   ONA  81.0%
+    single_rm_mbr_bon (reward-model-deberta-v3-large-v2)  Acc  66.3%   ONA  80.1%
+    single_rm_soft_bon (reward-model-deberta-v3-large-v2)  Acc  66.6%   ONA  80.4%
+    wco_minimax                               Acc  68.4%   ONA  82.6%
+    uwo_sharpe                                Acc  68.2%   ONA  82.4%
+    uwo_linear                                Acc  68.5%   ONA  82.7%
+
+  N = 8   (Oracle@N = 88.3%):
+    vanilla_bon (FsfairX-LLaMA3-RM-v0.1)      Acc  68.7%   ONA  77.8%
+    vanilla_bon (Llama-3-OffsetBias-RM-8B)    Acc  67.5%   ONA  76.4%
+    vanilla_bon (reward-model-deberta-v3-large-v2)  Acc  66.5%   ONA  75.2%
+    vanilla_bon (ensemble)                    Acc  68.1%   ONA  77.1%
+    single_rm_mbr_bon (FsfairX-LLaMA3-RM-v0.1)  Acc  68.8%   ONA  77.8%
+    single_rm_soft_bon (FsfairX-LLaMA3-RM-v0.1)  Acc  67.9%   ONA  76.9%
+    single_rm_mbr_bon (Llama-3-OffsetBias-RM-8B)  Acc  67.6%   ONA  76.5%
+    single_rm_soft_bon (Llama-3-OffsetBias-RM-8B)  Acc  67.3%   ONA  76.2%
+    single_rm_mbr_bon (reward-model-deberta-v3-large-v2)  Acc  66.6%   ONA  75.4%
+    single_rm_soft_bon (reward-model-deberta-v3-large-v2)  Acc  66.3%   ONA  75.0%
+    wco_minimax                               Acc  69.0%   ONA  78.0%
+    uwo_sharpe                                Acc  69.2%   ONA  78.3%
+    uwo_linear                                Acc  68.9%   ONA  78.0%
+
+  N = 16   (Oracle@N = 91.8%):
+    vanilla_bon (FsfairX-LLaMA3-RM-v0.1)      Acc  68.1%   ONA  74.2%
+    vanilla_bon (Llama-3-OffsetBias-RM-8B)    Acc  66.6%   ONA  72.6%
+    vanilla_bon (reward-model-deberta-v3-large-v2)  Acc  66.5%   ONA  72.4%
+    vanilla_bon (ensemble)                    Acc  67.8%   ONA  73.9%
+    single_rm_mbr_bon (FsfairX-LLaMA3-RM-v0.1)  Acc  68.3%   ONA  74.4%
+    single_rm_soft_bon (FsfairX-LLaMA3-RM-v0.1)  Acc  67.9%   ONA  73.9%
+    single_rm_mbr_bon (Llama-3-OffsetBias-RM-8B)  Acc  66.9%   ONA  72.9%
+    single_rm_soft_bon (Llama-3-OffsetBias-RM-8B)  Acc  66.7%   ONA  72.6%
+    single_rm_mbr_bon (reward-model-deberta-v3-large-v2)  Acc  66.6%   ONA  72.6%
+    single_rm_soft_bon (reward-model-deberta-v3-large-v2)  Acc  66.4%   ONA  72.3%
+    wco_minimax                               Acc  69.2%   ONA  75.4%
+    uwo_sharpe                                Acc  69.2%   ONA  75.4%
+    uwo_linear                                Acc  68.8%   ONA  74.9%
+
+  N = 24   (Oracle@N = 93.4%):
+    vanilla_bon (FsfairX-LLaMA3-RM-v0.1)      Acc  67.6%   ONA  72.4%
+    vanilla_bon (Llama-3-OffsetBias-RM-8B)    Acc  66.1%   ONA  70.8%
+    vanilla_bon (reward-model-deberta-v3-large-v2)  Acc  66.7%   ONA  71.4%
+    vanilla_bon (ensemble)                    Acc  67.5%   ONA  72.3%
+    single_rm_mbr_bon (FsfairX-LLaMA3-RM-v0.1)  Acc  67.7%   ONA  72.6%
+    single_rm_soft_bon (FsfairX-LLaMA3-RM-v0.1)  Acc  67.6%   ONA  72.4%
+    single_rm_mbr_bon (Llama-3-OffsetBias-RM-8B)  Acc  66.3%   ONA  71.0%
+    single_rm_soft_bon (Llama-3-OffsetBias-RM-8B)  Acc  66.9%   ONA  71.7%
+    single_rm_mbr_bon (reward-model-deberta-v3-large-v2)  Acc  66.8%   ONA  71.6%
+    single_rm_soft_bon (reward-model-deberta-v3-large-v2)  Acc  67.0%   ONA  71.7%
+    wco_minimax                               Acc  69.3%   ONA  74.2%
+    uwo_sharpe                                Acc  69.5%   ONA  74.4%
+    uwo_linear                                Acc  68.8%   ONA  73.7%
+
+Generated Plots:
+  - accuracy_vs_n.png

@@ -1,32 +1,32 @@
 Hypothesis: h7_sequential_early_stopping
 Description: RWSC Sequential Early Stopping: Stops generation once a candidate's answer cluster mass (using single strongest RM) exceeds a threshold.
 Category: parallel
-Timestamp: 2026-06-09T12:02:43.062068
+Timestamp: 2026-06-22T22:48:59.336468
 
 Results by N  (Acc = accuracy;  ONA = oracle-normalized = Acc / Oracle@N):
 ----------------------------------------------------------------------
 
-  N = 24   (Oracle@N = 79.4%):
-    vanilla_bon (FsfairX-LLaMA3-RM-v0.1)      Acc  62.0%   ONA  78.1%
-    vanilla_bon (Llama-3-OffsetBias-RM-8B)    Acc  64.4%   ONA  81.1%
-    vanilla_bon (reward-model-deberta-v3-large-v2)  Acc  62.8%   ONA  79.1%
-    vanilla_bon (ensemble)                    Acc  64.8%   ONA  81.6%
-    seq_rwsc_thresh_0.2                       Acc  62.2%   ONA  78.3%
-    seq_rwsc_thresh_0.3                       Acc  62.2%   ONA  78.3%
-    seq_rwsc_thresh_0.4                       Acc  62.2%   ONA  78.3%
-    seq_rwsc_thresh_0.5                       Acc  62.4%   ONA  78.6%
-    seq_rwsc_thresh_0.6                       Acc  64.2%   ONA  80.9%
-    seq_rwsc_thresh_0.7                       Acc  65.4%   ONA  82.4%
-    seq_rwsc_thresh_0.8                       Acc  66.2%   ONA  83.4%
-    seq_rwsc_thresh_0.9                       Acc  66.0%   ONA  83.1%
-    seq_rwsc_thresh_0.95                      Acc  66.0%   ONA  83.1%
-    seq_pure_best_rm_thresh_5.0               Acc  63.0%   ONA  79.3%
-    seq_pure_best_rm_thresh_10.0              Acc  61.8%   ONA  77.8%
-    seq_pure_best_rm_thresh_15.0              Acc  62.0%   ONA  78.1%
-    seq_pure_best_rm_thresh_20.0              Acc  62.0%   ONA  78.1%
-    seq_pure_best_rm_thresh_25.0              Acc  62.0%   ONA  78.1%
-    baseline_best_rm_bon_N                    Acc  62.0%   ONA  78.1%
-    baseline_rwsc_h5_N                        Acc  66.0%   ONA  83.1%
+  N = 24   (Oracle@N = 83.6%):
+    vanilla_bon (FsfairX-LLaMA3-RM-v0.1)      Acc  61.8%   ONA  73.9%
+    vanilla_bon (Llama-3-OffsetBias-RM-8B)    Acc  60.8%   ONA  72.7%
+    vanilla_bon (reward-model-deberta-v3-large-v2)  Acc  59.6%   ONA  71.3%
+    vanilla_bon (ensemble)                    Acc  62.7%   ONA  75.1%
+    seq_rwsc_thresh_0.2                       Acc  61.3%   ONA  73.3%
+    seq_rwsc_thresh_0.3                       Acc  61.3%   ONA  73.3%
+    seq_rwsc_thresh_0.4                       Acc  62.0%   ONA  74.2%
+    seq_rwsc_thresh_0.5                       Acc  62.7%   ONA  75.1%
+    seq_rwsc_thresh_0.6                       Acc  65.0%   ONA  77.7%
+    seq_rwsc_thresh_0.7                       Acc  65.7%   ONA  78.6%
+    seq_rwsc_thresh_0.8                       Acc  67.9%   ONA  81.2%
+    seq_rwsc_thresh_0.9                       Acc  68.6%   ONA  82.1%
+    seq_rwsc_thresh_0.95                      Acc  68.6%   ONA  82.1%
+    seq_pure_best_rm_thresh_5.0               Acc  61.0%   ONA  73.0%
+    seq_pure_best_rm_thresh_10.0              Acc  62.3%   ONA  74.5%
+    seq_pure_best_rm_thresh_15.0              Acc  61.8%   ONA  73.9%
+    seq_pure_best_rm_thresh_20.0              Acc  61.8%   ONA  73.9%
+    seq_pure_best_rm_thresh_25.0              Acc  61.8%   ONA  73.9%
+    baseline_best_rm_bon_N                    Acc  61.8%   ONA  73.9%
+    baseline_rwsc_h5_N                        Acc  69.1%   ONA  82.7%
 
 Generated Plots:
   - accuracy_vs_n.png

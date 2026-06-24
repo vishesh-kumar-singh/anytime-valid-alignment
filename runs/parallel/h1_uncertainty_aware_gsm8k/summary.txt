@@ -1,54 +1,65 @@
 Hypothesis: h1_uncertainty_aware
 Description: Uncertainty-aware BoN methods (Sharpe, Linear, SoftBoN) resist reward hacking better than vanilla argmax.
 Category: parallel
-Timestamp: 2026-06-09T09:52:20.702773
+Timestamp: 2026-06-22T22:52:08.644456
 
 Results by N  (Acc = accuracy;  ONA = oracle-normalized = Acc / Oracle@N):
 ----------------------------------------------------------------------
 
-  N = 4   (Oracle@N = 95.8%):
-    vanilla_bon (FsfairX-LLaMA3-RM-v0.1)      Acc  90.5%   ONA  94.5%
-    vanilla_bon (Llama-3-OffsetBias-RM-8B)    Acc  90.1%   ONA  94.1%
-    vanilla_bon (reward-model-deberta-v3-large-v2)  Acc  90.4%   ONA  94.5%
-    vanilla_bon (ensemble)                    Acc  90.0%   ONA  94.0%
-    bon_sharpe                                Acc  90.4%   ONA  94.4%
-    bon_linear                                Acc  90.4%   ONA  94.4%
-    soft_bon                                  Acc  89.8%   ONA  93.8%
-    softbon_sharpe                            Acc  90.5%   ONA  94.5%
-    softbon_linear                            Acc  89.9%   ONA  93.9%
+  N = 1   (Oracle@N = 79.5%):
+    vanilla_bon (FsfairX-LLaMA3-RM-v0.1)      Acc  79.5%   ONA 100.0%
+    vanilla_bon (Llama-3-OffsetBias-RM-8B)    Acc  79.5%   ONA 100.0%
+    vanilla_bon (reward-model-deberta-v3-large-v2)  Acc  79.5%   ONA 100.0%
+    vanilla_bon (ensemble)                    Acc  79.5%   ONA 100.0%
+    bon_sharpe                                Acc  79.5%   ONA 100.0%
+    bon_linear                                Acc  79.5%   ONA 100.0%
+    soft_bon                                  Acc  79.5%   ONA 100.0%
+    softbon_sharpe                            Acc  79.5%   ONA 100.0%
+    softbon_linear                            Acc  79.5%   ONA 100.0%
 
-  N = 8   (Oracle@N = 96.5%):
-    vanilla_bon (FsfairX-LLaMA3-RM-v0.1)      Acc  90.7%   ONA  94.0%
-    vanilla_bon (Llama-3-OffsetBias-RM-8B)    Acc  89.8%   ONA  93.1%
-    vanilla_bon (reward-model-deberta-v3-large-v2)  Acc  90.1%   ONA  93.3%
-    vanilla_bon (ensemble)                    Acc  90.0%   ONA  93.2%
-    bon_sharpe                                Acc  90.9%   ONA  94.2%
-    bon_linear                                Acc  90.5%   ONA  93.8%
-    soft_bon                                  Acc  91.1%   ONA  94.4%
-    softbon_sharpe                            Acc  91.7%   ONA  95.0%
-    softbon_linear                            Acc  89.8%   ONA  93.1%
+  N = 4   (Oracle@N = 92.4%):
+    vanilla_bon (FsfairX-LLaMA3-RM-v0.1)      Acc  84.8%   ONA  91.8%
+    vanilla_bon (Llama-3-OffsetBias-RM-8B)    Acc  83.0%   ONA  89.8%
+    vanilla_bon (reward-model-deberta-v3-large-v2)  Acc  82.2%   ONA  88.9%
+    vanilla_bon (ensemble)                    Acc  83.8%   ONA  90.6%
+    bon_sharpe                                Acc  83.7%   ONA  90.6%
+    bon_linear                                Acc  83.7%   ONA  90.6%
+    soft_bon                                  Acc  83.3%   ONA  90.2%
+    softbon_sharpe                            Acc  84.1%   ONA  91.0%
+    softbon_linear                            Acc  82.0%   ONA  88.7%
 
-  N = 16   (Oracle@N = 97.4%):
-    vanilla_bon (FsfairX-LLaMA3-RM-v0.1)      Acc  90.3%   ONA  92.7%
-    vanilla_bon (Llama-3-OffsetBias-RM-8B)    Acc  89.8%   ONA  92.2%
-    vanilla_bon (reward-model-deberta-v3-large-v2)  Acc  89.0%   ONA  91.4%
-    vanilla_bon (ensemble)                    Acc  89.5%   ONA  91.8%
-    bon_sharpe                                Acc  90.4%   ONA  92.8%
-    bon_linear                                Acc  89.8%   ONA  92.1%
-    soft_bon                                  Acc  88.9%   ONA  91.2%
-    softbon_sharpe                            Acc  90.6%   ONA  93.0%
-    softbon_linear                            Acc  90.1%   ONA  92.5%
+  N = 8   (Oracle@N = 95.3%):
+    vanilla_bon (FsfairX-LLaMA3-RM-v0.1)      Acc  86.0%   ONA  90.2%
+    vanilla_bon (Llama-3-OffsetBias-RM-8B)    Acc  82.9%   ONA  87.0%
+    vanilla_bon (reward-model-deberta-v3-large-v2)  Acc  82.8%   ONA  86.9%
+    vanilla_bon (ensemble)                    Acc  84.8%   ONA  89.0%
+    bon_sharpe                                Acc  84.5%   ONA  88.7%
+    bon_linear                                Acc  84.9%   ONA  89.1%
+    soft_bon                                  Acc  83.5%   ONA  87.7%
+    softbon_sharpe                            Acc  83.6%   ONA  87.7%
+    softbon_linear                            Acc  82.3%   ONA  86.4%
 
-  N = 24   (Oracle@N = 97.8%):
-    vanilla_bon (FsfairX-LLaMA3-RM-v0.1)      Acc  89.2%   ONA  91.2%
-    vanilla_bon (Llama-3-OffsetBias-RM-8B)    Acc  88.6%   ONA  90.6%
-    vanilla_bon (reward-model-deberta-v3-large-v2)  Acc  87.8%   ONA  89.8%
-    vanilla_bon (ensemble)                    Acc  88.6%   ONA  90.5%
-    bon_sharpe                                Acc  90.4%   ONA  92.4%
-    bon_linear                                Acc  88.9%   ONA  90.9%
-    soft_bon                                  Acc  88.9%   ONA  90.9%
-    softbon_sharpe                            Acc  91.0%   ONA  93.0%
-    softbon_linear                            Acc  89.8%   ONA  91.8%
+  N = 16   (Oracle@N = 96.4%):
+    vanilla_bon (FsfairX-LLaMA3-RM-v0.1)      Acc  86.5%   ONA  89.7%
+    vanilla_bon (Llama-3-OffsetBias-RM-8B)    Acc  83.7%   ONA  86.8%
+    vanilla_bon (reward-model-deberta-v3-large-v2)  Acc  82.8%   ONA  85.8%
+    vanilla_bon (ensemble)                    Acc  85.4%   ONA  88.5%
+    bon_sharpe                                Acc  84.3%   ONA  87.4%
+    bon_linear                                Acc  85.4%   ONA  88.6%
+    soft_bon                                  Acc  83.2%   ONA  86.3%
+    softbon_sharpe                            Acc  83.3%   ONA  86.4%
+    softbon_linear                            Acc  82.6%   ONA  85.6%
+
+  N = 24   (Oracle@N = 96.9%):
+    vanilla_bon (FsfairX-LLaMA3-RM-v0.1)      Acc  85.3%   ONA  88.0%
+    vanilla_bon (Llama-3-OffsetBias-RM-8B)    Acc  82.5%   ONA  85.1%
+    vanilla_bon (reward-model-deberta-v3-large-v2)  Acc  82.3%   ONA  84.9%
+    vanilla_bon (ensemble)                    Acc  84.2%   ONA  86.9%
+    bon_sharpe                                Acc  83.6%   ONA  86.3%
+    bon_linear                                Acc  84.6%   ONA  87.3%
+    soft_bon                                  Acc  82.9%   ONA  85.6%
+    softbon_sharpe                            Acc  83.5%   ONA  86.2%
+    softbon_linear                            Acc  82.7%   ONA  85.4%
 
 Generated Plots:
   - accuracy_vs_n.png

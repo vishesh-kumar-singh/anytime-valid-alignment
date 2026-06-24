@@ -13,46 +13,60 @@
   "variance_norm_mode": "robust_zscore",
   "results_by_n": {
     "24": {
-      "vanilla_bon (FsfairX-LLaMA3-RM-v0.1)": 0.8923426838514026,
-      "vanilla_bon (Llama-3-OffsetBias-RM-8B)": 0.8862774829416225,
-      "vanilla_bon (reward-model-deberta-v3-large-v2)": 0.8779378316906747,
-      "vanilla_bon (ensemble)": 0.8855193328279,
-      "baseline_adabon": 0.9044730856709629,
-      "baseline_beacon": 0.9067475360121304,
-      "baseline_pandora": 0.9052312357846853
+      "vanilla_bon (FsfairX-LLaMA3-RM-v0.1)": 0.8529188779378317,
+      "vanilla_bon (Llama-3-OffsetBias-RM-8B)": 0.8248673237300985,
+      "vanilla_bon (reward-model-deberta-v3-large-v2)": 0.8225928733889311,
+      "vanilla_bon (ensemble)": 0.8423047763457164,
+      "baseline_adabon": 0.865049279757392,
+      "baseline_beacon": 0.849128127369219,
+      "baseline_pandora": 0.849128127369219
     }
   },
   "oracle_by_n": {
-    "24": 0.978013646702047
+    "24": 0.9689158453373768
   },
   "normalized_by_n": {
     "24": {
-      "vanilla_bon (FsfairX-LLaMA3-RM-v0.1)": 0.9124031007751938,
-      "vanilla_bon (Llama-3-OffsetBias-RM-8B)": 0.9062015503875969,
-      "vanilla_bon (reward-model-deberta-v3-large-v2)": 0.8976744186046511,
-      "vanilla_bon (ensemble)": 0.9054263565891473,
-      "baseline_adabon": 0.9248062015503876,
-      "baseline_beacon": 0.9271317829457364,
-      "baseline_pandora": 0.9255813953488372
+      "vanilla_bon (FsfairX-LLaMA3-RM-v0.1)": 0.8802816901408451,
+      "vanilla_bon (Llama-3-OffsetBias-RM-8B)": 0.8513302034428795,
+      "vanilla_bon (reward-model-deberta-v3-large-v2)": 0.848982785602504,
+      "vanilla_bon (ensemble)": 0.8693270735524257,
+      "baseline_adabon": 0.8928012519561815,
+      "baseline_beacon": 0.8763693270735524,
+      "baseline_pandora": 0.8763693270735524
     }
   },
   "overall": {
-    "vanilla_bon (FsfairX-LLaMA3-RM-v0.1)": 0.8923426838514026,
-    "vanilla_bon (Llama-3-OffsetBias-RM-8B)": 0.8862774829416225,
-    "vanilla_bon (reward-model-deberta-v3-large-v2)": 0.8779378316906747,
-    "vanilla_bon (ensemble)": 0.8855193328279,
-    "baseline_adabon": 0.9044730856709629,
-    "baseline_beacon": 0.9067475360121304,
-    "baseline_pandora": 0.9052312357846853
+    "vanilla_bon (FsfairX-LLaMA3-RM-v0.1)": 0.8529188779378317,
+    "vanilla_bon (Llama-3-OffsetBias-RM-8B)": 0.8248673237300985,
+    "vanilla_bon (reward-model-deberta-v3-large-v2)": 0.8225928733889311,
+    "vanilla_bon (ensemble)": 0.8423047763457164,
+    "baseline_adabon": 0.865049279757392,
+    "baseline_beacon": 0.849128127369219,
+    "baseline_pandora": 0.849128127369219
   },
   "overall_normalized": {
-    "vanilla_bon (FsfairX-LLaMA3-RM-v0.1)": 0.9124031007751938,
-    "vanilla_bon (Llama-3-OffsetBias-RM-8B)": 0.9062015503875969,
-    "vanilla_bon (reward-model-deberta-v3-large-v2)": 0.8976744186046511,
-    "vanilla_bon (ensemble)": 0.9054263565891473,
-    "baseline_adabon": 0.9248062015503876,
-    "baseline_beacon": 0.9271317829457364,
-    "baseline_pandora": 0.9255813953488372
+    "vanilla_bon (FsfairX-LLaMA3-RM-v0.1)": 0.8802816901408451,
+    "vanilla_bon (Llama-3-OffsetBias-RM-8B)": 0.8513302034428795,
+    "vanilla_bon (reward-model-deberta-v3-large-v2)": 0.848982785602504,
+    "vanilla_bon (ensemble)": 0.8693270735524257,
+    "baseline_adabon": 0.8928012519561815,
+    "baseline_beacon": 0.8763693270735524,
+    "baseline_pandora": 0.8763693270735524
   },
-  "_saved_at": "2026-06-22T12:32:30.987246"
+  "average_budget": {
+    "baseline_adabon": {
+      "mean": 11.511751326762699,
+      "std": 3.970089826827853
+    },
+    "baseline_beacon": {
+      "mean": 4.005307050796057,
+      "std": 0.13757030222730118
+    },
+    "baseline_pandora": {
+      "mean": 4.300227445034117,
+      "std": 1.557858099701973
+    }
+  },
+  "_saved_at": "2026-06-24T08:46:56.987501"
 }

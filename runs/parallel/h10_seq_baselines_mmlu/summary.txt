@@ -1,0 +1,24 @@
+Hypothesis: h10_seq_baselines
+Description: Sequential baselines from literature: AdaBoN, BEACON, and Pandora's Box.
+Category: parallel
+Timestamp: 2026-06-24T08:47:05.747700
+
+Results by N  (Acc = accuracy;  ONA = oracle-normalized = Acc / Oracle@N):
+----------------------------------------------------------------------
+
+  N = 24   (Oracle@N = 93.4%):
+    vanilla_bon (FsfairX-LLaMA3-RM-v0.1)      Acc  67.6%   ONA  72.4%
+    vanilla_bon (Llama-3-OffsetBias-RM-8B)    Acc  66.1%   ONA  70.8%
+    vanilla_bon (reward-model-deberta-v3-large-v2)  Acc  66.7%   ONA  71.4%
+    vanilla_bon (ensemble)                    Acc  67.5%   ONA  72.3%
+    baseline_adabon                           Acc  68.7%   ONA  73.6%
+    baseline_beacon                           Acc  68.6%   ONA  73.4%
+    baseline_pandora                          Acc  68.9%   ONA  73.8%
+
+Generated Plots:
+  - accuracy_vs_n.pngAverage Candidates Generated (Budget):
+----------------------------------------------------------------------
+  baseline_adabon                         :   9.83 ±  3.36
+  baseline_beacon                         :   5.62 ±  5.21
+  baseline_pandora                        :   4.34 ±  1.61
+

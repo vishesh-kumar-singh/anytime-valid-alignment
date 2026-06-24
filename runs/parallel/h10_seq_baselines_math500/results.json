@@ -13,46 +13,60 @@
   "variance_norm_mode": "robust_zscore",
   "results_by_n": {
     "24": {
-      "vanilla_bon (FsfairX-LLaMA3-RM-v0.1)": 0.62,
-      "vanilla_bon (Llama-3-OffsetBias-RM-8B)": 0.644,
-      "vanilla_bon (reward-model-deberta-v3-large-v2)": 0.628,
-      "vanilla_bon (ensemble)": 0.648,
-      "baseline_adabon": 0.626,
-      "baseline_beacon": 0.62,
-      "baseline_pandora": 0.618
+      "vanilla_bon (FsfairX-LLaMA3-RM-v0.1)": 0.6176470588235294,
+      "vanilla_bon (Llama-3-OffsetBias-RM-8B)": 0.6078431372549019,
+      "vanilla_bon (reward-model-deberta-v3-large-v2)": 0.5955882352941176,
+      "vanilla_bon (ensemble)": 0.6274509803921569,
+      "baseline_adabon": 0.5980392156862745,
+      "baseline_beacon": 0.6102941176470589,
+      "baseline_pandora": 0.6102941176470589
     }
   },
   "oracle_by_n": {
-    "24": 0.794
+    "24": 0.8357843137254902
   },
   "normalized_by_n": {
     "24": {
-      "vanilla_bon (FsfairX-LLaMA3-RM-v0.1)": 0.7808564231738035,
-      "vanilla_bon (Llama-3-OffsetBias-RM-8B)": 0.8110831234256927,
-      "vanilla_bon (reward-model-deberta-v3-large-v2)": 0.7909319899244333,
-      "vanilla_bon (ensemble)": 0.8161209068010076,
-      "baseline_adabon": 0.7884130982367759,
-      "baseline_beacon": 0.7808564231738035,
-      "baseline_pandora": 0.7783375314861462
+      "vanilla_bon (FsfairX-LLaMA3-RM-v0.1)": 0.7390029325513197,
+      "vanilla_bon (Llama-3-OffsetBias-RM-8B)": 0.7272727272727273,
+      "vanilla_bon (reward-model-deberta-v3-large-v2)": 0.7126099706744868,
+      "vanilla_bon (ensemble)": 0.750733137829912,
+      "baseline_adabon": 0.7155425219941349,
+      "baseline_beacon": 0.7302052785923754,
+      "baseline_pandora": 0.7302052785923754
     }
   },
   "overall": {
-    "vanilla_bon (FsfairX-LLaMA3-RM-v0.1)": 0.62,
-    "vanilla_bon (Llama-3-OffsetBias-RM-8B)": 0.644,
-    "vanilla_bon (reward-model-deberta-v3-large-v2)": 0.628,
-    "vanilla_bon (ensemble)": 0.648,
-    "baseline_adabon": 0.626,
-    "baseline_beacon": 0.62,
-    "baseline_pandora": 0.618
+    "vanilla_bon (FsfairX-LLaMA3-RM-v0.1)": 0.6176470588235294,
+    "vanilla_bon (Llama-3-OffsetBias-RM-8B)": 0.6078431372549019,
+    "vanilla_bon (reward-model-deberta-v3-large-v2)": 0.5955882352941176,
+    "vanilla_bon (ensemble)": 0.6274509803921569,
+    "baseline_adabon": 0.5980392156862745,
+    "baseline_beacon": 0.6102941176470589,
+    "baseline_pandora": 0.6102941176470589
   },
   "overall_normalized": {
-    "vanilla_bon (FsfairX-LLaMA3-RM-v0.1)": 0.7808564231738035,
-    "vanilla_bon (Llama-3-OffsetBias-RM-8B)": 0.8110831234256927,
-    "vanilla_bon (reward-model-deberta-v3-large-v2)": 0.7909319899244333,
-    "vanilla_bon (ensemble)": 0.8161209068010076,
-    "baseline_adabon": 0.7884130982367759,
-    "baseline_beacon": 0.7808564231738035,
-    "baseline_pandora": 0.7783375314861462
+    "vanilla_bon (FsfairX-LLaMA3-RM-v0.1)": 0.7390029325513197,
+    "vanilla_bon (Llama-3-OffsetBias-RM-8B)": 0.7272727272727273,
+    "vanilla_bon (reward-model-deberta-v3-large-v2)": 0.7126099706744868,
+    "vanilla_bon (ensemble)": 0.750733137829912,
+    "baseline_adabon": 0.7155425219941349,
+    "baseline_beacon": 0.7302052785923754,
+    "baseline_pandora": 0.7302052785923754
   },
-  "_saved_at": "2026-06-22T12:32:12.869605"
+  "average_budget": {
+    "baseline_adabon": {
+      "mean": 10.137254901960784,
+      "std": 3.539799528183887
+    },
+    "baseline_beacon": {
+      "mean": 4.0,
+      "std": 0.0
+    },
+    "baseline_pandora": {
+      "mean": 4.541666666666667,
+      "std": 2.108160885763095
+    }
+  },
+  "_saved_at": "2026-06-24T08:46:55.305676"
 }
