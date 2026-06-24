@@ -1,0 +1,17 @@
+Pipeline: rwsc
+Description: Answer-level BoN (Reward-Weighted Self-Consistency) aggregates RM scores across candidates that yield the same answer. Computes for both ensemble and individual RMs.
+Category: parallel
+Timestamp: 2026-06-24T22:11:58.000687
+
+Results by N  (Acc = accuracy;  ONA = oracle-normalized = Acc / Oracle@N):
+----------------------------------------------------------------------
+
+  N = 24   (Oracle@N = 93.4%):
+    vanilla_bon (FsfairX-LLaMA3-RM-v0.1)      Acc  67.6%   ONA  72.4%
+    vanilla_bon (Llama-3-OffsetBias-RM-8B)    Acc  66.1%   ONA  70.8%
+    vanilla_bon (reward-model-deberta-v3-large-v2)  Acc  66.7%   ONA  71.4%
+    vanilla_bon (ensemble)                    Acc  67.5%   ONA  72.3%
+    ensemble_rwsc                             Acc  70.2%   ONA  75.2%
+    single_rm_rwsc (FsfairX-LLaMA3-RM-v0.1)   Acc  70.3%   ONA  75.4%
+    single_rm_rwsc (Llama-3-OffsetBias-RM-8B)  Acc  69.2%   ONA  74.1%
+    single_rm_rwsc (reward-model-deberta-v3-large-v2)  Acc  69.8%   ONA  74.8%

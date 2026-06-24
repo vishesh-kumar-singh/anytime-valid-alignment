@@ -1,0 +1,30 @@
+Pipeline: sprt_rwsc
+Description: SPRT-RWSC: Sequential Probability Ratio Test for early stopping with provable error control, ensemble-weighted evidence, and adaptive burn-in prior estimation.
+Category: parallel
+Timestamp: 2026-06-24T22:11:38.196795
+
+Results by N  (Acc = accuracy;  ONA = oracle-normalized = Acc / Oracle@N):
+----------------------------------------------------------------------
+
+  N = 24   (Oracle@N = 96.9%):
+    vanilla_bon (FsfairX-LLaMA3-RM-v0.1)      Acc  85.3%   ONA  88.0%
+    vanilla_bon (Llama-3-OffsetBias-RM-8B)    Acc  82.5%   ONA  85.1%
+    vanilla_bon (reward-model-deberta-v3-large-v2)  Acc  82.3%   ONA  84.9%
+    vanilla_bon (ensemble)                    Acc  84.2%   ONA  86.9%
+    sprt_rwsc_a0.01_b0.01                     Acc  89.5%   ONA  92.3%   BUG 18.98+-5.82
+    esprt_rwsc_a0.01_b0.01                    Acc  88.6%   ONA  91.4%   BUG 11.34+-7.00
+    sprt_rwsc_a0.01_b0.05                     Acc  89.5%   ONA  92.3%   BUG 18.83+-5.84
+    esprt_rwsc_a0.01_b0.05                    Acc  88.5%   ONA  91.3%   BUG 11.15+-6.91
+    sprt_rwsc_a0.01_b0.1                      Acc  89.5%   ONA  92.3%   BUG 18.70+-5.85
+    esprt_rwsc_a0.01_b0.1                     Acc  88.4%   ONA  91.2%   BUG 11.08+-6.88
+    sprt_rwsc_a0.05_b0.05                     Acc  89.5%   ONA  92.4%   BUG 16.58+-6.69
+    esprt_rwsc_a0.05_b0.05                    Acc  88.4%   ONA  91.2%   BUG 10.31+-6.66
+    sprt_rwsc_a0.05_b0.1                      Acc  89.5%   ONA  92.4%   BUG 16.41+-6.66
+    esprt_rwsc_a0.05_b0.1                     Acc  88.5%   ONA  91.3%   BUG 10.26+-6.62
+    sprt_rwsc_a0.1_b0.1                       Acc  89.6%   ONA  92.5%   BUG 15.00+-6.92
+    esprt_rwsc_a0.1_b0.1                      Acc  88.5%   ONA  91.3%   BUG  9.87+-6.49
+    sprt_rwsc_a0.1_b0.2                       Acc  89.8%   ONA  92.6%   BUG 14.21+-7.23
+    esprt_rwsc_a0.1_b0.2                      Acc  88.6%   ONA  91.4%   BUG  9.74+-6.43
+    baseline_h7_tau_0.7                       Acc  88.2%   ONA  91.0%   BUG  7.32+-7.17
+    baseline_h7_tau_0.8                       Acc  89.2%   ONA  92.0%   BUG  9.89+-8.92
+    baseline_h7_tau_0.9                       Acc  89.5%   ONA  92.3%   BUG 11.65+-9.59

@@ -1,0 +1,72 @@
+{
+  "hypothesis": "seq_baselines",
+  "dataset": "math500",
+  "n_values": [
+    24
+  ],
+  "n_examples": 500,
+  "rm_names": [
+    "FsfairX-LLaMA3-RM-v0.1",
+    "Llama-3-OffsetBias-RM-8B",
+    "reward-model-deberta-v3-large-v2"
+  ],
+  "variance_norm_mode": "robust_zscore",
+  "results_by_n": {
+    "24": {
+      "vanilla_bon (FsfairX-LLaMA3-RM-v0.1)": 0.6176470588235294,
+      "vanilla_bon (Llama-3-OffsetBias-RM-8B)": 0.6078431372549019,
+      "vanilla_bon (reward-model-deberta-v3-large-v2)": 0.5955882352941176,
+      "vanilla_bon (ensemble)": 0.6274509803921569,
+      "baseline_adabon": 0.5980392156862745,
+      "baseline_beacon": 0.6102941176470589,
+      "baseline_pandora": 0.6102941176470589
+    }
+  },
+  "oracle_by_n": {
+    "24": 0.8357843137254902
+  },
+  "normalized_by_n": {
+    "24": {
+      "vanilla_bon (FsfairX-LLaMA3-RM-v0.1)": 0.7390029325513197,
+      "vanilla_bon (Llama-3-OffsetBias-RM-8B)": 0.7272727272727273,
+      "vanilla_bon (reward-model-deberta-v3-large-v2)": 0.7126099706744868,
+      "vanilla_bon (ensemble)": 0.750733137829912,
+      "baseline_adabon": 0.7155425219941349,
+      "baseline_beacon": 0.7302052785923754,
+      "baseline_pandora": 0.7302052785923754
+    }
+  },
+  "overall": {
+    "vanilla_bon (FsfairX-LLaMA3-RM-v0.1)": 0.6176470588235294,
+    "vanilla_bon (Llama-3-OffsetBias-RM-8B)": 0.6078431372549019,
+    "vanilla_bon (reward-model-deberta-v3-large-v2)": 0.5955882352941176,
+    "vanilla_bon (ensemble)": 0.6274509803921569,
+    "baseline_adabon": 0.5980392156862745,
+    "baseline_beacon": 0.6102941176470589,
+    "baseline_pandora": 0.6102941176470589
+  },
+  "overall_normalized": {
+    "vanilla_bon (FsfairX-LLaMA3-RM-v0.1)": 0.7390029325513197,
+    "vanilla_bon (Llama-3-OffsetBias-RM-8B)": 0.7272727272727273,
+    "vanilla_bon (reward-model-deberta-v3-large-v2)": 0.7126099706744868,
+    "vanilla_bon (ensemble)": 0.750733137829912,
+    "baseline_adabon": 0.7155425219941349,
+    "baseline_beacon": 0.7302052785923754,
+    "baseline_pandora": 0.7302052785923754
+  },
+  "average_budget": {
+    "baseline_adabon": {
+      "mean": 10.137254901960784,
+      "std": 3.539799528183887
+    },
+    "baseline_beacon": {
+      "mean": 4.0,
+      "std": 0.0
+    },
+    "baseline_pandora": {
+      "mean": 4.541666666666667,
+      "std": 2.108160885763095
+    }
+  },
+  "_saved_at": "2026-06-24T22:11:42.683518"
+}

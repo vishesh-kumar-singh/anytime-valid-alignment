@@ -1,0 +1,22 @@
+Pipeline: baselines
+Description: Formal baselines from the literature review (Single RM MBR, Soft BoN, WCO, UWO).
+Category: parallel
+Timestamp: 2026-06-24T22:11:39.274470
+
+Results by N  (Acc = accuracy;  ONA = oracle-normalized = Acc / Oracle@N):
+----------------------------------------------------------------------
+
+  N = 24   (Oracle@N = 96.9%):
+    vanilla_bon (FsfairX-LLaMA3-RM-v0.1)      Acc  85.3%   ONA  88.0%
+    vanilla_bon (Llama-3-OffsetBias-RM-8B)    Acc  82.5%   ONA  85.1%
+    vanilla_bon (reward-model-deberta-v3-large-v2)  Acc  82.3%   ONA  84.9%
+    vanilla_bon (ensemble)                    Acc  84.2%   ONA  86.9%
+    single_rm_mbr_bon (FsfairX-LLaMA3-RM-v0.1)  Acc  86.3%   ONA  89.0%
+    single_rm_soft_bon (FsfairX-LLaMA3-RM-v0.1)  Acc  83.7%   ONA  86.4%
+    single_rm_mbr_bon (Llama-3-OffsetBias-RM-8B)  Acc  85.1%   ONA  87.8%
+    single_rm_soft_bon (Llama-3-OffsetBias-RM-8B)  Acc  82.6%   ONA  85.2%
+    single_rm_mbr_bon (reward-model-deberta-v3-large-v2)  Acc  85.0%   ONA  87.7%
+    single_rm_soft_bon (reward-model-deberta-v3-large-v2)  Acc  81.4%   ONA  84.0%
+    wco_minimax                               Acc  84.9%   ONA  87.6%
+    uwo_sharpe                                Acc  83.6%   ONA  86.3%
+    uwo_linear                                Acc  84.6%   ONA  87.3%

@@ -1,0 +1,82 @@
+{
+  "hypothesis": "baselines",
+  "dataset": "math500",
+  "n_values": [
+    24
+  ],
+  "n_examples": 500,
+  "rm_names": [
+    "FsfairX-LLaMA3-RM-v0.1",
+    "Llama-3-OffsetBias-RM-8B",
+    "reward-model-deberta-v3-large-v2"
+  ],
+  "variance_norm_mode": "robust_zscore",
+  "results_by_n": {
+    "24": {
+      "vanilla_bon (FsfairX-LLaMA3-RM-v0.1)": 0.6176470588235294,
+      "vanilla_bon (Llama-3-OffsetBias-RM-8B)": 0.6078431372549019,
+      "vanilla_bon (reward-model-deberta-v3-large-v2)": 0.5955882352941176,
+      "vanilla_bon (ensemble)": 0.6274509803921569,
+      "single_rm_mbr_bon (FsfairX-LLaMA3-RM-v0.1)": 0.6495098039215687,
+      "single_rm_soft_bon (FsfairX-LLaMA3-RM-v0.1)": 0.6127450980392157,
+      "single_rm_mbr_bon (Llama-3-OffsetBias-RM-8B)": 0.6691176470588235,
+      "single_rm_soft_bon (Llama-3-OffsetBias-RM-8B)": 0.6102941176470589,
+      "single_rm_mbr_bon (reward-model-deberta-v3-large-v2)": 0.6397058823529411,
+      "single_rm_soft_bon (reward-model-deberta-v3-large-v2)": 0.6053921568627451,
+      "wco_minimax": 0.625,
+      "uwo_sharpe": 0.6176470588235294,
+      "uwo_linear": 0.6200980392156863
+    }
+  },
+  "oracle_by_n": {
+    "24": 0.8357843137254902
+  },
+  "normalized_by_n": {
+    "24": {
+      "vanilla_bon (FsfairX-LLaMA3-RM-v0.1)": 0.7390029325513197,
+      "vanilla_bon (Llama-3-OffsetBias-RM-8B)": 0.7272727272727273,
+      "vanilla_bon (reward-model-deberta-v3-large-v2)": 0.7126099706744868,
+      "vanilla_bon (ensemble)": 0.750733137829912,
+      "single_rm_mbr_bon (FsfairX-LLaMA3-RM-v0.1)": 0.7771260997067448,
+      "single_rm_soft_bon (FsfairX-LLaMA3-RM-v0.1)": 0.7331378299120235,
+      "single_rm_mbr_bon (Llama-3-OffsetBias-RM-8B)": 0.8005865102639296,
+      "single_rm_soft_bon (Llama-3-OffsetBias-RM-8B)": 0.7302052785923754,
+      "single_rm_mbr_bon (reward-model-deberta-v3-large-v2)": 0.7653958944281525,
+      "single_rm_soft_bon (reward-model-deberta-v3-large-v2)": 0.7243401759530792,
+      "wco_minimax": 0.7478005865102639,
+      "uwo_sharpe": 0.7390029325513197,
+      "uwo_linear": 0.7419354838709677
+    }
+  },
+  "overall": {
+    "vanilla_bon (FsfairX-LLaMA3-RM-v0.1)": 0.6176470588235294,
+    "vanilla_bon (Llama-3-OffsetBias-RM-8B)": 0.6078431372549019,
+    "vanilla_bon (reward-model-deberta-v3-large-v2)": 0.5955882352941176,
+    "vanilla_bon (ensemble)": 0.6274509803921569,
+    "single_rm_mbr_bon (FsfairX-LLaMA3-RM-v0.1)": 0.6495098039215687,
+    "single_rm_soft_bon (FsfairX-LLaMA3-RM-v0.1)": 0.6127450980392157,
+    "single_rm_mbr_bon (Llama-3-OffsetBias-RM-8B)": 0.6691176470588235,
+    "single_rm_soft_bon (Llama-3-OffsetBias-RM-8B)": 0.6102941176470589,
+    "single_rm_mbr_bon (reward-model-deberta-v3-large-v2)": 0.6397058823529411,
+    "single_rm_soft_bon (reward-model-deberta-v3-large-v2)": 0.6053921568627451,
+    "wco_minimax": 0.625,
+    "uwo_sharpe": 0.6176470588235294,
+    "uwo_linear": 0.6200980392156863
+  },
+  "overall_normalized": {
+    "vanilla_bon (FsfairX-LLaMA3-RM-v0.1)": 0.7390029325513197,
+    "vanilla_bon (Llama-3-OffsetBias-RM-8B)": 0.7272727272727273,
+    "vanilla_bon (reward-model-deberta-v3-large-v2)": 0.7126099706744868,
+    "vanilla_bon (ensemble)": 0.750733137829912,
+    "single_rm_mbr_bon (FsfairX-LLaMA3-RM-v0.1)": 0.7771260997067448,
+    "single_rm_soft_bon (FsfairX-LLaMA3-RM-v0.1)": 0.7331378299120235,
+    "single_rm_mbr_bon (Llama-3-OffsetBias-RM-8B)": 0.8005865102639296,
+    "single_rm_soft_bon (Llama-3-OffsetBias-RM-8B)": 0.7302052785923754,
+    "single_rm_mbr_bon (reward-model-deberta-v3-large-v2)": 0.7653958944281525,
+    "single_rm_soft_bon (reward-model-deberta-v3-large-v2)": 0.7243401759530792,
+    "wco_minimax": 0.7478005865102639,
+    "uwo_sharpe": 0.7390029325513197,
+    "uwo_linear": 0.7419354838709677
+  },
+  "_saved_at": "2026-06-24T22:11:43.271087"
+}
