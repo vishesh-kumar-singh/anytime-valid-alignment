@@ -3,6 +3,7 @@
 wandb/
 *.pkl
 *.tex
+*.bib
 proposal.md
 FUTURE_WORK.md
 run_demo.py
@@ -11,6 +12,8 @@ nohup*.log
 output.log
 Python-3.13.0/*
 logs/*
+scratch/*
+runs/archive/*
 
 # Keep lightweight result summaries and tables
 !runs/**/*summary*.txt
@@ -170,4 +173,6 @@ cython_debug/
 venv/
 .env
 papers/
+data/
+runs/
 data/

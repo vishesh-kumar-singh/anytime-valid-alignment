@@ -13,14 +13,12 @@ from .scorer import (
     TRIVIAL_4_RM_PRESET,
     TRIVIAL_5_RM_PRESET,
     RMScorer,
-    TrivialEnsembleScorer,
     build_scorer,
 )
 
 __all__ = [
     "BaseExperimentConfig",
     "RMScorer",
-    "TrivialEnsembleScorer",
     "build_scorer",
     "TRIVIAL_4_RM_PRESET",
     "TRIVIAL_5_RM_PRESET",

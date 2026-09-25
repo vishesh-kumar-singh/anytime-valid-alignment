@@ -1,12 +1,9 @@
 """H10: Sequential Literature Baselines.
 
-Implements sequential early stopping baselines from literature:
-1. AdaBoN (Adaptive burn-in budget allocation)
-2. BEACON (Bayesian posterior variance stopping)
-3. Pandora's Box (Weitzman UCB reservation price)
-
-Note: Speculative Rejection is omitted because it requires token-level 
-intermediate proxy rewards, which our cached dataset does not contain.
+Implements exact mathematical sequential early stopping baselines from literature:
+1. AdaBoN (Adaptive global variance-proportional budget allocation)
+2. BEACON (Bayesian posterior variance stopping with adaptive target)
+3. Pandora's Box (Weitzman exact Gaussian expected marginal gain)
 """
 
 from __future__ import annotations
@@ -17,25 +14,28 @@ from typing import Any, Dict, List
 
 import numpy as np
 
-from .base import EvaluationPipeline, _extract_answer
+from .base import EvaluationPipeline, _extract_answer, get_semantic_cluster_ids
 
 def _pick_best_rm(rm_names: List[str]) -> int:
-    """Select the best RM for single-RM baselines."""
-    prefs = ["FsfairX", "Llama-3-OffsetBias", "reward-model-deberta"]
+    prefs = ["FsfairX", "Llama-3-OffsetBias", "reward-model-deberta", "ArmoRM", "Skywork"]
     for pref in prefs:
         for j, name in enumerate(rm_names):
             if pref.lower() in name.lower():
                 return j
     return 0
 
+from ..methods.sequential.baselines import compute_adabon, compute_beacon, compute_pandora, compute_consol
+
 class SeqBaselinesPipeline(EvaluationPipeline):
     name = "seq_baselines"
     category = "parallel"
-    description = "Sequential baselines from literature: AdaBoN, BEACON, and Pandora's Box."
+    description = "Exact sequential baselines from literature: AdaBoN, BEACON, and Pandora's Box."
 
     def __init__(self):
         super().__init__()
         self.steps_used = defaultdict(list)
+        self.adabon_budgets = {}
+        self._candidate_to_idx = {}
 
     def evaluate_methods(
         self,
@@ -53,93 +53,40 @@ class SeqBaselinesPipeline(EvaluationPipeline):
             return results
 
         best_j = _pick_best_rm(rm_names)
-        # Use a single RM's scores for these baselines as they don't natively support ensembles
         scores = np.asarray(member_scores[best_j], dtype=float)
 
-        # ---------------------------------------------------------
-        # 1. Simulated AdaBoN (Burn-in and adaptive budget)
-        # ---------------------------------------------------------
-        K = 4 # Burn-in
-        burn_in_scores = scores[:K]
-        var_burn_in = np.var(burn_in_scores)
-        
-        # Heuristic allocation based on variance
-        var_threshold = 1.0  # z-scores typically have variance ~1.0
-        if var_burn_in > var_threshold:
-            # High variance = hard prompt, allocate more budget
-            n_budget = min(N, K + 12)
-        else:
-            # Low variance = easy prompt, allocate less budget
-            n_budget = min(N, K + 4)
-            
-        best_idx_adabon = int(np.argmax(scores[:n_budget]))
-        results["baseline_adabon"] = candidates[best_idx_adabon]
-        self.steps_used["baseline_adabon"].append(n_budget)
+        first_cand = candidates[0]
+        idx = self._candidate_to_idx.get(first_cand, -1)
 
         # ---------------------------------------------------------
-        # 2. Simulated BEACON (Bayesian sequential stopping)
+        # 1. Exact AdaBoN (Global variance-proportional allocation)
         # ---------------------------------------------------------
-        # We model the reward as drawn from N(mu, sigma^2). 
-        # We maintain a posterior over mu. Stop when posterior confidence P(mu > theta_target) > gamma.
-        prior_mu = 0.0
-        prior_var = 1.0
-        obs_var = 1.0 # Assumed observation noise
-        
-        gamma = 0.85 # Stopping threshold for posterior confidence
-        theta_target = 0.5 # Target acceptable reward score (normalized z-score)
-        stopped_beacon = False
-        
-        def norm_cdf(x):
-            return 0.5 * (1 + math.erf(x / math.sqrt(2)))
-            
-        for i in range(1, N + 1):
-            current_scores = scores[:i]
-            post_var = 1.0 / ((1.0 / prior_var) + (i / obs_var))
-            post_mu = post_var * ((prior_mu / prior_var) + (np.sum(current_scores) / obs_var))
-            
-            prob_good = norm_cdf((post_mu - theta_target) / math.sqrt(post_var))
-            
-            if prob_good > gamma and i >= 4:
-                best_idx = int(np.argmax(current_scores))
-                results["baseline_beacon"] = candidates[best_idx]
-                self.steps_used["baseline_beacon"].append(i)
-                stopped_beacon = True
-                break
-                
-        if not stopped_beacon:
-            best_idx = int(np.argmax(scores))
-            results["baseline_beacon"] = candidates[best_idx]
-            self.steps_used["baseline_beacon"].append(N)
+        n_budget = self.adabon_budgets.get(N, {}).get(idx, N)
+        adabon_ans, adabon_steps = compute_adabon(candidates, scores, n_budget)
+        results["baseline_adabon"] = adabon_ans
+        self.steps_used["baseline_adabon"].append(adabon_steps)
 
         # ---------------------------------------------------------
-        # 3. Simulated Pandora's Box (Weitzman UCB)
+        # 2. Adaptive BEACON (Bayesian sequential stopping)
         # ---------------------------------------------------------
-        # Stop when r* >= E[r_next] - c
-        # We approximate E[r_next] via UCB of next observation: mu_hat + alpha * sigma_hat
-        c = 0.05 # Cost of generating one candidate
-        alpha = 1.0 # UCB exploration parameter
-        
-        stopped_pandora = False
-        for i in range(4, N):
-            current_scores = scores[:i]
-            r_star = np.max(current_scores)
-            mu_hat = np.mean(current_scores)
-            sigma_hat = np.std(current_scores)
-            
-            # Fix: UCB of NEXT OBSERVATION uses sigma, not standard error of the mean (sigma/sqrt(i))
-            ucb_next = mu_hat + alpha * sigma_hat
-            
-            if r_star >= ucb_next - c:
-                best_idx = int(np.argmax(current_scores))
-                results["baseline_pandora"] = candidates[best_idx]
-                self.steps_used["baseline_pandora"].append(i)
-                stopped_pandora = True
-                break
-                
-        if not stopped_pandora:
-            best_idx = int(np.argmax(scores))
-            results["baseline_pandora"] = candidates[best_idx]
-            self.steps_used["baseline_pandora"].append(N)
+        beacon_ans, beacon_steps = compute_beacon(candidates, scores, gamma=0.85)
+        results["baseline_beacon"] = beacon_ans
+        self.steps_used["baseline_beacon"].append(beacon_steps)
+
+        # ---------------------------------------------------------
+        # 3. Exact Pandora's Box (Weitzman Expected Marginal Gain)
+        # ---------------------------------------------------------
+        pandora_ans, pandora_steps = compute_pandora(candidates, scores, c=0.05)
+        results["baseline_pandora"] = pandora_ans
+        self.steps_used["baseline_pandora"].append(pandora_steps)
+
+        # ---------------------------------------------------------
+        # 4. ConSol (SPRT on top 2 frequent answers)
+        # ---------------------------------------------------------
+        global_cluster_ids = get_semantic_cluster_ids(candidates, dataset)
+        consol_ans, consol_steps = compute_consol(candidates, global_cluster_ids)
+        results["baseline_consol"] = consol_ans
+        self.steps_used["baseline_consol"].append(consol_steps)
 
         return results
 
@@ -152,14 +99,52 @@ class SeqBaselinesPipeline(EvaluationPipeline):
         **kwargs: Any,
     ) -> Dict[str, Any]:
         
+        examples = self.load_candidates(candidates_path)
+        rm_names, all_rm_scores = self.load_scores(score_paths)
         n_values = [int(x.strip()) for x in eval_n.split(",")]
-        max_n = max(n_values)
+        
+        self._candidate_to_idx.clear()
+        for ex in examples:
+            self._candidate_to_idx[ex["candidates"][0]] = ex["example_index"]
+
+        self.adabon_budgets.clear()
+        K = 4
+        best_j = _pick_best_rm(rm_names)
+        
+        for n in sorted(n_values):
+            self.adabon_budgets[n] = {}
+            if n <= K:
+                for ex in examples:
+                    self.adabon_budgets[n][ex["example_index"]] = n
+                continue
+                
+            stds = {}
+            for ex in examples:
+                idx = ex["example_index"]
+                if idx not in all_rm_scores or len(all_rm_scores[idx]) != len(rm_names):
+                    continue
+                scores = np.asarray(all_rm_scores[idx][best_j][:n], dtype=float)
+                if len(scores) >= K:
+                    stds[idx] = np.std(scores[:K])
+                    
+            total_stds = sum(stds.values())
+            if total_stds > 1e-6:
+                M = len(stds)
+                total_remaining_budget = M * (n - K)
+                for idx, std in stds.items():
+                    prop = std / total_stds
+                    budget = K + int(round(total_remaining_budget * prop))
+                    self.adabon_budgets[n][idx] = min(budget, n)
+            else:
+                for idx in stds:
+                    self.adabon_budgets[n][idx] = n
+                    
         self.steps_used.clear()
 
         results = super().run(
             candidates_path=candidates_path,
             score_paths=score_paths,
-            eval_n=str(max_n),
+            eval_n=eval_n,
             variance_norm_mode=variance_norm_mode,
             **kwargs
         )
@@ -178,5 +163,3 @@ class SeqBaselinesPipeline(EvaluationPipeline):
 
         results["average_budget"] = avg_budget
         return results
-
-

@@ -20,7 +20,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from ..core.data import check_correctness
-from ..core.method_runners import run_vanilla_bon
+from ..methods.parallel.standard import run_vanilla_bon
 from ..core.normalize import normalize_member_scores
 from ..core.results import ResultsManager
 
@@ -127,7 +127,129 @@ def _extract_answer(text: str, dataset: str) -> Optional[str]:
             return matches[-1].upper()
         return None
 
+    if dataset == "cruxeval":
+        match = re.search(r"output:\s*(.*)", text, flags=re.IGNORECASE | re.DOTALL)
+        if match:
+            ans = match.group(1).strip().strip("` \n")
+            if ans.startswith("python\n"):
+                ans = ans[7:].strip()
+            return ans
+        return text.strip()
+
     return None
+
+def group_candidates_semantically(candidates: List[str], dataset: str) -> List[List[int]]:
+    """Cluster candidates by semantic equivalence.
+    
+    Returns a list of clusters, where each cluster is a list of candidate indices.
+    """
+    N = len(candidates)
+    if N == 0:
+        return []
+        
+    extracted_strings = [_extract_answer(c, dataset) for c in candidates]
+    
+    clusters = []
+    
+    if dataset == "math500":
+        try:
+            from math_verify import parse, verify
+            from math_verify.parser import ExprExtractionConfig, LatexExtractionConfig
+            configs = [LatexExtractionConfig(), ExprExtractionConfig()]
+        except ImportError:
+            parse = verify = None
+            configs = []
+            
+        if parse and verify:
+            parsed_cands = []
+            for i in range(N):
+                try:
+                    if extracted_strings[i] is not None:
+                        p = parse(extracted_strings[i], extraction_config=configs)
+                        parsed_cands.append(p)
+                    else:
+                        parsed_cands.append(None)
+                except Exception:
+                    parsed_cands.append(None)
+                    
+            # Build clusters
+            for i in range(N):
+                added = False
+                for cluster in clusters:
+                    head_idx = cluster[0]
+                    str_i = extracted_strings[i]
+                    str_h = extracted_strings[head_idx]
+                    is_equiv = False
+                    
+                    if str_i is not None and str_h is not None and str_i == str_h:
+                        is_equiv = True
+                    elif parsed_cands[i] and parsed_cands[head_idx]:
+                        try:
+                            if verify(parsed_cands[i], parsed_cands[head_idx]):
+                                is_equiv = True
+                        except Exception:
+                            pass
+                            
+                    if is_equiv:
+                        cluster.append(i)
+                        added = True
+                        break
+                if not added:
+                    clusters.append([i])
+            return clusters
+
+    # For GSM8K and MMLU (and MATH500 fallback if math_verify missing), use robust exact match on _extract_answer
+    ans_to_cluster = {}
+    for i in range(N):
+        ans = extracted_strings[i]
+        if ans is None:
+            # If nothing can be extracted, it's its own cluster
+            clusters.append([i])
+            continue
+            
+        if dataset == "gsm8k":
+            try:
+                # Group by float equivalence for GSM8K
+                val = float(ans)
+                added = False
+                for existing_ans, cluster_indices in ans_to_cluster.items():
+                    try:
+                        if abs(float(existing_ans) - val) < 1e-5:
+                            ans_to_cluster[existing_ans].append(i)
+                            added = True
+                            break
+                    except ValueError:
+                        pass
+                if not added:
+                    ans_to_cluster[ans] = [i]
+            except ValueError:
+                if ans not in ans_to_cluster:
+                    ans_to_cluster[ans] = []
+                ans_to_cluster[ans].append(i)
+        else:
+            if ans not in ans_to_cluster:
+                ans_to_cluster[ans] = []
+            ans_to_cluster[ans].append(i)
+            
+    # Combine the dict clusters into a list
+    for indices in ans_to_cluster.values():
+        clusters.append(indices)
+    return clusters
+
+def get_semantic_cluster_ids(candidates: List[str], dataset: str) -> List[int]:
+    """Return a list of integer cluster IDs for each candidate.
+    
+    Candidates that are semantically equivalent will have the same cluster ID.
+    """
+    clusters = group_candidates_semantically(candidates, dataset)
+    N = len(candidates)
+    ids = [-1] * N
+    
+    for cluster_id, cluster_indices in enumerate(clusters):
+        for idx in cluster_indices:
+            ids[idx] = cluster_id
+            
+    return ids
 
 
 class EvaluationPipeline(ABC):
@@ -199,6 +321,8 @@ class EvaluationPipeline(ABC):
         name = Path(candidates_path).name.lower()
         if "gsm8k" in name:
             return "gsm8k"
+        if "cruxeval" in name:
+            return "cruxeval"
         if "math500" in name:
             return "math500"
         if "mmlu" in name:
@@ -315,6 +439,12 @@ class EvaluationPipeline(ABC):
                 if check_correctness(m_ens.selected_answer, gold, dataset):
                     correct["vanilla_bon (ensemble)"] += 1
 
+                # --- Base policy (pi_ref) baseline ---
+                # Expected pass@1 (approximated here deterministically via candidate 0)
+                total["pi_ref (pass@1)"] += 1
+                if check_correctness(candidates[0], gold, dataset):
+                    correct["pi_ref (pass@1)"] += 1
+
                 # --- Hypothesis-specific methods ---
                 selections = self.evaluate_methods(
                     candidates, means, variances, member_scores_n,
@@ -402,13 +532,19 @@ class EvaluationPipeline(ABC):
         dataset: str,
         config: Optional[Any] = None,
         experiment_name: Optional[str] = None,
+        model: str = "default",
     ) -> ResultsManager:
         """Save results using the standard directory layout.
 
         Uses a stable directory name so re-runs overwrite previous results.
         """
         exp_name = experiment_name or self.make_experiment_name(dataset)
-        output_dir = Path("runs") / exp_name
+        
+        if "ablation" in exp_name:
+            output_dir = Path("runs") / model / "ablations" / exp_name
+        else:
+            output_dir = Path("runs") / model / exp_name
+            
         manager = ResultsManager(output_dir)
 
         if config is not None:
@@ -443,8 +579,7 @@ class EvaluationPipeline(ABC):
         # N-sweep results
         if "results_by_n" in results:
             oracle_by_n = results.get("oracle_by_n", {})
-            normalized_by_n = results.get("normalized_by_n", {})
-            lines.append("Results by N  (Acc = accuracy;  ONA = oracle-normalized = Acc / Oracle@N):")
+            lines.append("Results by N  (Acc = accuracy):")
             lines.append("-" * 70)
             for n_val, methods in sorted(results["results_by_n"].items(), key=lambda x: int(x[0])):
                 orc = oracle_by_n.get(n_val)
@@ -452,16 +587,12 @@ class EvaluationPipeline(ABC):
                 if orc is not None:
                     header += f"   (Oracle@N = {orc:.1%})"
                 lines.append(header + ":")
-                norm = normalized_by_n.get(n_val, {})
                 for method, acc in methods.items():
-                    ona = norm.get(method)
                     avg_budget = results.get("average_budget", {}).get(method)
                     
                     line_str = f"    {method:<40s}  Acc {acc:>6.1%}"
-                    if ona is not None:
-                        line_str += f"   ONA {ona:>6.1%}"
                     if avg_budget is not None:
-                        line_str += f"   BUG {avg_budget['mean']:>5.2f}+-{avg_budget['std']:<4.2f}"
+                        line_str += f"   BGT {avg_budget['mean']:>5.2f}+-{avg_budget['std']:<4.2f}"
                     
                     lines.append(line_str)
             lines.append("")

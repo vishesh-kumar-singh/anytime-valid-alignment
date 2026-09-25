@@ -12,7 +12,7 @@ from collections import Counter
 
 import numpy as np
 
-from ..core.method_runners import (
+from ..methods.parallel.standard import (
     run_vanilla_bon,
     run_minimax,
     run_bon_sharpe,
@@ -20,9 +20,7 @@ from ..core.method_runners import (
     run_soft_bon
 )
 from ..core.normalize import normalize_member_scores
-from ..data_utils.math500 import extract_math_answer
-from ..data_utils.gsm8k import extract_gsm8k_answer
-from .base import EvaluationPipeline
+from .base import EvaluationPipeline, get_semantic_cluster_ids
 
 
 class ParallelBaselinesPipeline(EvaluationPipeline):
@@ -44,18 +42,12 @@ class ParallelBaselinesPipeline(EvaluationPipeline):
         N = len(candidates)
         
         # 1. Extract answers to calculate exact match overlap (for MBR)
-        extracted_answers = []
-        is_math = "math" in dataset.lower()
-        for cand in candidates:
-            if is_math:
-                ans = extract_math_answer(cand)
-            else:
-                ans = extract_gsm8k_answer(cand)
-            extracted_answers.append(ans if ans is not None else cand.strip())
+        # We use rigorous semantic clustering to prevent string-fragmentation penalty against MBR
+        cluster_ids = get_semantic_cluster_ids(candidates, dataset)
             
         # Compute MBR overlap score U(y, y') = 1 if match else 0
-        answer_counts = Counter(extracted_answers)
-        mbr_scores = [answer_counts[ans] / N for ans in extracted_answers]
+        answer_counts = Counter(cluster_ids)
+        mbr_scores = [answer_counts[cid] / N for cid in cluster_ids]
 
         # Ensure scores are normalized for threshold/temperature consistency
         norm_scores = normalize_member_scores(member_scores, mode="robust_zscore")

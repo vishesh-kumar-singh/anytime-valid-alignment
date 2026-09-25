@@ -111,7 +111,7 @@ class RewardEnsemble:
         self,
         model_names: List[str],
         batch_size: int = 8,
-        max_length: int = 1024,
+        max_length: int = 4096,
         device: Optional[str] = None,
         load_in_4bit: bool = False,
     ):
@@ -300,6 +300,28 @@ class RewardEnsemble:
         """
         model_path = str(getattr(getattr(model, "config", None), "_name_or_path", "")).lower()
         if "armorm" in model_path or "rlhflow" in model_path:
+            formatted = []
+            for candidate in candidates:
+                messages = [
+                    {"role": "user", "content": prompt},
+                    {"role": "assistant", "content": candidate},
+                ]
+                try:
+                    text = tokenizer.apply_chat_template(
+                        messages,
+                        tokenize=False,
+                        add_generation_prompt=False,
+                    )
+                except Exception:
+                    text = (
+                        "<|begin_of_text|><|start_header_id|>user<|end_header_id|>\n\n"
+                        f"{prompt}<|eot_id|><|start_header_id|>assistant<|end_header_id|>\n\n"
+                        f"{candidate}<|eot_id|>"
+                    )
+                formatted.append(text)
+            return formatted
+
+        elif "offsetbias" in model_path or "llama" in model_path or "fsfairx" in model_path:
             formatted = []
             for candidate in candidates:
                 messages = [

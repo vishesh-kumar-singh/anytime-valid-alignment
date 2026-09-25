@@ -135,7 +135,7 @@ def load_dataset_examples(
     """Load examples from the specified dataset.
 
     Args:
-        dataset: One of ``gsm8k``, ``math500``, ``alpaca_eval``.
+        dataset: One of ``gsm8k``, ``math500``, ``mmlu``.
         split: Dataset split (e.g. ``test``).
         max_examples: Cap the number of examples. ``None`` = full split.
 
@@ -149,17 +149,14 @@ def load_dataset_examples(
     elif dataset == "math500":
         from ..data_utils.math500 import load_math500
         return load_math500(max_examples=max_examples)
-    elif dataset == "alpaca_eval":
-        from ..data_utils.alpaca_eval import load_alpaca_eval
-        return load_alpaca_eval(max_examples=max_examples)
-    elif dataset == "alpaca":
-        from ..data_utils.alpaca import load_alpaca
-        return load_alpaca(max_examples=max_examples)
     elif dataset == "mmlu":
         from ..data_utils.mmlu import load_mmlu
         return load_mmlu(split=split, max_examples=max_examples)
+    elif dataset == "cruxeval":
+        from ..data_utils.cruxeval import load_cruxeval
+        return load_cruxeval(split=split, max_examples=max_examples)
     else:
-        raise ValueError(f"Unknown dataset: {dataset}. Choose from: gsm8k, math500, alpaca_eval, alpaca, mmlu")
+        raise ValueError(f"Unknown dataset: {dataset}. Choose from: gsm8k, math500, mmlu, cruxeval")
 
 
 def check_correctness(prediction: str, ground_truth: str, dataset: str) -> bool:
@@ -183,14 +180,25 @@ def check_correctness(prediction: str, ground_truth: str, dataset: str) -> bool:
         try:
             return check_math_correct_cached(prediction, ground_truth)
         except ImportError:
+            import warnings
+            warnings.warn(
+                "\n" + "="*80 + "\n"
+                "CRITICAL WARNING: `math_verify` is not installed! "
+                "Falling back to legacy string grader for MATH500.\n"
+                "This WILL artificially inflate accuracy scores by ~10-12 points.\n"
+                "Please run `pip install math_verify` before evaluating."
+                "\n" + "="*80 + "\n"
+            )
             from ..data_utils.math500 import check_math_correct
             return check_math_correct(prediction, ground_truth)
     elif dataset == "mmlu":
         from ..data_utils.mmlu import check_answer_correct as check_mmlu_correct
         return check_mmlu_correct(prediction, ground_truth)
-    elif dataset in ("alpaca_eval", "alpaca"):
-        return False  # open-ended: no ground-truth correctness
-    return False
+    elif dataset == "cruxeval":
+        from ..data_utils.cruxeval import check_cruxeval_correct
+        return check_cruxeval_correct(prediction, ground_truth)
+    else:
+        return False
 
 
 def dataset_system_message(dataset: str) -> str:
@@ -208,8 +216,12 @@ def dataset_system_message(dataset: str) -> str:
             "You are a helpful assistant for arithmetic word problems. "
             "Solve briefly and clearly. Put your final numerical answer after ####."
         )
-    if dataset == "alpaca":
-        return "You are a helpful, harmless, and honest assistant. Follow the instruction carefully."
     if dataset == "mmlu":
         return "You are a knowledgeable assistant. Answer the multiple choice question by selecting the correct option (A, B, C, or D). Provide a brief explanation followed by your final answer in the format: 'Answer: (X)' where X is the correct letter."
+    if dataset == "cruxeval":
+        return (
+            "You are an expert Python code executor. You will be given a Python function and an input. "
+            "Please mentally execute the code and predict the exact output. Provide your reasoning, "
+            "and end your response with 'Output: ' followed by the raw Python literal value."
+        )
     return "You are a helpful assistant."

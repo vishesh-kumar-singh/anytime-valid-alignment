@@ -54,7 +54,6 @@ class BaseExperimentConfig:
     history_budget: int = 2
 
     # ── Controller ────────────────────────────────────────────────────
-    controller_type: str = "threshold"
     uncertainty_top_k: int = 3
     u_low: float = 0.05
     u_high: float = 0.2
@@ -65,7 +64,7 @@ class BaseExperimentConfig:
         "OpenAssistant/reward-model-deberta-v3-large-v2",
         "NCSOFT/Llama-3-OffsetBias-RM-8B",
     ])
-    reward_batch_size: int = 8
+    reward_batch_size: int = 2
     reward_load_in_4bit: bool = False
     urm_ensemble_dir: Optional[str] = None
     urm_base_model: str = "microsoft/deberta-v3-base"

@@ -78,7 +78,7 @@ def extract_math_answer(answer_text: str) -> Optional[str]:
                 depth += 1
             elif answer_text[i] == "}":
                 if depth == 0:
-                    return answer_text[start:i].strip()
+                    return answer_text[start:i].strip().replace('\n', '').replace('\r', '')
                 depth -= 1
 
     # Try #### marker
@@ -89,13 +89,36 @@ def extract_math_answer(answer_text: str) -> Optional[str]:
         if match:
             return match.group(0).replace(",", "")
 
+    # Try common prefixes for unboxed equations
+    lower_text = answer_text.lower()
+    prefixes = ["the final answer is", "the answer is", "so the answer is", "final answer:"]
+    for prefix in prefixes:
+        idx = lower_text.rfind(prefix)
+        if idx != -1:
+            ans = answer_text[idx + len(prefix):].strip()
+            # Remove trailing punctuation often found at the end of sentences
+            if ans.endswith('.') or ans.endswith(';'):
+                ans = ans[:-1].strip()
+            # If the extracted answer is non-empty, return it
+            if ans:
+                return ans.replace('\n', '').replace('\r', '')
+
+    # Try to extract the last math block $...$ or \[...\]
+    math_blocks = re.findall(r"\$([^\$]+)\$", answer_text)
+    if math_blocks:
+        return math_blocks[-1].strip().replace('\n', '').replace('\r', '')
+        
+    math_blocks = re.findall(r"\\\[(.*?)\\\]", answer_text, re.DOTALL)
+    if math_blocks:
+        return math_blocks[-1].strip().replace('\n', '').replace('\r', '')
+
     # Fallback: last number
     numbers = re.findall(r"-?[\d,]+\.?\d*", answer_text)
     if numbers:
         return numbers[-1].replace(",", "")
 
     # Fallback: return cleaned text
-    return answer_text.strip()
+    return answer_text.strip().replace('\n', '').replace('\r', '')
 
 
 def check_math_correct(prediction: str, ground_truth: str) -> bool:
@@ -135,6 +158,44 @@ def check_math_correct(prediction: str, ground_truth: str) -> bool:
         g = float(gold.replace(",", ""))
         return abs(p - g) < 1e-5
     except (ValueError, TypeError):
+        pass
+
+    # Try SymPy symbolic/numeric equivalence
+    try:
+        import sympy
+        from sympy.parsing.latex import parse_latex
+        import signal
+
+        class TimeoutException(BaseException): pass
+
+        def timeout_handler(signum, frame):
+            raise TimeoutException()
+
+        # Clean up some common unsupported latex before parsing
+        p_clean = pred.replace("\\%", "").replace("^{\\circ}", "").replace("\\$", "")
+        g_clean = gold.replace("\\%", "").replace("^{\\circ}", "").replace("\\$", "")
+        
+        signal.signal(signal.SIGALRM, timeout_handler)
+        signal.alarm(3) # 3 seconds timeout for parsing and simplify
+        try:
+            expr_p = parse_latex(p_clean)
+            expr_g = parse_latex(g_clean)
+            
+            # 1. Algebraic simplification
+            if sympy.simplify(expr_p - expr_g) == 0:
+                signal.alarm(0)
+                return True
+                
+            # 2. Numeric evaluation
+            diff = abs(expr_p.evalf() - expr_g.evalf())
+            if diff < 1e-5:
+                signal.alarm(0)
+                return True
+        except TimeoutException:
+            pass
+        finally:
+            signal.alarm(0)
+    except Exception:
         pass
 
     return False

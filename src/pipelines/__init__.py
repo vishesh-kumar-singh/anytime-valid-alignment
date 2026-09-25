@@ -26,10 +26,11 @@ from .base import EvaluationPipeline
 _REGISTRY: Dict[str, str] = {
     "rwsc": "src.pipelines.rwsc.RWSCPipeline",
 
-
     "sprt_rwsc": "src.pipelines.sprt.SPRTPipeline",
+    "e_rwsc": "src.pipelines.e_process.EProcessPipeline",
     "seq_baselines": "src.pipelines.seq_baselines.SeqBaselinesPipeline",
     "baselines": "src.pipelines.parallel_baselines.ParallelBaselinesPipeline",
+    "cite_isolated": "src.pipelines.cite.CITEPipeline",
 }
 
 
@@ -41,7 +42,7 @@ def _import_class(dotted_path: str) -> Type[EvaluationPipeline]:
     return getattr(mod, cls_name)
 
 
-def get_pipeline(pipeline_id: str) -> EvaluationPipeline:
+def get_pipeline(pipeline_id: str, **kwargs) -> EvaluationPipeline:
     """Instantiate a pipeline by its short ID (e.g. ``sprt_rwsc``)."""
     if pipeline_id not in _REGISTRY:
         raise KeyError(
@@ -49,7 +50,7 @@ def get_pipeline(pipeline_id: str) -> EvaluationPipeline:
             f"Available: {list(_REGISTRY.keys())}"
         )
     cls = _import_class(_REGISTRY[pipeline_id])
-    return cls()
+    return cls(**kwargs)
 
 
 def list_pipelines() -> Dict[str, str]:

@@ -34,6 +34,7 @@ def main(
     output_path: Optional[str] = typer.Option(None, help="Output JSONL path"),
     num_chunks: int = typer.Option(1, help="Total number of chunks to split the data into"),
     chunk_idx: int = typer.Option(0, help="Index of the chunk to process (0 to num_chunks-1)"),
+    batch_size: int = typer.Option(2, help="Batch size for the reward model inference"),
 ):
     in_path = Path(candidates_path)
     if not in_path.exists():
@@ -43,11 +44,12 @@ def main(
     _name = in_path.name.lower()
     dataset = "gsm8k" if "gsm8k" in _name else ("alpaca_eval" if "alpaca" in _name else "math500")
     rm_short = reward_model.split("/")[-1]
+    model_shortname = in_path.parent.name
 
     if output_path is None:
         chunk_suffix = f"_chunk{chunk_idx}of{num_chunks}" if num_chunks > 1 else ""
         out_name = in_path.stem + f"_scores_{rm_short}{chunk_suffix}.jsonl"
-        out_path_obj = in_path.parent.parent / "scores" / out_name
+        out_path_obj = in_path.parent.parent.parent / "scores" / model_shortname / out_name
     else:
         out_path_obj = Path(output_path)
 
@@ -96,6 +98,7 @@ def main(
         reward_model_names=[reward_model],
         rm_mode="trivial4",
         reward_load_in_4bit=load_in_4bit,
+        reward_batch_size=batch_size,
     )
     scorer = build_scorer(cfg)
     exp_logger.log_phase_end("rm_loading", time.time() - t0)
@@ -140,7 +143,7 @@ def main(
     exp_logger.log_inference_end(len(examples_to_score))
     print(f"\n✓ Scored {len(examples_to_score)} examples!")
     print(f"✓ Saved to: {out_path_obj}")
-    print("  Next step: run scripts/evaluate_offline.py")
+    print("  Next step: run experiments/run_pipeline.py")
 
 if __name__ == "__main__":
     app()

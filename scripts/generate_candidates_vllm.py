@@ -41,7 +41,7 @@ def main(
     max_examples: int = typer.Option(200, help="Max examples. 0 = full dataset."),
     temperature: float = typer.Option(0.7, help="Generation temperature."),
     top_p: float = typer.Option(0.95, help="Generation top_p."),
-    max_new_tokens: int = typer.Option(512, help="Max tokens per generation."),
+    max_new_tokens: int = typer.Option(2048, help="Max tokens per generation."),
     gpu_memory_utilization: float = typer.Option(0.85, help="vLLM memory utilization."),
     num_gpus: int = typer.Option(1, help="Number of GPUs to use (tensor_parallel_size)."),
     output_path: Optional[str] = typer.Option(None, help="Output JSONL path."),
@@ -57,10 +57,11 @@ def main(
 
     dataset = dataset.lower()
     resolved_max = None if max_examples <= 0 else max_examples
+    model_shortname = model_name.split("/")[-1].lower()
 
     if output_path is None:
         scope = "full" if resolved_max is None else f"{resolved_max}ex"
-        output_path = f"data/candidates/{dataset}_n{n_candidates}_{scope}_vllm.jsonl"
+        output_path = f"data/candidates/{model_shortname}/{dataset}_n{n_candidates}_{scope}_vllm.jsonl"
 
     out_path = Path(output_path)
     out_path.parent.mkdir(parents=True, exist_ok=True)

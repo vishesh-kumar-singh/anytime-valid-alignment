@@ -1,78 +1,94 @@
 # Test-Time Alignment with Uncertainty-Aware Ensemble Methods
 
-Research on improving LLM inference-time alignment using reward model ensembles, uncertainty estimation, and mathematically rigorous sequential early stopping.
+Research on improving LLM inference-time alignment using reward model ensembles, uncertainty estimation, and mathematically rigorous sequential early stopping. 
 
-**Advisor:** Prof. Sayak Ray Chowdhury, IIT Kanpur
+This repository contains the complete supplementary codebase for our ICLR submission, providing reference implementations of all proposed algorithms (RWSC, SPRT-RWSC, E-RWSC), alongside automated generation pipelines, rigorous theoretical bound validation, and all manuscript visualizations.
 
-## Background & Key Findings
+## Background & Problem Statement
 
-This project explores scaling test-time compute for Large Language Models (LLMs) by utilizing Reward Model (RM) ensembles. By moving beyond naive Best-of-N (BoN), we developed novel parallel and sequential algorithms that establish a new Pareto frontier on complex reasoning benchmarks (MATH500, GSM8K, MMLU).
+Aligning Large Language Models (LLMs) via test-time scaling typically relies on the Best-of-$N$ (BoN) approach: generating $N$ candidate responses and using a proxy Reward Model (RM) to select the best one. However, proxy RMs are imperfect heuristics. As $N$ scales, standard BoN aggressively optimizes against the RM, inevitably forcing the policy into out-of-distribution (OOD) spaces. In these high-divergence regions, maximizing the proxy reward often causes a collapse in the actual, true utility—a phenomenon known as **reward over-optimization** or **reward hacking**.
 
-**Key Contributions:**
-1. **Top-K MBR-RWSC:** A parallel algorithm that merges Minimum Bayes Risk (MBR) decoding with Reward-Weighted Self-Consistency (RWSC). By filtering out low-quality "tail" candidates before applying topological consensus, we prevent consensus dilution and achieve state-of-the-art accuracy.
-2. **SPRT-RWSC:** A sequential early stopping framework based on Wald's Sequential Probability Ratio Test (SPRT). By mathematically bounding Type-I/Type-II errors, it guarantees near-optimal accuracy while dynamically halting generation the moment statistical convergence is achieved.
-3. **E-SPRT (Ensemble SPRT):** By scaling the SPRT evidence thresholds dynamically using the disagreement (variance) of the RM ensemble, E-SPRT dramatically slashes test-time compute requirements while maintaining strict error bounds.
+Furthermore, generating $N$ independent candidates in parallel incurs massive computational overhead, often wasting resources on trivial prompts that do not require high generation budgets.
 
-### Pareto Frontier on MATH500 (N=24)
-- **Top-13 MBR-RWSC:** 68.9% Accuracy (100% compute budget, $N=24$)
-- **Vanilla BoN:** ~61.8% Accuracy (100% compute budget, $N=24$)
-- **E-SPRT (α=0.1, β=0.2):** 68.9% Accuracy (**36% compute budget, Avg N=8.70**)
+## Key Contributions
 
-*E-SPRT achieves the exact same state-of-the-art accuracy as the best parallel method, but uses almost 3x less compute!*
+This project establishes a new Pareto frontier on complex reasoning benchmarks by addressing both reward hacking and computational inefficiency:
 
-## Repository Structure
+1. **Reward-Weighted Self-Consistency (RWSC)**
+   We shift the selection paradigm from candidate-level evaluation to **answer-level topological consensus**. By leveraging the ensemble's mathematical consensus, we filter out low-quality "tail" candidates and prevent consensus dilution, mitigating isolated RM vulnerabilities and achieving state-of-the-art accuracy.
+
+2. **Sequential Early Stopping (SPRT-RWSC)**
+   We introduce a mathematically rigorous sequential halting mechanism based on Wald's Sequential Probability Ratio Test (SPRT). By strictly bounding Type-I/Type-II errors, it guarantees near-optimal accuracy while dynamically halting generation the exact moment statistical convergence is achieved.
+
+3. **E-Process Early Stopping (E-RWSC)**
+   Leveraging betting martingales and the E-Process, we introduce an anytime-valid sequential stopping mechanism that provides non-asymptotic bounds. E-RWSC effectively bridges the gap between efficiency and inference scaling laws, adaptively consuming compute only on highly uncertain prompts and reducing computational waste by up to 60%.
+
+## Evaluated Matrix
+
+The codebase is fully equipped to run automated pipelines across the following extensive experimental grid:
+* **Generators (Base LLMs)**: `Qwen2.5-3B-Instruct`, `Qwen2.5-7B-Instruct`, `Meta-Llama-3-8B-Instruct`, `Phi-3-Mini-4K-Instruct`
+* **Reward Verifiers**: `ArmoRM`, `Skywork V1/V2`, `FsfairX`, `OffsetBias`, `DeBERTa`, and native logprob-based `W-CITE`
+* **Benchmarks**: `GSM8K`, `MATH500`, `MMLU`, `CruxEval`
+
+## Repository Architecture
+
+The execution structure is cleanly decoupled into high-level shell orchestration and modular Python core logic:
 
 ```text
-├── src/
-│   ├── core/                   # Shared infrastructure (scoring, datasets)
-│   ├── hypotheses/             # One file per experiment
-│   │   ├── h6_mbr_ensemble_aggregation.py # MBR Consensus
-│   │   ├── h8_top_k_mbr_rwsc.py           # Top-K MBR-RWSC (Parallel)
-│   │   ├── h9_sprt_rwsc.py                # SPRT / E-SPRT (Sequential)
-│   │   ├── h10_seq_baselines.py           # Literature Baselines (Pandora/BEACON)
-│   ├── data_utils/             # Dataset loaders (GSM8K, MATH500, MMLU, Alpaca)
-├── experiments/                # CLI entry points
-│   ├── run_hypothesis.py       # Run a single hypothesis
-│   └── run_all.py              # Run all hypotheses
-├── bash_scripts/               # Orchestration scripts for vLLM generation
-├── scripts/                    # Data pipeline (generate → score)
-│   ├── generate_candidates_vllm.py
-│   └── score_candidates.py
-└── rough.tex                   # Academic manuscript draft (ICML/ICLR formatting)
+├── bash_scripts/               # Automated high-level orchestration
+│   ├── 01_setup_and_download.sh        # Setup virtual environment and dependencies
+│   ├── 02_generate_and_score.sh        # End-to-end vLLM generation and automated scoring
+│   └── 03_run_experiments.sh           # Batch execution of all core baselines and pipelines
+│
+├── scripts/                    # Direct Python execution entrypoints & analysis
+│   ├── generate_candidates_*.py        # High-throughput generation using vLLM
+│   ├── score_candidates.py             # RM verification scoring
+│   ├── extract_logprobs_from_existing.py # Retrospective VLLM logprob extraction for W-CITE
+│   ├── run_all_pipelines.py            # Master evaluation pipeline runner
+│   ├── generate_plots.py               # Pareto frontiers and adaptivity visualizations
+│   ├── plot_eprocess_bounds.py         # Empirical validation of theoretical E-Process bounds
+│   └── analyze_exhausted_*.py          # Hard vs. Easy prompt failure-mode analysis
+│
+├── src/                        # Core algorithmic framework
+│   ├── experiments/ablations/          # Specialized isolated ablation studies
+│   ├── pipelines/                      # Orchestrator definitions (RWSC, E-Process, SPRT)
+│   ├── methods/                        # Pure algorithmic logic
+│   │   ├── parallel/                   # RWSC, Vanilla BoN, Soft BoN
+│   │   └── sequential/                 # SPRT, E-Process, AdaBoN, BEACON
+│   └── core/                           # Data handling and JSONL I/O
+│
+├── data/                       # [Auto-Generated] Candidates and parsed scores
+└── runs/                       # [Auto-Generated] Final evaluation metrics and summaries
 ```
 
-## Quick Start
+## Quick Start Guide
+
+Our workflow is completely streamlined using the `bash_scripts/` directory. Output directories like `data/` and `runs/` are dynamically generated on the fly.
 
 ### 1. Environment Setup
-
+Initialize the virtual environment and install all core dependencies, including vLLM and math verification suites:
 ```bash
-# Create and activate a virtual environment
-python -m venv venv
-source venv/bin/activate
-
-# Install the project and core dependencies
-pip install -e .
-
-# (Optional) For generating candidates, install vLLM:
-pip install vllm
+bash bash_scripts/01_setup_and_download.sh
 ```
 
 ### 2. Generate and Score Candidates
-We use vLLM for high-throughput generation and HuggingFace for RM scoring. See `bash_scripts/` for automated orchestration.
+Run the automated script to generate candidates via vLLM, extract retrospective W-CITE token probabilities, and score candidates across the entire Reward Model ensemble. 
+*(Note: It loops over all 4 base models and all datasets automatically).*
 ```bash
-python scripts/generate_candidates_vllm.py --model-name "Qwen/Qwen2.5-3B-Instruct" --dataset math500 --n-candidates 24
-python scripts/score_candidates.py --candidates-path data/candidates/math500_n24_full_vllm.jsonl --reward-model "sfairXC/FsfairX-LLaMA3-RM-v0.1"
+bash bash_scripts/02_generate_and_score.sh
 ```
+*To run on a specific benchmark, simply pass the flag: `--dataset math500`*
 
-### 3. Run Experiments
-Evaluate the pre-scored candidates using our proposed alignment algorithms:
+### 3. Run Experiments and Baselines
+Once candidates and scores are cached, execute the master pipeline to evaluate them across all parallel and sequential alignment algorithms (including RWSC, SPRT, and E-Process).
 ```bash
-# See all available hypotheses
-python experiments/run_hypothesis.py --list
+bash bash_scripts/03_run_experiments.sh
+```
+*Results will automatically populate inside the `runs/` directory.*
 
-# Run E-SPRT Sequential Early Stopping on MATH500
-python experiments/run_all.py \
-    --hypotheses h9 \
-    --candidates-path data/candidates/math500_n24_full_vllm.jsonl \
-    --score-paths data/scores/math500_n24_full_vllm_scores_*.jsonl
+### 4. Reproduce Figures and Bounds
+All plotting and theoretical bounding scripts are centrally located in the `scripts/` directory. For example, to generate the Pareto frontier and stopping-time bounds for MATH500:
+```bash
+python scripts/generate_plots.py --dataset math500
+python scripts/plot_eprocess_bounds.py
 ```

@@ -10,13 +10,20 @@ from __future__ import annotations
 
 from typing import Dict, List
 import numpy as np
+from collections import Counter
 
-from .base import EvaluationPipeline, _extract_answer
+from .base import EvaluationPipeline, _extract_answer, get_semantic_cluster_ids
+from ..methods.parallel.rwsc import compute_rwsc, compute_borda_voting
 
 class RWSCPipeline(EvaluationPipeline):
     name = "rwsc"
     category = "parallel"
     description = "Answer-level BoN (Reward-Weighted Self-Consistency) aggregates RM scores across candidates that yield the same answer. Computes for both ensemble and individual RMs."
+
+    def __init__(self, temperatures=None, p_borda=1.2):
+        super().__init__()
+        self.temperatures = temperatures if temperatures is not None else [1.0]
+        self.P_BORDA = p_borda
 
     def evaluate_methods(
         self,
@@ -33,57 +40,31 @@ class RWSCPipeline(EvaluationPipeline):
         N = len(candidates)
         if N == 0:
             return results
-            
-        # Helper function to compute RWSC for a given set of scores
-        def compute_rwsc(scores: List[float]) -> str:
-            ans_to_scores = {}
-            ans_to_candidates = {}
-            
-            for i in range(N):
-                ans = _extract_answer(candidates[i], dataset)
-                if ans is None:
-                    ans = f"__noans__{i}"
-                    
-                if ans not in ans_to_scores:
-                    ans_to_scores[ans] = []
-                    ans_to_candidates[ans] = []
-                    
-                ans_to_scores[ans].append(scores[i])
-                ans_to_candidates[ans].append((i, candidates[i], scores[i]))
-                
-            best_ans = None
-            best_ans_score = -float('inf')
-            
-            for ans, s_list in ans_to_scores.items():
-                # Apply robust z-scoring to prevent overflow in softmax
-                raw = np.asarray(scores, dtype=float)
-                z = (raw - raw.mean()) / (raw.std() + 1e-6)
-                
-                # We calculate the sum of softmax probabilities for the cluster
-                # Note: to accurately match the original rwsc logic, we exponentiate the z-scores
-                w = np.exp(z - z.max())
-                
-                ans_score = 0.0
-                for cand_idx, _, _ in ans_to_candidates[ans]:
-                    ans_score += float(w[cand_idx])
-                    
-                if ans_score > best_ans_score:
-                    best_ans_score = ans_score
-                    best_ans = ans
-                    
-            if best_ans is not None:
-                # Pick the candidate for the best answer that had the highest individual RM score
-                best_c = max(ans_to_candidates[best_ans], key=lambda x: x[2])[1]
-                return best_c
-            return candidates[0]
-
-        # 1. Ensemble RWSC
-        results["ensemble_rwsc"] = compute_rwsc(means)
+        # Pre-compute semantic clusters for this question
+        cluster_ids = get_semantic_cluster_ids(candidates, dataset)
         
-        # 2. Individual RM RWSC
+        # 1. Ensemble Aggregations
+        for t in self.temperatures:
+            tag = f"ensemble_rwsc_t{t}" if len(self.temperatures) > 1 else "ensemble_rwsc"
+            results[tag] = compute_rwsc(means, candidates, cluster_ids, t)
+            
+        results["ensemble_borda"] = compute_borda_voting(means, candidates, cluster_ids, self.P_BORDA)
+        
+        # 2. Individual RM Aggregations
         for idx, rm_name in enumerate(rm_names):
             clean_rm_name = rm_name.split('/')[-1]
             rm_scores = member_scores[idx]
-            results[f"single_rm_rwsc ({clean_rm_name})"] = compute_rwsc(rm_scores)
+            for t in self.temperatures:
+                tag = f"single_rm_rwsc ({clean_rm_name})_t{t}" if len(self.temperatures) > 1 else f"single_rm_rwsc ({clean_rm_name})"
+                results[tag] = compute_rwsc(rm_scores, candidates, cluster_ids, t)
+                
+            results[f"single_rm_borda ({clean_rm_name})"] = compute_borda_voting(rm_scores, candidates, cluster_ids, self.P_BORDA)
+                
+        # 3. Pure SC (Majority Vote without scores)
+        ans_counts = Counter(cluster_ids)
+        if ans_counts:
+            majority_c_id = ans_counts.most_common(1)[0][0]
+            majority_idx = cluster_ids.index(majority_c_id)
+            results["pure_sc"] = candidates[majority_idx]
             
         return results
