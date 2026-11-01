@@ -1,27 +1,25 @@
-# Test-Time Alignment with Uncertainty-Aware Ensemble Methods
+# Sequential Anytime Valid Tests for Efficient Inference-Time Alignment
 
-Research on improving LLM inference-time alignment using reward model ensembles, uncertainty estimation, and mathematically rigorous sequential early stopping. 
+Official codebase for **"Sequential Anytime Valid Tests for Efficient Inference-Time Alignment"**.
 
-This repository contains the complete supplementary codebase for our ICLR submission, providing reference implementations of all proposed algorithms (RWSC, SPRT-RWSC, E-RWSC), alongside automated generation pipelines, rigorous theoretical bound validation, and all manuscript visualizations.
+This repository provides reference implementations of our anytime-valid sequential early-stopping frameworks (**E-RWSC**, **SPRT-RWSC**) and topological consensus selection (**RWSC**), alongside automated candidate generation pipelines (via vLLM), reward model scoring ensembles, theoretical bound verification, and reproduction scripts for all paper figures.
 
-## Background & Problem Statement
+---
 
-Aligning Large Language Models (LLMs) via test-time scaling typically relies on the Best-of-$N$ (BoN) approach: generating $N$ candidate responses and using a proxy Reward Model (RM) to select the best one. However, proxy RMs are imperfect heuristics. As $N$ scales, standard BoN aggressively optimizes against the RM, inevitably forcing the policy into out-of-distribution (OOD) spaces. In these high-divergence regions, maximizing the proxy reward often causes a collapse in the actual, true utility—a phenomenon known as **reward over-optimization** or **reward hacking**.
+## Overview & Key Contributions
 
-Furthermore, generating $N$ independent candidates in parallel incurs massive computational overhead, often wasting resources on trivial prompts that do not require high generation budgets.
+Aligning Large Language Models (LLMs) via test-time compute scaling typically relies on Best-of-$N$ (BoN) sampling: generating $N$ candidates and selecting the highest-scoring candidate under a proxy Reward Model (RM). However, proxy RMs are imperfect heuristics susceptible to **reward hacking** when over-optimized. Moreover, allocating a static maximum budget $N_{\max}$ across all prompts is computationally wasteful, spending identical compute on confident/trivial queries and highly uncertain ones.
 
-## Key Contributions
+Our framework introduces anytime-valid statistical testing and rank-weighted topological consensus to achieve an optimal Pareto frontier between accuracy and inference compute:
 
-This project establishes a new Pareto frontier on complex reasoning benchmarks by addressing both reward hacking and computational inefficiency:
+1. **Rank-Weighted Self-Consistency (RWSC)**:
+   Shifts the selection objective from individual candidate scores to **answer-level topological consensus**. By integrating rank-based reward confidence with semantic clustering, RWSC outperforms Vanilla BoN and standard Self-Consistency across mathematical and multi-turn reasoning benchmarks while guarding against reward over-optimization.
 
-1. **Reward-Weighted Self-Consistency (RWSC)**
-   We shift the selection paradigm from candidate-level evaluation to **answer-level topological consensus**. By leveraging the ensemble's mathematical consensus, we filter out low-quality "tail" candidates and prevent consensus dilution, mitigating isolated RM vulnerabilities and achieving state-of-the-art accuracy.
+2. **Anytime-Valid E-Process Early Stopping (E-RWSC)**:
+   Constructs a non-negative supermartingale (test martingale / $e$-process) over sequential candidate draws. Guarantees non-asymptotic Type-I error control under arbitrary stopping times (anytime validity), dynamically halting compute as soon as evidence is statistically decisive and cutting average inference budget by up to **60%**.
 
-2. **Sequential Early Stopping (SPRT-RWSC)**
-   We introduce a mathematically rigorous sequential halting mechanism based on Wald's Sequential Probability Ratio Test (SPRT). By strictly bounding Type-I/Type-II errors, it guarantees near-optimal accuracy while dynamically halting generation the exact moment statistical convergence is achieved.
-
-3. **E-Process Early Stopping (E-RWSC)**
-   Leveraging betting martingales and the E-Process, we introduce an anytime-valid sequential stopping mechanism that provides non-asymptotic bounds. E-RWSC effectively bridges the gap between efficiency and inference scaling laws, adaptively consuming compute only on highly uncertain prompts and reducing computational waste by up to 60%.
+3. **Sequential Probability Ratio Test (SPRT-RWSC)**:
+   Sequential early stopping under Wald's SPRT framework with bounded Type-I ($\alpha$) and Type-II ($\beta$) error rates, achieving near-optimal budget reduction.
 
 ## Evaluated Matrix
 
