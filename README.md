@@ -38,16 +38,32 @@ The execution structure is cleanly decoupled into high-level shell orchestration
 ├── bash_scripts/               # Automated high-level orchestration
 │   ├── 01_setup_and_download.sh        # Setup virtual environment and dependencies
 │   ├── 02_generate_and_score.sh        # End-to-end vLLM generation and automated scoring
-│   └── 03_run_experiments.sh           # Batch execution of all core baselines and pipelines
+│   ├── 03_run_experiments.sh           # Batch execution of all core baselines and pipelines
+│   ├── 05_run_burnin_ablation.sh       # Burn-in ablation sweep
+│   ├── 06_run_budget_sweep.sh          # Full N_max budget sweep experiments
+│   ├── 07_run_pdagger_sweep.sh         # Prior alignment (p_dagger) sweep
+│   └── 08_run_c_sweep.sh               # Stopping boundary parameter sweep
 │
-├── scripts/                    # Direct Python execution entrypoints & analysis
-│   ├── generate_candidates_*.py        # High-throughput generation using vLLM
-│   ├── score_candidates.py             # RM verification scoring
+├── scripts/                    # Core reproducible pipeline entrypoints
+│   ├── generate_candidates_*.py        # High-throughput candidate generation (vLLM / HF / Ollama)
+│   ├── score_candidates.py             # RM verification scoring across ensemble
 │   ├── extract_logprobs_from_existing.py # Retrospective VLLM logprob extraction for W-CITE
+│   ├── score_self_certainty.py         # Self-certainty confidence scoring
 │   ├── run_all_pipelines.py            # Master evaluation pipeline runner
-│   ├── generate_plots.py               # Pareto frontiers and adaptivity visualizations
-│   ├── plot_eprocess_bounds.py         # Empirical validation of theoretical E-Process bounds
-│   └── analyze_exhausted_*.py          # Hard vs. Easy prompt failure-mode analysis
+│   ├── run_pipeline.py                 # Single pipeline execution entrypoint
+│   │
+│   ├── plots/                          # Paper figures & Pareto visualizers
+│   │   ├── plot_table1.py              # Generates full-budget bar charts & Pareto frontier subplots
+│   │   ├── plot_eprocess_stopping_dist.py # Stopping distributions under N_max=512
+│   │   ├── plot_hard_vs_easy_accurate.py  # Confident vs. highly uncertain subset failure modes
+│   │   ├── plot_eprocess_bounds.py     # Empirical validation of theoretical E-Process bounds
+│   │   ├── plot_wald_bounds.py         # Empirical validation of SPRT bounds
+│   │   ├── plot_ablations.py           # Sensitivity ablations (alpha, p_dagger, c, burn-in)
+│   │   └── generate_plots.py           # Multi-benchmark Pareto frontier curves
+│   │
+│   └── analysis/                       # Deep-dive analytical scripts
+│       ├── analyze_exhausted_questions.py # Failure-mode breakdown on exhausted questions
+│       └── eval_cite_512.py            # Vanilla CITE budget sweep evaluations for N=512
 │
 ├── src/                        # Core algorithmic framework
 │   ├── experiments/ablations/          # Specialized isolated ablation studies
@@ -87,8 +103,18 @@ bash bash_scripts/03_run_experiments.sh
 *Results will automatically populate inside the `runs/` directory.*
 
 ### 4. Reproduce Figures and Bounds
-All plotting and theoretical bounding scripts are centrally located in the `scripts/` directory. For example, to generate the Pareto frontier and stopping-time bounds for MATH500:
+All plotting and theoretical bounding scripts are centrally located in the `scripts/plots/` directory:
 ```bash
-python scripts/generate_plots.py --dataset math500
-python scripts/plot_eprocess_bounds.py
+# Table 1: Full-budget bar charts and Early-Stopping Pareto frontiers
+python scripts/plots/plot_table1.py
+
+# Stopping step distribution under N=512
+python scripts/plots/plot_eprocess_stopping_dist.py
+
+# Failure modes on Confident vs. Highly Uncertain queries
+python scripts/plots/plot_hard_vs_easy_accurate.py
+
+# Empirical validation of theoretical stopping-time bounds
+python scripts/plots/plot_eprocess_bounds.py
 ```
+

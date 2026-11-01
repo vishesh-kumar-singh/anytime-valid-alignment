@@ -14,7 +14,11 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from src.data_utils.math500 import extract_math_answer
 from src.data_utils.gsm8k import extract_gsm8k_answer
 from src.data_utils.mmlu import extract_mmlu_answer
-from scripts.generate_wcite_candidates import extract_cruxeval_answer
+from src.pipelines.base import _extract_answer
+
+def extract_cruxeval_answer(text: str) -> Optional[str]:
+    return _extract_answer(text, "cruxeval")
+
 
 app = typer.Typer()
 

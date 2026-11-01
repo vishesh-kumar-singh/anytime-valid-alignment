@@ -4,7 +4,9 @@ import sys
 import numpy as np
 from collections import Counter
 
-sys.path.append(os.path.abspath("."))
+ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
+if ROOT_DIR not in sys.path:
+    sys.path.insert(0, ROOT_DIR)
 from src.methods.sequential.e_process import _e_borda_stop
 from src.pipelines.base import _extract_answer
 from math_verify import parse, verify

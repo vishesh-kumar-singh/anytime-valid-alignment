@@ -5,7 +5,9 @@ import numpy as np
 from collections import Counter
 import matplotlib.pyplot as plt
 
-sys.path.append(os.path.abspath("."))
+ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
+if ROOT_DIR not in sys.path:
+    sys.path.insert(0, ROOT_DIR)
 from src.methods.sequential.e_process import _e_borda_stop
 from src.pipelines.base import _extract_answer
 from math_verify import parse, verify
@@ -162,17 +164,15 @@ for idx in sorted(cands_data.keys()):
 labels = list(groups.keys())
 bon_accs = [groups[l]["bon"] / groups[l]["total"] * 100 for l in labels]
 sc_accs = [groups[l]["sc"] / groups[l]["total"] * 100 for l in labels]
-borda_accs = [groups[l]["borda"] / groups[l]["total"] * 100 for l in labels]
 rwsc_accs = [groups[l]["rwsc"] / groups[l]["total"] * 100 for l in labels]
 
 x = np.arange(len(labels))
-width = 0.2
+width = 0.25
 
 fig, ax = plt.subplots(figsize=(10, 6))
-rects1 = ax.bar(x - 1.5*width, bon_accs, width, label='Vanilla BoN', color='indianred')
-rects2 = ax.bar(x - 0.5*width, sc_accs, width, label='Majority Voting (SC)', color='lightsteelblue')
-rects3 = ax.bar(x + 0.5*width, borda_accs, width, label='Borda', color='steelblue')
-rects4 = ax.bar(x + 1.5*width, rwsc_accs, width, label='RWSC', color='darkblue')
+rects1 = ax.bar(x - width, bon_accs, width, label='Vanilla BoN', color='indianred')
+rects2 = ax.bar(x, sc_accs, width, label='Majority Voting (SC)', color='lightsteelblue')
+rects4 = ax.bar(x + width, rwsc_accs, width, label='RWSC', color='darkblue')
 
 ax.set_ylabel('Accuracy (%)', fontsize=12, fontweight='bold')
 ax.set_title('Accuracy on Confident vs. Highly Uncertain Questions', fontsize=14, fontweight='bold')
@@ -191,7 +191,6 @@ def autolabel(rects):
 
 autolabel(rects1)
 autolabel(rects2)
-autolabel(rects3)
 autolabel(rects4)
 
 plt.tight_layout()
