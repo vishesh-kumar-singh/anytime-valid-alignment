@@ -20,6 +20,7 @@ early_stopping_data = {
         "AdaBoN": (91.3, 18.25),
         "ConSol": (88.0, 5.53),
         "CITE": (87.9, 21.91),
+        "MMC": (87.9, 17.63),
         "SPRT-RWSC": (91.1, 11.48),
         "E-RWSC": (91.2, 14.81)
     },
@@ -27,6 +28,7 @@ early_stopping_data = {
         "AdaBoN": (71.4, 18.82),
         "ConSol": (75.4, 8.02),
         "CITE": (75.4, 21.68),
+        "MMC": (75.4, 19.50),
         "SPRT-RWSC": (74.6, 13.23),
         "E-RWSC": (74.4, 15.59)
     },
@@ -34,6 +36,7 @@ early_stopping_data = {
         "AdaBoN": (74.8, 18.89),
         "ConSol": (71.8, 5.39),
         "CITE": (72.2, 21.60),
+        "MMC": (72.2, 17.71),
         "SPRT-RWSC": (74.5, 12.38),
         "E-RWSC": (76.7, 14.19)
     },
@@ -41,6 +44,7 @@ early_stopping_data = {
         "AdaBoN": (48.8, 19.37),
         "ConSol": (54.1, 11.99),
         "CITE": (54.4, 23.31),
+        "MMC": (54.4, 19.53),
         "SPRT-RWSC": (54.8, 17.17),
         "E-RWSC": (54.6, 20.40)
     }
@@ -97,11 +101,11 @@ plt.close(fig1)
 # Figure 2: Early Stopping Pareto Frontiers (1x4)
 # ---------------------------------------------------------
 fig2, axes2 = plt.subplots(1, 4, figsize=(20, 5))
-early_method_names = ["AdaBoN", "CITE", "SPRT-RWSC", "E-RWSC", "Vanilla BoN", "Self-Consistency"]
+early_method_names = ["AdaBoN", "CITE", "MMC", "SPRT-RWSC", "E-RWSC", "Vanilla BoN", "Self-Consistency"]
 
-# Adjusting markers: AdaBoN, CITE, SPRT-RWSC, E-RWSC, Vanilla BoN, Self-Consistency
-colors_scatter = ['#34495e', '#9b59b6', '#f39c12', '#2ecc71', '#e74c3c', '#3498db']
-markers_scatter = ['o', '^', 'D', '*', 'X', 'P']
+# Adjusting markers: AdaBoN, CITE, MMC, SPRT-RWSC, E-RWSC, Vanilla BoN, Self-Consistency
+colors_scatter = ['#34495e', '#9b59b6', '#d35400', '#f39c12', '#2ecc71', '#e74c3c', '#3498db']
+markers_scatter = ['o', '^', 'v', 'D', '*', 'X', 'P']
 
 handles = []
 labels = []
@@ -158,7 +162,7 @@ for i, dataset in enumerate(datasets):
 
 # Add a single legend at the top or center of the entire figure
 fig2.legend(handles, labels, loc='upper center', bbox_to_anchor=(0.5, 1.15), 
-            ncol=6, fontsize=18, framealpha=1.0, edgecolor='black')
+            ncol=7, fontsize=17, framealpha=1.0, edgecolor='black')
 
 plt.tight_layout()
 # bbox_inches='tight' will make sure the legend outside the axes is saved too

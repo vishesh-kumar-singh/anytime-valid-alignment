@@ -9,10 +9,11 @@ def main():
     # 1. Alpha Sweep
     alphas = [0.05, 0.1, 0.2, 0.3, 0.4]
     acc_alpha = [76.8, 77.0, 77.0, 77.0, 77.0]
+    cert_acc_alpha = [97.9, 97.6, 97.3, 97.0, 96.1]
     budget_alpha = [34.22, 32.89, 31.61, 30.49, 30.11]
     
     fig1, ax1 = plt.subplots(figsize=(5, 4))
-    ax1.plot(alphas, budget_alpha, marker='o', color='royalblue', linewidth=2, label="Budget")
+    l1 = ax1.plot(alphas, budget_alpha, marker='o', color='royalblue', linewidth=2, label="Budget")
     ax1.set_xlabel(r"Nominal Type-I Error ($\alpha$)", fontsize=16)
     ax1.set_ylabel("Average Budget", fontsize=16, color='royalblue')
     ax1.tick_params(axis='x', labelsize=14)
@@ -20,10 +21,15 @@ def main():
     
     # Adding accuracy on secondary y-axis
     ax1_twin = ax1.twinx()
-    ax1_twin.plot(alphas, acc_alpha, marker='s', color='darkorange', linewidth=2, linestyle='--', label="Accuracy")
-    ax1_twin.set_ylabel("Accuracy (%)", fontsize=16, color='darkorange')
-    ax1_twin.tick_params(axis='y', labelcolor='darkorange', labelsize=14)
-    # ax1_twin.set_ylim(70, 80)
+    l2 = ax1_twin.plot(alphas, cert_acc_alpha, marker='^', color='forestgreen', linewidth=2, linestyle='-.', label="Certified Acc")
+    l3 = ax1_twin.plot(alphas, acc_alpha, marker='s', color='darkorange', linewidth=2, linestyle='--', label="Overall Acc")
+    ax1_twin.set_ylabel("Accuracy (%)", fontsize=16, color='black')
+    ax1_twin.tick_params(axis='y', labelcolor='black', labelsize=14)
+    ax1_twin.set_ylim(70, 102)
+    
+    lines = l1 + l2 + l3
+    labels = [l.get_label() for l in lines]
+    ax1.legend(lines, labels, loc="center right", fontsize=10, framealpha=0.9)
     
     ax1.set_title(r"Sensitivity to $\alpha$", fontsize=18, fontweight='bold')
     fig1.tight_layout()

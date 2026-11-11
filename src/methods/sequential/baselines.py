@@ -2,6 +2,8 @@ import math
 from typing import List, Tuple
 import numpy as np
 
+from .mmc import _mmc_stop
+
 def norm_pdf(x: float) -> float:
     return math.exp(-0.5 * x**2) / math.sqrt(2 * math.pi)
 
@@ -113,3 +115,16 @@ def compute_consol(candidates: List[str], global_cluster_ids: List[int], p1: flo
     best_cid = max(counts.items(), key=lambda x: x[1])[0]
     best_idx = global_cluster_ids.index(best_cid)
     return candidates[best_idx], N
+
+
+def compute_mmc(
+    candidates: List[str],
+    global_cluster_ids: List[int],
+    alpha: float = 0.1,
+    N_max: int = None,
+) -> Tuple[str, int]:
+    """Martingale Majority Certificate (MMC) baseline from Cordero-Encinar & Duncan (2025)."""
+    if N_max is None:
+        N_max = len(candidates)
+    res = _mmc_stop(candidates, global_cluster_ids, alpha=alpha, N_max=N_max)
+    return candidates[res["best_idx"]], res["stopped_at"]

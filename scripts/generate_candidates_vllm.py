@@ -42,6 +42,7 @@ def main(
     temperature: float = typer.Option(0.7, help="Generation temperature."),
     top_p: float = typer.Option(0.95, help="Generation top_p."),
     max_new_tokens: int = typer.Option(2048, help="Max tokens per generation."),
+    max_model_len: int = typer.Option(4096, help="Max model sequence length."),
     gpu_memory_utilization: float = typer.Option(0.85, help="vLLM memory utilization."),
     num_gpus: int = typer.Option(1, help="Number of GPUs to use (tensor_parallel_size)."),
     output_path: Optional[str] = typer.Option(None, help="Output JSONL path."),
@@ -133,7 +134,9 @@ def main(
         model=model_name,
         gpu_memory_utilization=gpu_memory_utilization,
         tensor_parallel_size=num_gpus,
-        trust_remote_code=True, enforce_eager=True,
+        max_model_len=max_model_len,
+        trust_remote_code=True,
+        enforce_eager=True,
     )
     exp_logger.log_phase_end("model_loading", time.time() - t0)
 
@@ -147,7 +150,7 @@ def main(
     )
 
     # Generate in chunks so we save progress and don't lose everything on a crash!
-    CHUNK_SIZE = 500
+    CHUNK_SIZE = 50
     print(f"\nStarting batched generation in chunks of {CHUNK_SIZE} examples...")
     exp_logger.log_inference_start(total_to_do, n_candidates)
     

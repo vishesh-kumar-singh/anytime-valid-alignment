@@ -79,35 +79,44 @@ def main():
     idx_list = sorted(cands_data.keys())
     
     print(f"Evaluating {len(idx_list)} questions...")
-    precomputed_clusters = {}
-    full_budget_ans = {}
-    
-    for idx in tqdm(idx_list, desc="Precomputing N=512 Clusters"):
-        if idx not in scores_data: continue
-        ex = cands_data[idx]
-        candidates = ex["candidates"]
-        raw_scores = np.array(scores_data[idx])
-        global_cluster_ids, _ = fast_semantic_clustering(candidates, dataset)
-        precomputed_clusters[idx] = global_cluster_ids
-        
-        clusters_final = _compute_rwsc_clusters(global_cluster_ids, raw_scores, temperature=1.0)
-        leader_ans, _, best_idx = _get_leader(clusters_final)
-        full_budget_ans[idx] = leader_ans
+    cache_path = "data/cache_clusters_math500_n512.pkl"
+    if os.path.exists(cache_path):
+        print(f"Loading precomputed clusters from {cache_path}...")
+        import pickle
+        with open(cache_path, "rb") as f:
+            precomputed_clusters = pickle.load(f)
+    else:
+        for idx in tqdm(idx_list, desc="Precomputing N=512 Clusters"):
+            if idx not in scores_data: continue
+            ex = cands_data[idx]
+            candidates = ex["candidates"]
+            global_cluster_ids, _ = fast_semantic_clustering(candidates, dataset)
+            precomputed_clusters[idx] = global_cluster_ids
 
-    # 1. Sweep Alphas for Realized Error
-    print("\nSweeping alphas for Realized Error...")
-    alpha_sweep = np.linspace(0.01, 0.40, 10)
+    # Empirical generation probabilities theta_hat(a) over full N=512 pool
+    from collections import Counter
+    empirical_thetas = {}
+    for idx in idx_list:
+        if idx not in precomputed_clusters: continue
+        c_list = precomputed_clusters[idx]
+        counts = Counter(c_list)
+        empirical_thetas[idx] = {cid: cnt / len(c_list) for cid, cnt in counts.items()}
+
+    # 1. Sweep Alphas for Realized Error (Theorem 1: P(theta_a <= p_dagger) <= alpha)
+    print("\nSweeping alphas for Realized Error (Theorem 1)...")
+    alpha_sweep = np.array([0.01, 0.05, 0.10, 0.15, 0.20, 0.25, 0.30, 0.35, 0.40, 0.45, 0.50])
     realized_errors = []
     p_dagger = 0.5
     
     for alpha in tqdm(alpha_sweep, desc="Alpha Sweep"):
         errors = 0
-        total_stopped = 0
+        total_prompts = 0
         
         for idx in idx_list:
-            if idx not in scores_data: continue
+            if idx not in scores_data or idx not in precomputed_clusters: continue
+            total_prompts += 1
             res = _e_rwsc_stop(
-                candidates=cands_data[idx]["candidates"],
+                candidates=[''] * len(scores_data[idx]),
                 raw_scores=np.array(scores_data[idx]),
                 variances=None,
                 global_cluster_ids=precomputed_clusters[idx],
@@ -121,11 +130,13 @@ def main():
             )
             
             if res["decision"] == "accept":
-                total_stopped += 1
-                if res["leader_answer"] != full_budget_ans[idx]:
+                leader_cid = res["leader_answer"]
+                theta_hat = empirical_thetas[idx].get(leader_cid, 0.0)
+                # Theorem 1: False certification occurs if theta_a <= p_dagger
+                if theta_hat <= p_dagger:
                     errors += 1
                     
-        emp_err = errors / total_stopped if total_stopped > 0 else 0
+        emp_err = errors / total_prompts if total_prompts > 0 else 0
         realized_errors.append(emp_err)
 
     # 2. D_KL Scaling (Fix Alpha = 0.05)
@@ -168,17 +179,29 @@ def main():
     plt.style.use('ggplot')
     os.makedirs("figures", exist_ok=True)
     
+    # Cache computed results
+    cache_results_path = "data/eprocess_bounds_results.npz"
+    np.savez(
+        cache_results_path,
+        alpha_sweep=alpha_sweep,
+        realized_errors=realized_errors,
+        dkl_inv_list=dkl_inv_list,
+        stopping_steps=stopping_steps
+    )
+    print(f"Cached results to {cache_results_path}")
+
     # Figure 1: Realized Error vs Alpha
     fig1, ax1 = plt.subplots(figsize=(6, 5))
-    ax1.plot(alpha_sweep, realized_errors, marker='o', color='royalblue', linewidth=2, label="E-RWSC Realized Error")
-    ax1.plot([0, 0.45], [0, 0.45], color='black', linestyle='--', alpha=0.7, label="Theoretical Bound ($y=x$)")
-    ax1.fill_between([0, 0.45], [0, 0.45], 0, color='gray', alpha=0.1)
-    ax1.set_xlim(0, 0.45)
-    ax1.set_ylim(0, 0.45)
+    ax1.plot(alpha_sweep, realized_errors, marker='o', color='royalblue', linewidth=2.5, markersize=8, label="E-RWSC Realized Error", zorder=4)
+    ax1.plot([0, 0.52], [0, 0.52], color='black', linestyle='--', linewidth=2, alpha=0.7, label="Theoretical Bound ($y=x$)", zorder=3)
+    ax1.fill_between([0, 0.52], [0, 0.52], 0, color='gray', alpha=0.15, zorder=2)
+    ax1.set_xlim(0, 0.52)
+    ax1.set_ylim(-0.015, 0.52)
+    ax1.set_yticks(np.arange(0.0, 0.55, 0.05))
     ax1.set_xlabel("Nominal Type-I Error ($\\alpha$)", fontsize=12)
     ax1.set_ylabel("Realized Error Rate", fontsize=12)
     ax1.set_title("Anytime-Valid Certification Bounds", fontsize=14, fontweight='bold')
-    ax1.legend(fontsize=11)
+    ax1.legend(fontsize=11, loc="upper left")
     
     fig1.tight_layout()
     fig1.savefig("figures/eprocess_realized_error.png", dpi=300)

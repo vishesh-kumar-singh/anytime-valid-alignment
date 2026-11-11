@@ -24,7 +24,7 @@ def _pick_best_rm(rm_names: List[str]) -> int:
                 return j
     return 0
 
-from ..methods.sequential.baselines import compute_adabon, compute_beacon, compute_pandora, compute_consol
+from ..methods.sequential.baselines import compute_adabon, compute_beacon, compute_pandora, compute_consol, compute_mmc
 
 class SeqBaselinesPipeline(EvaluationPipeline):
     name = "seq_baselines"
@@ -87,6 +87,13 @@ class SeqBaselinesPipeline(EvaluationPipeline):
         consol_ans, consol_steps = compute_consol(candidates, global_cluster_ids)
         results["baseline_consol"] = consol_ans
         self.steps_used["baseline_consol"].append(consol_steps)
+
+        # ---------------------------------------------------------
+        # 5. MMC (Martingale Majority Certificate)
+        # ---------------------------------------------------------
+        mmc_ans, mmc_steps = compute_mmc(candidates, global_cluster_ids, alpha=0.1)
+        results["baseline_mmc"] = mmc_ans
+        self.steps_used["baseline_mmc"].append(mmc_steps)
 
         return results
 
